@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Palpiteiros | Entrar{% endblock title %}
+
+{% block content %}
+
+<h1>Login</h1>
+
+{% if not form.errors %}
+<p>Preencha seus dados no formulário abaixo:</p>
+{% endif %}
+
+<form action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><input type="hidden" name="next" value="{{ next }}"></p>
+    <p><input type="submit" value="Entrar"></p>
+</form>
+<p><a href="{% url 'password_reset' %}">Esqueci minha senha</a></p>
+
+{% endblock content %}

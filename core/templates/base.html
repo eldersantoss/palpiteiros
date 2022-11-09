@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+    <title>{% block title %}{% endblock title %}</title>
+</head>
+
+<body>
+
+    <header>
+        <span id="logo"><a href="{% url 'core:index' %}">Palpiteiros | Copa do Mundo</a></span>
+        <span id="controls">
+            {% if request.user.is_authenticated %}
+                Bem vindo, {{ request.user }} | <a href="{% url 'logout' %}">Sair</a>
+            {% endif %}
+        </span>
+    </header>
+
+    <main>
+        {% block content %}{% endblock content %}
+    </main>
+
+    <footer>
+        {% block footer %}{% endblock footer %}
+        <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
+    </footer>
+
+</body>
+
+</html>
