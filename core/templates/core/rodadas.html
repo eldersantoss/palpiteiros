@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Palpiteiros | Rodadas{% endblock title %}
+
+{% block content %}
+
+<h1>Rodadas</h1>
+
+<nav class="menu vertical">
+    {% for rodada in rodadas %}
+    <a href="{% url 'core:detalhes_rodada' rodada.id %}">{{ rodada }}</a>
+    {% endfor %}
+</nav>
+
+{% endblock content %}

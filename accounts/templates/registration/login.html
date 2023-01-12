@@ -6,16 +6,19 @@
 
 <h1>Login</h1>
 
-{% if not form.errors %}
-<p>Preencha seus dados no formulário abaixo:</p>
-{% endif %}
-
-<form action="{% url 'login' %}" method="post">
+<form action="{% url 'login' %}" method="post" class="login-form">
+    {% if not form.errors %}
+    <p>Bem-vindo, palpiteiro(a)</p>
+    {% endif %}
     {% csrf_token %}
-    {{ form.as_p }}
-    <p><input type="hidden" name="next" value="{{ next }}"></p>
-    <p><input type="submit" value="Entrar"></p>
+    {{ form.as_div }}
+    <div><input type="hidden" name="next" value="{{ next }}"></div>
+    <div><input type="submit" value="Entrar"></div>
 </form>
-<p><a href="{% url 'password_reset' %}">Esqueci minha senha</a></p>
+
+<div class="help-links">
+    <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+    <a href="{% url 'register' %}">Criar conta</a>
+</div>
 
 {% endblock content %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Palpiteiros | Cadastrar{% endblock title %}
+
+{% block content %}
+
+<h1>Criar usuário</h1>
+
+<form action="{% url 'register' %}" method="post" class="login-form">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <div><input type="hidden" name="next" value="{{ next }}"></div>
+    <div><input type="submit" value="Criar conta"></div>
+</form>
+
+<div class="help-links">
+    <a href="{% url 'login' %}">Ir para login</a>
+</div>
+
+{% endblock content %}

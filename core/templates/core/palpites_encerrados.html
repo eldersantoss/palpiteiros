@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
-{% block title %}Palpiteiros{% endblock title %}
+{% block title %}Palpiteiros | Palpitar{% endblock title %}
 
 {% block content %}
 
+<h1>Palpitar</h1>
+
+<div class="msg-central">
+    <h3>Palpites encerrados! ❌</h3>
+    <p>Infelizmente os palpites para a rodada atual já foram encerrados</p>
+</div>
+
 <nav class="menu vertical">
-    <a href="{% url 'core:palpitar' %}">Palpitar</a>
     <a href="{% url 'core:classificacao' %}">Classificação</a>
     <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
 </nav>

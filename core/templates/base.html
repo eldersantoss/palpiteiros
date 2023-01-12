@@ -14,15 +14,25 @@
 <body>
 
     <header>
-        <span id="logo"><a href="{% url 'core:index' %}">Palpiteiros | Copa do Mundo</a></span>
+        <span id="logo"><a href="{% url 'core:index' %}">Palpiteiros</a></span>
         <span id="controls">
             {% if request.user.is_authenticated %}
-                Bem vindo, {{ request.user }} | <a href="{% url 'logout' %}">Sair</a>
+            {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
             {% endif %}
         </span>
     </header>
 
     <main>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close-message">x</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         {% block content %}{% endblock content %}
     </main>
 
@@ -31,6 +41,7 @@
         <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
     </footer>
 
+    <script src={% static 'core/base.js' %}></script>
 </body>
 
 </html>

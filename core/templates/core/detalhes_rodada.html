@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Palpites{% endblock title %}
+
+{% block content %}
+
+<h1>{{ rodada }}</h1>
+
+<table class="main-table">
+  <thead>
+    <tr>
+      <th style="width:5%"></th>
+      <th style="width:45%">Palpiteiro</th>
+      <th style="width:20%">Pontuação parcial</th>
+      <th style="width:30%"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for dados_palpiteiro in dados_palpiteiros|dictsortreversed:"pontuacao" %}
+    <tr
+      class="clickable-row"
+      name="clickable-row{{ dados_palpiteiro.palpiteiro.usuario.id }}"
+      onclick="expandDetailRow('{{ dados_palpiteiro.palpiteiro.usuario.id }}')"
+    >
+      <td>{{ forloop.counter }}º</td>
+      <td>{{ dados_palpiteiro.palpiteiro.usuario.get_full_name }}</td>
+      <td>{{ dados_palpiteiro.pontuacao }}</td>
+      <td class="expand-icon">
+      {% if dados_palpiteiro.palpiteiro.usuario == request.user %}
+      Palpites 🔼
+      {% else %}
+      Palpites 🔽
+      {% endif %}
+      </td>
+    </tr>
+    <tr
+      class="detail-row"
+      name="detail-row{{ dados_palpiteiro.palpiteiro.usuario.id }}"
+      {% if dados_palpiteiro.palpiteiro.usuario == request.user %}
+      style="display: table-row"
+      {% endif %}
+    >
+      <td colspan="4" class="detail-table-container">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th style="width:50%">Partida</th>
+              <th>Resultado</th>
+              <th>Palpite</th>
+              <th>Pontuação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for partida_palpite in dados_palpiteiro.partidas_e_palpites %}
+              <tr>
+                <td>{{ partida_palpite.partida.abreviacao }}</td>
+                <td>{{ partida_palpite.partida.resultado|default:"" }}</td>
+                <td>{{ partida_palpite.palpite.resultado|default:"" }}</td>
+                <td>{{ partida_palpite.palpite.pontuacao|default:"" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<nav class="menu vertical">
+  <a href="{% url 'core:palpitar' %}">Palpitar</a>
+  <a href="{% url 'core:classificacao' %}">Classificação</a>
+  <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
+</nav>
+
+{% endblock content %}

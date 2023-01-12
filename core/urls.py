@@ -1,10 +1,44 @@
 from django.urls import path
 
-from .views import IndexView
+from . import views
 
 
 app_name = "core"
 
 urlpatterns = [
-    path("", IndexView.as_view(), name="index"),
+    path(
+        "",
+        views.IndexView.as_view(),
+        name="index",
+    ),
+    path(
+        "palpitar/",
+        views.palpitar,
+        name="palpitar",
+    ),
+    path(
+        "palpitar/sucesso",
+        views.PalpitarSucessoView.as_view(),
+        name="palpitar_sucesso",
+    ),
+    path(
+        "palpitar/encerrado",
+        views.PalpitesEncerradosView.as_view(),
+        name="palpites_encerrados",
+    ),
+    path(
+        "classificacao/",
+        views.classificacao,
+        name="classificacao",
+    ),
+    path(
+        "rodadas/",
+        views.RodadasListView.as_view(),
+        name="lista_rodadas",
+    ),
+    path(
+        "rodada/<int:id_rodada>/",
+        views.detalhes_rodada,
+        name="detalhes_rodada",
+    ),
 ]

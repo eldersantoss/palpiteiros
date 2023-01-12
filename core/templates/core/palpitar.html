@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Palpiteiros | Palpitar{% endblock title %}
+
+{% block content %}
+
+<h1>Palpitar</h1>
+
+<form action="{% url 'core:palpitar' %}" method="post" class="palpite-form">
+
+    {% csrf_token %}
+    {% for form in form_list %}
+        <div class="partida-wrapper">
+            {{ form.non_field_errors }}
+            {{ form.gols_mandante.errors }}
+            {{ form.gols_visitante.errors }}
+            <p class="horario-partida">{{ form.partida.data_hora }}</p>
+            <div>
+                {{ form.gols_mandante.label_tag }} {{ form.gols_mandante }} x {{ form.gols_visitante }} {{ form.gols_visitante.label_tag }}
+            </div>
+            </div>
+    {% endfor %}
+
+    <input type="submit" value="Salvar palpites">
+    
+</form>
+
+{% endblock content %}
