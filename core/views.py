@@ -28,7 +28,10 @@ def palpitar(request):
     dos respectivos models.
     """
 
-    palpiteiro = request.user.palpiteiro
+    try:
+        palpiteiro = request.user.palpiteiro
+    except:
+        return redirect(reverse("core:palpiteiro_nao_encontrado"))
     rodada = Rodada.objects.last()
     partidas_encerradas = rodada.partidas.filter(
         data_hora__lt=timezone.now() - timedelta(minutes=5)
@@ -105,6 +108,15 @@ class PalpitesEncerradosView(LoginRequiredMixin, TemplateView):
     """
 
     template_name = "core/palpites_encerrados.html"
+
+
+class PalpiteiroNaoEncontradoView(LoginRequiredMixin, TemplateView):
+    """
+    TODO: bloquear acesso direto a essa view, permitindo apenas acesso
+    via redirecionamento a partir da view palpitar
+    """
+
+    template_name = "core/palpiteiro_nao_encontrado.html"
 
 
 class RodadasListView(LoginRequiredMixin, ListView):
@@ -200,11 +212,13 @@ def _obter_periodo(get_params: QueryDict):
         inicio = inicio_base.replace(month=1)
         fim = fim_base.replace(day=31, month=12)
 
-    # data da primeira partida registrada até data atual
+    # periodo entre data da primeira partida registrada até data atual
     elif periodo == "geral":
-        inicio = (
-            Palpite.objects.order_by("partida__data_hora").first().partida.data_hora
-        )
+        partida = Palpite.objects.order_by("partida__data_hora").first()
+        if partida is not None:
+            inicio = partida.data_hora
+        else:
+            inicio = timezone.now()
         fim = timezone.now()
 
     # mes e ano atuais

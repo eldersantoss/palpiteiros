@@ -27,6 +27,11 @@ urlpatterns = [
         name="palpites_encerrados",
     ),
     path(
+        "palpitar/palpiteiro_nao_encontrado",
+        views.PalpiteiroNaoEncontradoView.as_view(),
+        name="palpiteiro_nao_encontrado",
+    ),
+    path(
         "classificacao/",
         views.classificacao,
         name="classificacao",
