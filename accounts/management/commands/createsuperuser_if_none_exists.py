@@ -18,7 +18,7 @@ class Command(BaseCommand):
         User = get_user_model()
         if User.objects.exists():
             return
-        username = options["user"]
+        username = options["username"]
         password = options["password"]
         email = options["email"]
         User.objects.create_superuser(username=username, password=password, email=email)
