@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+EXPOSE 8000
+
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -21,3 +23,4 @@ RUN chmod +x *.sh
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 CMD [ "./start.sh", "server" ]
+EXPOSE 8000
