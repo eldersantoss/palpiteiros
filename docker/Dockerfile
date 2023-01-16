@@ -19,8 +19,8 @@ WORKDIR /
 # USER app_user:app_user
 # COPY --chown=app_user:app_user . .
 COPY . .
-RUN chmod +x *.sh
+RUN chmod +x scripts/*.sh
 
-ENTRYPOINT [ "./entrypoint.sh" ]
-CMD [ "./start.sh", "server" ]
+ENTRYPOINT [ "./scripts/entrypoint.sh" ]
+CMD [ "./scripts/start.sh", "server" ]
 EXPOSE 8000
