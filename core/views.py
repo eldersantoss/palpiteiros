@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import QueryDict
 
-from .models import Rodada, Palpite, Palpiteiro
+from .models import Rodada, Partida, Palpite, Palpiteiro
 from .forms import EnabledPalpiteForm, DisabledPalpiteForm
 
 
@@ -214,7 +214,7 @@ def _obter_periodo(get_params: QueryDict):
 
     # periodo entre data da primeira partida registrada até data atual
     elif periodo == "geral":
-        partida = Palpite.objects.order_by("partida__data_hora").first()
+        partida = Partida.objects.order_by("data_hora").first()
         if partida is not None:
             inicio = partida.data_hora
         else:
