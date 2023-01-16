@@ -32,9 +32,13 @@ class Rodada(models.Model):
         ]
         mes = timezone.now().month
         ano = timezone.now().year
-        numero_rodada = (
-            Rodada.objects.last().partidas.filter(data_hora__month=mes).count() + 1
-        )
+        try:
+            numero_rodada = (
+                Rodada.objects.last().partidas.filter(data_hora__month=mes).count() + 1
+            )
+        except AttributeError:
+            numero_rodada = 1
+
         return f"#{str(numero_rodada).zfill(2)} de {meses[mes - 1]} de {ano}"
 
     label = models.CharField(max_length=50, default=_gerar_label_default)
