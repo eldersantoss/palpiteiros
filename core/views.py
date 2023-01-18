@@ -148,23 +148,21 @@ def detalhes_rodada(request, id_rodada):
 
     for dados_palpiteiro in dados_palpiteiros:
         palpiteiro = dados_palpiteiro["palpiteiro"]
-        palpite = None
 
         for partida in partidas:
             try:
-                if (
-                    not partida.aberta_para_palpites()
+                palpite = (
+                    partida.palpites.get(palpiteiro=dados_palpiteiro["palpiteiro"])
+                    if not partida.aberta_para_palpites()
                     or palpiteiro == palpiteiro_logado
-                ):
-                    palpite = partida.palpites.get(
-                        palpiteiro=dados_palpiteiro["palpiteiro"]
-                    )
+                    else None
+                )
 
-                    if partida.resultado is not None:
-                        dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao()
+                if palpite is not None and partida.resultado is not None:
+                    dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao()
 
             except ObjectDoesNotExist:
-                pass
+                palpite = None
 
             dados_palpiteiro["partidas_e_palpites"].append(
                 {"partida": partida, "palpite": palpite}
