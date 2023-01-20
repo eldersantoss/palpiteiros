@@ -34,11 +34,13 @@
         </ul>
         {% endif %}
         {% block content %}{% endblock content %}
+        {% if request.user.is_authenticated %}
         <nav class="menu vertical">
             <a href="{% url 'core:palpitar' %}">Palpitar</a>
             <a href="{% url 'core:classificacao' %}">Classificação</a>
             <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
         </nav>
+        {% endif %}
     </main>
 
     <footer>
