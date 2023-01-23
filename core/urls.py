@@ -17,19 +17,24 @@ urlpatterns = [
         name="palpitar",
     ),
     path(
-        "palpitar/sucesso",
+        "palpitar/sucesso/",
         views.PalpitarSucessoView.as_view(),
         name="palpitar_sucesso",
     ),
     path(
-        "palpitar/encerrado",
+        "palpitar/encerrado/",
         views.PalpitesEncerradosView.as_view(),
         name="palpites_encerrados",
     ),
     path(
-        "palpitar/palpiteiro_nao_encontrado",
+        "palpitar/palpiteiro_nao_encontrado/",
         views.PalpiteiroNaoEncontradoView.as_view(),
         name="palpiteiro_nao_encontrado",
+    ),
+    path(
+        "manual_administracao/",
+        views.ManualAdminView.as_view(),
+        name="manual_administracao",
     ),
     path(
         "classificacao/",

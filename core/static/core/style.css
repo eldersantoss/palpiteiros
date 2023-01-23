@@ -57,6 +57,28 @@ main p {
     margin: 5vh 0;
 }
 
+article {
+    width: 85vw;
+}
+
+h2 {
+    margin: 7vh 0 5vh 0;
+}
+
+.paragrafo-comum {
+    line-height: 25px;
+    margin: 5vh 0 0 0;
+}
+
+.lista-comum {
+    line-height: 25px;
+    padding-left: 5vw;
+}
+
+.item-lista-comum {
+    margin-top: 2vh;
+}
+
 .menu {
     display: flex;
     align-items: center;

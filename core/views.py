@@ -26,6 +26,14 @@ def palpitar(request):
     TODO: refatorar view removendo o exceço de responsabilidades e
     transferindo lógia referente à manipulação dos dados para o escopo
     dos respectivos models.
+
+    TODO: Alterar exibição das partidas encerradas, utilizar parágrafos
+    ao invés de formulários.
+
+    TODO: Melhorar obtenção das partidas abertas para palpites.
+    Atualmente, somente as partidas da última rodada serão exibidas,
+    impossibilitando a criação de novas rodadas enquanto a última não
+    tenha sido resolvida.
     """
 
     try:
@@ -117,6 +125,10 @@ class PalpiteiroNaoEncontradoView(LoginRequiredMixin, TemplateView):
     """
 
     template_name = "core/palpiteiro_nao_encontrado.html"
+
+
+class ManualAdminView(LoginRequiredMixin, TemplateView):
+    template_name = "core/manual_administracao.html"
 
 
 class RodadasListView(LoginRequiredMixin, ListView):
