@@ -16,7 +16,7 @@ class Equipe(models.Model):
 
 class Rodada(models.Model):
     def _gerar_label_default():
-        meses = [
+        nome_meses = [
             "janeiro",
             "fevereiro",
             "março",
@@ -30,18 +30,28 @@ class Rodada(models.Model):
             "novembro",
             "dezembro",
         ]
-        mes = timezone.now().month
-        ano = timezone.now().year
+        mes_atual = timezone.now().month
+        ano_atual = timezone.now().year
+
         try:
+            ultima_partida = Partida.objects.order_by("data_hora").last()
+            numero_ultima_rodada = int(ultima_partida.rodada.label.split(" ")[0][:-1])
             numero_rodada = (
-                Rodada.objects.last().partidas.filter(data_hora__month=mes).count() + 1
+                numero_ultima_rodada + 1
+                if mes_atual == ultima_partida.data_hora.month
+                else 1
             )
+
         except AttributeError:
             numero_rodada = 1
 
-        return f"#{str(numero_rodada).zfill(2)} de {meses[mes - 1]} de {ano}"
+        return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
 
-    label = models.CharField(max_length=50, default=_gerar_label_default)
+    label = models.CharField(
+        max_length=50,
+        default=_gerar_label_default,
+        editable=False,
+    )
 
     @admin.display(description="Número de partidas")
     def numero_partidas(self) -> int:
@@ -51,18 +61,25 @@ class Rodada(models.Model):
         boolean=True,
         description="Aberta para palpites?",
     )
-    def aberta_para_palpites(self) -> bool:
-        partidas = self.partidas.all()
+    def aberta_para_palpites(self):
         horario_limite = timezone.now() - timedelta(minutes=15)
-        return any([partida.data_hora > horario_limite for partida in partidas])
+        return any(
+            [partida.data_hora > horario_limite for partida in self.partidas.all()]
+        )
 
     @property
     def abertura(self):
-        return self.partidas.order_by("data_hora").first().data_hora
+        try:
+            return self.partidas.order_by("data_hora").first().data_hora
+        except AttributeError:
+            return timezone.now()
 
     @property
     def fechamento(self):
-        return self.partidas.order_by("data_hora").last().data_hora
+        try:
+            return self.partidas.order_by("data_hora").last().data_hora
+        except AttributeError:
+            return timezone.now()
 
     def __str__(self) -> str:
         return self.label
@@ -116,6 +133,7 @@ class Partida(models.Model):
 class Palpiteiro(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    @admin.display(description="Pontuação geral")
     def obter_pontuacao_geral(self):
         palpites = self.palpites.all()
         pontuacao = self.calcular_pontuacao(palpites)
