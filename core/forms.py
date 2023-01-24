@@ -6,9 +6,9 @@ class BasePalpiteForm(forms.Form):
         self.partida = kwargs.pop("partida")
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
-        self["gols_mandante"].label = self.partida.mandante.abreviacao
+        self["gols_mandante"].label = self.partida.mandante.nome
         self["gols_mandante"].html_name += f"_{self.partida.id}"
-        self["gols_visitante"].label = self.partida.visitante.abreviacao
+        self["gols_visitante"].label = self.partida.visitante.nome
         self["gols_visitante"].html_name += f"_{self.partida.id}"
 
 

@@ -15,10 +15,16 @@
             {{ form.gols_mandante.errors }}
             {{ form.gols_visitante.errors }}
             <p class="horario-partida">{{ form.partida.data_hora }}</p>
-            <div>
-                {{ form.gols_mandante.label_tag }} {{ form.gols_mandante }} x {{ form.gols_visitante }} {{ form.gols_visitante.label_tag }}
+            <div class="palpite-wrapper">
+                <div class="equipe mandante">
+                    {{ form.gols_mandante.label_tag }} {{ form.gols_mandante }}
+                </div>
+                <div>x</div>
+                <div class="equipe visitante">
+                    {{ form.gols_visitante }} {{ form.gols_visitante.label_tag }}
+                </div>
             </div>
-            </div>
+        </div>
     {% endfor %}
 
     <input type="submit" value="Salvar palpites">

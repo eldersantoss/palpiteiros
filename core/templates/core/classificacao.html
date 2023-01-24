@@ -34,10 +34,20 @@
     <tr>
         <th></th>
         <th></th>
+        <th></th>
         <th>Pontos</th>
     </tr>
     {% for palpiteiro in palpiteiros %}
     <tr>
+        <td>
+            {% if forloop.counter == 1 %}
+            🥇
+            {% elif forloop.counter == 2 %}
+            🥈
+            {% elif forloop.counter == 3 %}
+            🥉
+            {% endif %}
+        </td>
         <td>{{ forloop.counter }}º</td>
         <td>{{ palpiteiro.nome }}</td>
         <td>{{ palpiteiro.pontuacao }}</td>

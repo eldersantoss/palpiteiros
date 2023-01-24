@@ -55,6 +55,7 @@ main a {
 
 main p {
     margin: 5vh 0;
+    line-height: 2.75vh;
 }
 
 article {
@@ -79,6 +80,15 @@ h2 {
     margin-top: 2vh;
 }
 
+
+.separador {
+    width: 100%;
+    margin: 5vh 0;
+    border: 0;
+    height: 0.5vh;
+    background-image: linear-gradient(to right, transparent, #9acd32, transparent);
+}
+
 .menu {
     display: flex;
     align-items: center;
@@ -88,7 +98,6 @@ h2 {
     flex-direction: column;
     flex-grow: 1;
     justify-content: center;
-    margin-top: 2vh;
 }
 
 .horizontal {
@@ -203,13 +212,47 @@ div.helptext {
 .palpite-form input {
     text-align: center;
     padding: 1vw;
-    margin-top: 3vh;
+    margin: 0 1vw;
     min-height: 5vh;
-    min-width: 3vw;
-    max-width: 15vw;
+    max-width: 8vw;
     border: none;
     color: darkgreen;
     font-weight: bold;
+}
+
+.partida-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.palpite-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 0.7em;
+}
+
+.equipe {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    width: 47.5%;
+    line-height: 2.2vh;
+}
+
+.mandante {
+    justify-content: flex-end;
+    text-align: end;
+}
+
+.visitante {
+    justify-content: flex-start;
+    text-align: start;
 }
 
 input[type=submit] {
