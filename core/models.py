@@ -10,6 +10,9 @@ class Equipe(models.Model):
     nome = models.CharField(max_length=50)
     abreviacao = models.CharField(max_length=3, default="???")
 
+    class Meta:
+        ordering = ("nome",)
+
     def __str__(self) -> str:
         return self.nome
 

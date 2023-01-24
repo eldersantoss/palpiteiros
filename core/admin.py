@@ -50,7 +50,10 @@ class RodadaAdmin(admin.ModelAdmin):
 
 class PalpitesAdmin(admin.ModelAdmin):
     list_display = ("__str__", "palpiteiro")
-    list_filter = ["palpiteiro", "partida"]
+    list_filter = [
+        "palpiteiro",
+        "partida__rodada",
+    ]
 
 
 admin.site.register(Equipe, EquipeAdmin)
