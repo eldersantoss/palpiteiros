@@ -7,14 +7,22 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+    <link rel="stylesheet" href={% static 'core/style.css' %}>
+    <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
+    
     <title>{% block title %}{% endblock title %}</title>
+
 </head>
 
 <body>
 
     <header>
-        <span id="logo"><a href="{% url 'core:index' %}">Palpiteiros</a></span>
+        <span class="logo">
+            <a href="{% url 'core:index' %}">
+                <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
+                Palpiteiros
+            </a>
+        </span>
         <span id="controls">
             {% if request.user.is_authenticated %}
             {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
@@ -33,7 +41,9 @@
             {% endfor %}
         </ul>
         {% endif %}
+        
         {% block content %}{% endblock content %}
+        
         {% if request.user.is_authenticated %}
         <hr class="separador">
         <nav class="menu vertical">
@@ -49,7 +59,9 @@
     </main>
 
     <footer>
+        
         {% block footer %}{% endblock footer %}
+
         <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
     </footer>
 

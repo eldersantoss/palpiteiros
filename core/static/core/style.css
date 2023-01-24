@@ -35,6 +35,17 @@ header a {
     font-weight: bold;
 }
 
+.logo a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo img {
+    max-height: 10vh;
+    margin-right: 0.5vh;
+}
+
 main {
     flex-grow: 1;
     padding: 5vh 5vw;
