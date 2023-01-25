@@ -1,6 +1,6 @@
+rm -rf static
 pip install -r requirements.txt
 python manage.py migrate
-rm -rf static
 python manage.py collectstatic --noinput
 python manage.py createsuperuser_if_none_exists \
     --username=$ADMIN_USERNAME \
