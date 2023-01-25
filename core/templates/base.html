@@ -7,8 +7,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href={% static 'core/style.css' %}>
-    <link rel="icon" type="image/x-icon" href={% static 'core/palpiteiros.ico' %}>
+    <link rel="stylesheet" href={% static 'core/css/style.css' %}>
+    <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
 
     <title>{% block title %}{% endblock title %}</title>
 
@@ -19,7 +19,7 @@
     <header>
         <span class="logo">
             <a href="{% url 'core:index' %}">
-                <img src={% static 'core/palpiteiros.png' %} alt="Logotipo Palpiteiros">
+                <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
                 Palpiteiros
             </a>
         </span>
@@ -65,7 +65,7 @@
         <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
     </footer>
 
-    <script src={% static 'core/base.js' %}></script>
+    <script src={% static 'core/js/base.js' %}></script>
 </body>
 
 </html>
