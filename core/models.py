@@ -162,7 +162,7 @@ class Palpiteiro(models.Model):
         return pontuacao
 
     def __str__(self) -> str:
-        return f"{self.usuario.first_name}"
+        return f"{self.usuario.get_full_name()} ({self.usuario.username})"
 
 
 class Palpite(models.Model):

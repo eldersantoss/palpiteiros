@@ -193,7 +193,7 @@ def classificacao(request):
     for palpiteiro in Palpiteiro.objects.all():
         palpiteiros.append(
             {
-                "nome": palpiteiro.usuario.get_full_name(),
+                "nome": palpiteiro,
                 "pontuacao": palpiteiro.obter_pontuacao_no_periodo(inicio, fim),
             },
         )

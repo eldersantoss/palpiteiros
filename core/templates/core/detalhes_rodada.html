@@ -23,7 +23,7 @@
       onclick="expandDetailRow('{{ dados_palpiteiro.palpiteiro.usuario.id }}')"
     >
       <td>{{ forloop.counter }}º</td>
-      <td>{{ dados_palpiteiro.palpiteiro.usuario.get_full_name }}</td>
+      <td>{{ dados_palpiteiro.palpiteiro }}</td>
       <td>{{ dados_palpiteiro.pontuacao }}</td>
       <td class="expand-icon">
       {% if dados_palpiteiro.palpiteiro.usuario == request.user %}
