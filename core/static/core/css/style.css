@@ -210,12 +210,6 @@ div.helptext {
     margin-top: 1vh;
 }
 
-.palpite-form p {
-    text-align: center;
-    margin: 5vh 0 0 0;
-    font-size: 0.75em;
-}
-
 .palpite-form label {
     margin: 0 1vw;
 }
@@ -235,6 +229,18 @@ div.helptext {
     display: flex;
     flex-direction: column;
     width: 100%;
+}
+
+.aviso-partida-dobrada {
+    margin: 0;
+    font-size: 0.7em;
+    align-self: center;
+}
+
+.horario-partida {
+    text-align: center;
+    margin: 5vh 0 0 0;
+    font-size: 0.75em;
 }
 
 .palpite-wrapper {

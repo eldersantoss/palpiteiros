@@ -14,7 +14,12 @@
             {{ form.non_field_errors }}
             {{ form.gols_mandante.errors }}
             {{ form.gols_visitante.errors }}
-            <p class="horario-partida">{{ form.partida.data_hora }}</p>
+            <p class="horario-partida">
+                {{ form.partida.data_hora }}
+            </p>
+            {% if form.partida.pontuacao_dobrada %}
+            <p class="aviso-partida-dobrada">(x2 🔥)</p>
+            {% endif %}
             <div class="palpite-wrapper">
                 <div class="equipe mandante">
                     {{ form.gols_mandante.label_tag }} {{ form.gols_mandante }}
@@ -28,7 +33,7 @@
     {% endfor %}
 
     <input type="submit" value="Salvar palpites">
-    
+
 </form>
 
 {% endblock content %}

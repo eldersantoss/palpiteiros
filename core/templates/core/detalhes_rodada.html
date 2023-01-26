@@ -48,6 +48,7 @@
               <th>Resultado</th>
               <th>Palpite</th>
               <th>Pontuação</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -62,7 +63,14 @@
                 </td>
                 <td>{{ partida_palpite.partida.resultado|default:"" }}</td>
                 <td>{{ partida_palpite.palpite.resultado|default:"" }}</td>
-                <td>{{ partida_palpite.palpite.pontuacao }}</td>
+                <td>
+                    {{ partida_palpite.palpite.pontuacao }}
+                </td>
+                <td>
+                    {% if partida_palpite.partida.pontuacao_dobrada %}
+                    🔥
+                    {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>
