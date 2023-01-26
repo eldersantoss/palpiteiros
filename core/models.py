@@ -107,6 +107,7 @@ class Partida(models.Model):
     data_hora = models.DateTimeField("Data e hora")
     gols_mandante = models.PositiveIntegerField(blank=True, null=True)
     gols_visitante = models.PositiveIntegerField(blank=True, null=True)
+    pontuacao_dobrada = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("data_hora",)
@@ -206,43 +207,47 @@ class Palpite(models.Model):
         if self.partida.resultado is None:
             return
 
-        ACERTOU_RESULTADO_CRAVADO = (
-            self.gols_mandante == self.partida.gols_mandante
-            and self.gols_visitante == self.partida.gols_visitante
+        ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.gols_mandante
+        ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.gols_visitante
+        ACERTO_MANDANTE_VENCEDOR = (self.gols_mandante > self.gols_visitante) and (
+            self.partida.gols_mandante > self.partida.gols_visitante
         )
-
-        ACERTOU_VENCEDOR = (
-            self.gols_mandante > self.gols_visitante
-            and self.partida.gols_mandante > self.partida.gols_visitante
-        ) or (
-            self.gols_mandante < self.gols_visitante
-            and self.partida.gols_mandante < self.partida.gols_visitante
+        ACERTO_VISITANTE_VENCEDOR = (self.gols_mandante < self.gols_visitante) and (
+            self.partida.gols_mandante < self.partida.gols_visitante
         )
+        ACERTO_EMPATE = (self.gols_mandante == self.gols_visitante) and (
+            self.partida.gols_mandante == self.partida.gols_visitante
+        )
+        ACERTO_PARCIAL = ACERTO_MANDANTE_VENCEDOR or ACERTO_VISITANTE_VENCEDOR
+        ACERTO_PARCIAL_COM_GOLS = ACERTO_PARCIAL and (
+            ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE
+        )
+        ACERTO_SOMENTE_GOLS = (
+            ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE
+        ) and not ACERTO_PARCIAL
+        ACERTO_CRAVADO = ACERTO_DE_GOLS_MANDANTE and ACERTO_DE_GOLS_VISITANTE
 
-        ACERTOU_GOLS_MANDANTE_OU_VISITANTE = (
-            self.gols_mandante > 0 and self.partida.gols_mandante > 0
-        ) or (self.gols_visitante > 0 and self.partida.gols_visitante > 0)
+        PONTUACAO_ACERTO_CRAVADO = 10
+        PONTUACAO_ACERTO_PARCIAL_COM_GOLS = 5
+        PONTUACAO_ACERTO_EMPATE = 5
+        PONTUACAO_ACERTO_PARCIAL = 3
+        PONTUACAO_ACERTO_SOMENTE_GOLS = 1
 
-        ACERTOU_GOLS_MANDANTE_E_VISITANTE = (
-            self.gols_mandante > 0 and self.partida.gols_mandante > 0
-        ) and (self.gols_visitante > 0 and self.partida.gols_visitante > 0)
-
-        PONTUACAO_RESULTADO_CRAVADO = 10
-        PONTUACAO_VENCEDOR = 5
-        PONTUACAO_GOLS_MANDANTE_E_VISITANTE = 2
-        PONTUACOES_GOLS_MANDANTE_OU_VISITANTE = 1
-
-        if ACERTOU_RESULTADO_CRAVADO:
-            self.pontuacao = PONTUACAO_RESULTADO_CRAVADO
+        if ACERTO_CRAVADO:
+            self.pontuacao = PONTUACAO_ACERTO_CRAVADO
+        elif ACERTO_PARCIAL_COM_GOLS:
+            self.pontuacao = PONTUACAO_ACERTO_PARCIAL_COM_GOLS
+        elif ACERTO_EMPATE:
+            self.pontuacao = PONTUACAO_ACERTO_EMPATE
+        elif ACERTO_PARCIAL:
+            self.pontuacao = PONTUACAO_ACERTO_PARCIAL
+        elif ACERTO_SOMENTE_GOLS:
+            self.pontuacao = PONTUACAO_ACERTO_SOMENTE_GOLS
         else:
-            if ACERTOU_VENCEDOR:
-                self.pontuacao = PONTUACAO_VENCEDOR
-            elif ACERTOU_GOLS_MANDANTE_E_VISITANTE:
-                self.pontuacao = PONTUACAO_GOLS_MANDANTE_E_VISITANTE
-            elif ACERTOU_GOLS_MANDANTE_OU_VISITANTE:
-                self.pontuacao = PONTUACOES_GOLS_MANDANTE_OU_VISITANTE
-            else:
-                self.pontuacao = 0
+            self.pontuacao = 0
+
+        if self.partida.pontuacao_dobrada:
+            self.pontuacao *= 2
 
         self.contabilizado = True
         self.save()
