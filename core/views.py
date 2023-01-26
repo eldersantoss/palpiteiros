@@ -43,10 +43,10 @@ def palpitar(request):
     rodada = Rodada.objects.last()
     partidas_encerradas = rodada.partidas.filter(
         data_hora__lt=timezone.now() - timedelta(minutes=5)
-    ).order_by("data_hora")
+    )
     partidas_abertas = rodada.partidas.filter(
         data_hora__gte=timezone.now() + timedelta(minutes=5)
-    ).order_by("data_hora")
+    )
 
     if request.method == "POST":
         for partida in partidas_abertas:
@@ -224,7 +224,7 @@ def _obter_periodo(get_params: QueryDict):
 
     # periodo entre data da primeira partida registrada até data atual
     elif periodo == "geral":
-        partida = Partida.objects.order_by("data_hora").first()
+        partida = Partida.objects.first()
         if partida is not None:
             inicio = partida.data_hora
         else:

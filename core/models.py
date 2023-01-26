@@ -108,6 +108,9 @@ class Partida(models.Model):
     gols_mandante = models.PositiveIntegerField(blank=True, null=True)
     gols_visitante = models.PositiveIntegerField(blank=True, null=True)
 
+    class Meta:
+        ordering = ("data_hora",)
+
     def __str__(self):
         return f"{self.mandante.nome} x {self.visitante.nome}"
 
