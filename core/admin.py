@@ -61,3 +61,7 @@ admin.site.register(Palpiteiro, PalpiteiroAdmin)
 admin.site.register(Partida, PartidaAdmin)
 admin.site.register(Rodada, RodadaAdmin)
 admin.site.register(Palpite, PalpitesAdmin)
+
+admin.site.site_header = "Administração Palpiteiros"
+admin.site.site_title = "Administração Palpiteiros"
+admin.site.index_title = "Selecione entidade para modificar"

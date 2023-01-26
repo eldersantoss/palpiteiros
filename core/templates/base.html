@@ -51,7 +51,7 @@
             <a href="{% url 'core:classificacao' %}">Classificação</a>
             <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
             {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'core:manual_administracao' %}">Manual da Área de Administração</a>
+            <a href="{% url 'core:manual_administracao' %}">Manual da área de administração</a>
             <a href="{% url 'admin:index' %}">Acessar área de administração</a>
             {% endif %}
         </nav>
