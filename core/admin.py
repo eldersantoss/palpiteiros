@@ -25,10 +25,6 @@ class PartidaAdmin(admin.ModelAdmin):
         "aberta_para_palpites",
     )
     list_filter = ["rodada"]
-    fieldsets = [
-        ("Dados gerais", {"fields": ["rodada", "mandante", "visitante", "data_hora"]}),
-        ("Resultado", {"fields": ["gols_mandante", "gols_visitante"]}),
-    ]
 
 
 class PartidaInline(admin.TabularInline):
