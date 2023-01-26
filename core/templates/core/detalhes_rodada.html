@@ -53,7 +53,13 @@
           <tbody>
             {% for partida_palpite in dados_palpiteiro.partidas_e_palpites %}
               <tr>
-                <td>{{ partida_palpite.partida.abreviacao }}</td>
+                <td>
+                    <p>
+                        {{ partida_palpite.partida.mandante }}</br>
+                        x</br>
+                        {{ partida_palpite.partida.visitante }}
+                    </p>
+                </td>
                 <td>{{ partida_palpite.partida.resultado|default:"" }}</td>
                 <td>{{ partida_palpite.palpite.resultado|default:"" }}</td>
                 <td>{{ partida_palpite.palpite.pontuacao }}</td>

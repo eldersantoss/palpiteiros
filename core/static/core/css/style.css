@@ -339,7 +339,6 @@ td {
     margin: 1vh 0;
     font-size: 0.75em;
     color: white;
-    font-weight: bold;
 }
 
 .detail-table tr {
@@ -347,11 +346,17 @@ td {
 }
 
 .detail-table th {
+    font-weight: bold;
     padding: 15px 10px;
 }
 
 .detail-table td {
     padding: 15px 5px;
+}
+
+.detail-table p {
+    margin: 0;
+    line-height: 1.3vh;
 }
 
 .detail-row {
