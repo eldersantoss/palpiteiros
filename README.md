@@ -6,8 +6,6 @@
 [![License](https://img.shields.io/github/license/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/issues)
 [![Last commit](https://img.shields.io/github/last-commit/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/commits/main)
-
-<img src="docs\animacao.gif" width="250">
 </div>
 
 ## **Conteúdo**
@@ -21,6 +19,8 @@
 * [Licença](#licença)
 
 ## **Aplicação**
+
+<div align="center"><img src="docs\animacao.gif" width="250"></div>
 
 Resumidamente, o aplicativo consiste num jogo no qual os jogadores
 (palpiteiros) podem palpitar no resultado de partidas de futebol
