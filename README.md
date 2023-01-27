@@ -1,11 +1,13 @@
 <div align="center">
 <img src="core\static\core\img\palpiteiros.png" width="100px">
-<h1>Palpiteiros</h1>
+<h2>Palpiteiros</h2>
 <p>Palpites em jogos de futebol</p>
 
 [![License](https://img.shields.io/github/license/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/issues)
 [![Last commit](https://img.shields.io/github/last-commit/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/commits/main)
+
+<img src="docs\animacao.gif" width="250">
 </div>
 
 ## **Conteúdo**
