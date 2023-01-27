@@ -1,14 +1,12 @@
-<div style="display:flex; flex-direction:column; align-items:center">
+<div align="center">
 <img src="core\static\core\img\palpiteiros.png" width="100px">
-<h1 style="text-align:center; width:100%; margin-top:5px">Palpiteiros</h1>
-<p>Aplicativo de palpites em jogos de futebol.</p>
+<h1>Palpiteiros</h1>
+<p>Palpites em jogos de futebol</p>
 
 [![License](https://img.shields.io/github/license/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/issues)
 [![Last commit](https://img.shields.io/github/last-commit/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/commits/main)
 </div>
-
-
 
 ## **Conteúdo**
 
@@ -16,9 +14,8 @@
   * [Principais funcionalidades](#principais-funcionalidades)
   * [Teste a aplicação](#teste-a-aplicação)
 * [Tecnologias utilizadas](#tecnologias-utilizadas)
-* [Instalando na sua máquina](#instalando-na-sua-máquina)
-* [Próximos passos](#próximos-passos)
 * [Contribuindo](#contribuindo)
+* [Configurando ambiente](#configurando-ambiente)
 * [Licença](#licença)
 
 ## **Aplicação**
@@ -60,33 +57,41 @@ permissões necessárias para o cadastro de novas rodadas e partidas,
 bem como a atualização dos resultados das partidas após seu término
 aos membros da equipe;
 
-* `Tela de Palpites` na qual o usuário tem acesso ao formulário para
-palpitar nas partidas;
+* `Palpites:` o usuário tem acesso ao formulário para palpitar nas
+partidas;
 
-* `Tela de Classificação` em que os usuários encontrarão uma tabela com a
-pontuação acumulada de todos os palpiteiros em três períodos de tempo
-distintos (mensal, anual e geral, computado desde a data da primeira
-partida cadastrada no app), permitindo-os acompanhar seu desempenho e o
-dos demais palpiteiros, bem como os vencedores nos períodos citados.
+* `Classificação:` os usuários encontrarão uma tabela com a pontuação
+acumulada de todos os palpiteiros em três períodos de tempo distintos
+(mensal, anual e geral, computado desde a data da primeira partida
+cadastrada no app), permitindo-os acompanhar seu desempenho e o dos
+demais palpiteiros, bem como os vencedores nos períodos citados.
 
-* `Tela de Rodadas` que contém uma listagem com links referentes a cada
-uma das rodadas já disputadas cadatradas no sistema.
+* `Rodadas:` listagem com links referentes a cada uma das rodadas já
+disputadas cadatradas no sistema.
 
-* `Tela de Detalhes de Rodada` que exibe em um conjunto de tabelas
-aninhadas a classificação e pontuação de todos os jogadores naquela
-rodada específica, além dos palpites para cada uma das partidas e a
-respectiva pontuação recebida por cada palpite. Além disso, também é
-possível visualizar os palpites dos demais palpiteiros de forma
-discriminada clicando sobre a sua linha na tabela.
+* `Detalhes da Rodada:` conjunto de tabelas aninhadas a classificação
+e pontuação de todos os jogadores naquela rodada específica, além dos
+palpites para cada uma das partidas e a respectiva pontuação recebida
+por cada palpite. Além disso, também é possível visualizar os palpites
+dos demais palpiteiros de forma discriminada clicando sobre a sua linha
+na tabela.
 
 **OBS:** Todas as telas citadas são `responsivas`.
 
 ## **Tecnologias utilizadas**
 
-* Python + Django
-* PostgreSQL
+<div style="display:flex">
+<a href="https://www.djangoproject.com/"><img src="https://www.opengis.ch/wp-content/uploads/2020/04/django-python-logo.png" alt="Python e Django" width=100px>
+</a>
+<a href="https://www.postgresql.org/"><img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL" width=100px>
+</a>
+</div>
 
-## **Instalando na sua máquina**
+## **Contribuindo**
+
+Pull Requests são bem-vindas! Para maiores mudanças, por favor abrir uma Issue para discutirmos sua proposta. Ah, seria muito bom se o código que deseja adicionar possuísse testes.
+
+## **Configurando ambiente**
 
 * Utilizando Docker + Docker Compose:
 
@@ -108,10 +113,6 @@ docker compose up
 # credenciais ADMIN_USERNAME e ADMIN_PASSWORD que você definiu no
 # arquivo .env
 ```
-
-## **Contribuindo**
-
-Pull Requests são bem-vindas! Para maiores mudanças, por favor abrir uma Issue para discutirmos sua proposta. Ah, seria muito bom se o código que deseja adicionar possuísse testes.
 
 ## **Licença**
 
