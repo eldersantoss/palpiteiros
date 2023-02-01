@@ -51,4 +51,9 @@ urlpatterns = [
         views.detalhes_rodada,
         name="detalhes_rodada",
     ),
+    path(
+        "OneSignalSDKWorker.js/",
+        views.one_signal_worker,
+        name="one_signal_worker",
+    ),
 ]

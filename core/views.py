@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.urls import reverse
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 
 from .models import Rodada, Partida, Palpite, Palpiteiro
 from .forms import EnabledPalpiteForm, DisabledPalpiteForm
@@ -241,3 +241,10 @@ def _obter_periodo(get_params: QueryDict):
         ) - timedelta(days=1)
 
     return (periodo, inicio, fim)
+
+
+def one_signal_worker(request):
+    return HttpResponse(
+        "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",
+        headers={"Content-Type": "application/javascript; charset=utf-8"},
+    )
