@@ -53,7 +53,6 @@ class Rodada(models.Model):
     label = models.CharField(
         max_length=50,
         default=_gerar_label_default,
-        editable=False,
     )
 
     @admin.display(description="Número de partidas")
