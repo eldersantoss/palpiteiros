@@ -32,6 +32,11 @@ urlpatterns = [
         name="palpiteiro_nao_encontrado",
     ),
     path(
+        "palpitar/rodada_nao_encontrada/",
+        views.RodadaNaoEncontradaView.as_view(),
+        name="rodada_nao_encontrada",
+    ),
+    path(
         "manual_administracao/",
         views.ManualAdminView.as_view(),
         name="manual_administracao",

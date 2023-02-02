@@ -19,34 +19,20 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 @login_required
 def palpitar(request):
-    """
-    TODO: verificar se é vantajoso transformar as transactions dessa
-    view em atômicas.
-
-    TODO: refatorar view removendo o exceço de responsabilidades e
-    transferindo lógia referente à manipulação dos dados para o escopo
-    dos respectivos models.
-
-    TODO: Alterar exibição das partidas encerradas, utilizar parágrafos
-    ao invés de formulários.
-
-    TODO: Melhorar obtenção das partidas abertas para palpites.
-    Atualmente, somente as partidas da última rodada serão exibidas,
-    impossibilitando a criação de novas rodadas enquanto a última não
-    tenha sido resolvida.
-    """
-
     try:
         palpiteiro = request.user.palpiteiro
-    except:
+    except Palpiteiro.DoesNotExist:
         return redirect(reverse("core:palpiteiro_nao_encontrado"))
-    rodada = Rodada.objects.last()
-    partidas_encerradas = rodada.partidas.filter(
-        data_hora__lt=timezone.now() - timedelta(minutes=5)
-    )
-    partidas_abertas = rodada.partidas.filter(
-        data_hora__gte=timezone.now() + timedelta(minutes=5)
-    )
+    try:
+        rodada = Rodada.objects.last()
+        partidas_encerradas = rodada.partidas.filter(
+            data_hora__lt=timezone.now() - timedelta(minutes=5)
+        )
+        partidas_abertas = rodada.partidas.filter(
+            data_hora__gte=timezone.now() + timedelta(minutes=5)
+        )
+    except AttributeError:
+        return redirect(reverse("core:rodada_nao_encontrada"))
 
     if request.method == "POST":
         for partida in partidas_abertas:
@@ -125,6 +111,15 @@ class PalpiteiroNaoEncontradoView(LoginRequiredMixin, TemplateView):
     """
 
     template_name = "core/palpiteiro_nao_encontrado.html"
+
+
+class RodadaNaoEncontradaView(LoginRequiredMixin, TemplateView):
+    """
+    TODO: bloquear acesso direto a essa view, permitindo apenas acesso
+    via redirecionamento a partir da view palpitar
+    """
+
+    template_name = "core/rodada_nao_encontrada.html"
 
 
 class ManualAdminView(LoginRequiredMixin, TemplateView):
