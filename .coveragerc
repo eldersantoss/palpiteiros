@@ -1,0 +1,17 @@
+[run]
+source = .
+branch = True
+plugins = django_coverage_plugin
+omit =
+  */node_modules/*
+  */tests/*
+  */migrations/*
+  palpiteiros/*
+  venv/*
+  static/*
+  manage.py
+  requirements.txt
+
+[report]
+show_missing = True
+skip_covered = True
