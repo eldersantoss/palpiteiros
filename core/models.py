@@ -64,7 +64,7 @@ class Rodada(models.Model):
         description="Aberta para palpites?",
     )
     def aberta_para_palpites(self):
-        horario_limite = timezone.now() - timedelta(minutes=15)
+        horario_limite = timezone.now() - timedelta(minutes=30)
         return any(
             [partida.data_hora > horario_limite for partida in self.partidas.all()]
         )
@@ -133,7 +133,7 @@ class Partida(models.Model):
         description="Aberta para palpites?",
     )
     def aberta_para_palpites(self):
-        return self.data_hora > timezone.now()
+        return timezone.now() + timedelta(minutes=30) < self.data_hora
 
 
 class Palpiteiro(models.Model):
@@ -169,7 +169,6 @@ class Palpiteiro(models.Model):
 
 
 class Palpite(models.Model):
-
     palpiteiro = models.ForeignKey(
         Palpiteiro,
         on_delete=models.CASCADE,
@@ -193,6 +192,10 @@ class Palpite(models.Model):
         )
 
     @property
+    def aberto(self):
+        return timezone.now() - timedelta(minutes=30) > self.partida.data_hora
+
+    @property
     def resultado(self) -> str:
         return f"{self.gols_mandante} x {self.gols_visitante}"
 
@@ -202,7 +205,6 @@ class Palpite(models.Model):
         return self.pontuacao
 
     def _avaliar_pontuacao_e_contabilizar_palpite(self):
-
         if self.partida.resultado is None:
             return
 
