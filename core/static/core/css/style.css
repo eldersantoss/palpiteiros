@@ -336,7 +336,7 @@ td {
 }
 
 .main-table {
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 .clickable-row:hover {
@@ -344,7 +344,7 @@ td {
 }
 
 .expand-icon {
-  font-size: 0.7em;
+  font-size: 0.8em;
 }
 
 .detail-table-container {
@@ -353,7 +353,7 @@ td {
 
 .detail-table {
   margin: 1vh 0;
-  font-size: 0.75em;
+  font-size: 0.8em;
   color: white;
 }
 
@@ -372,7 +372,7 @@ td {
 
 .detail-table p {
   margin: 0;
-  line-height: 1.3vh;
+  line-height: 2.2vh;
 }
 
 .detail-row {

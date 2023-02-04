@@ -9,10 +9,17 @@
 <table class="main-table">
   <thead>
     <tr>
-      <th style="width:5%"></th>
+      <th style="width:2.5%"></th>
+      <th style="width:2.5%"></th>
       <th style="width:45%">Palpiteiro</th>
-      <th style="width:20%">Pontuação parcial</th>
-      <th style="width:30%"></th>
+      <th style="width:15%">
+        {% if rodada.aberta_para_palpites %}
+          Pontuação parcial
+          {% else %}
+          Pontuação
+        {% endif %}
+      </th>
+      <th style="width:35%"></th>
     </tr>
   </thead>
   <tbody>
@@ -22,6 +29,15 @@
       name="clickable-row{{ dados_palpiteiro.palpiteiro.usuario.id }}"
       onclick="expandDetailRow('{{ dados_palpiteiro.palpiteiro.usuario.id }}')"
     >
+      <td>
+        {% if forloop.counter == 1 %}
+          🥇
+        {% elif forloop.counter == 2 %}
+          🥈
+        {% elif forloop.counter == 3 %}
+          🥉
+        {% endif %}
+      </td>
       <td>{{ forloop.counter }}º</td>
       <td>{{ dados_palpiteiro.palpiteiro }}</td>
       <td>{{ dados_palpiteiro.pontuacao }}</td>
@@ -40,7 +56,7 @@
       style="display: table-row"
       {% endif %}
     >
-      <td colspan="4" class="detail-table-container">
+      <td colspan="5" class="detail-table-container">
         <table class="detail-table">
           <thead>
             <tr>

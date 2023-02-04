@@ -64,10 +64,7 @@ class Rodada(models.Model):
         description="Aberta para palpites?",
     )
     def aberta_para_palpites(self):
-        horario_limite = timezone.now() - timedelta(minutes=30)
-        return any(
-            [partida.data_hora > horario_limite for partida in self.partidas.all()]
-        )
+        return any([partida.aberta_para_palpites() for partida in self.partidas.all()])
 
     @property
     def abertura(self):
