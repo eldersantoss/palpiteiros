@@ -86,38 +86,21 @@ o acompanhamento de novas rodadas.
 
 ## **Tecnologias utilizadas**
 
-<div style="display:flex; justify-content:space-around; margin: 25px 0">
-  <a href="https://www.djangoproject.com/">
-    <div style="display:flex; flex-direction:column; align-items:center">
-      <img src="https://icon-library.com/images/django-icon/django-icon-0.jpg" alt="Logos Python e Django" width=50px>
-      <p style="margin-top: 10px">Django</p>
-    </div>
-  </a>
-  <a href="https://www.postgresql.org/">
-    <div style="display:flex; flex-direction:column; align-items:center">
-      <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Logo PostgreSQL" width=50px>
-      <p style="margin-top: 10px">PostgreSQL</p>
-    </div>
-  </a>
-  <a href="https://www.docker.com/">
-    <div style="display:flex; flex-direction:column; align-items:center">
-      <img src="https://docs.docker.com/assets/images/docker-icon.svg" alt="Logo Docker" width=50px>
-      <p style="margin-top: 10px">Docker</p>
-    </div>
-  </a>
-  <a href="https://railway.app/">
-    <div style="display:flex; flex-direction:column; align-items:center">
-      <img src="https://railway.app/brand/logo-light.svg" alt="Logo Railway" width=50px>
-      <p style="margin-top: 10px">Railway</p>
-    </div>
-  </a>
-  <a href="https://onesignal.com/">
-    <div style="display:flex; flex-direction:column; align-items:center">
-      <img src="https://yt3.googleusercontent.com/ytc/AL5GRJWWfcQqiORg8aP-KqYCD_ttCMw7loNXTDLQjayF=s900-c-k-c0x00ffffff-no-rj" alt="Logo OneSignal" width=50px>
-      <p style="margin-top: 10px">OneSignal</p>
-    </div>
-  </a>
-</div>
+<a href="https://www.djangoproject.com/">
+    <img src="https://icon-library.com/images/django-icon/django-icon-0.jpg" alt="Logos Python e Django" width=75px>
+</a>
+<a href="https://www.postgresql.org/">
+    <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Logo PostgreSQL" width=75px>
+</a>
+<a href="https://www.docker.com/">
+    <img src="https://docs.docker.com/assets/images/docker-icon.svg" alt="Logo Docker" width=75px>
+</a>
+<a href="https://railway.app/">
+    <img src="https://railway.app/brand/logo-light.svg" alt="Logo Railway" width=75px>
+</a>
+<a href="https://onesignal.com/">
+    <img src="https://yt3.googleusercontent.com/ytc/AL5GRJWWfcQqiORg8aP-KqYCD_ttCMw7loNXTDLQjayF=s900-c-k-c0x00ffffff-no-rj" alt="Logo OneSignal" width=75px>
+</a>
 
 ## **Contribuindo**
 
