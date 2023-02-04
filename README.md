@@ -22,14 +22,14 @@
 
 <div align="center"><img src="docs\animacao.gif" width="250"></div>
 
-Resumidamente, o aplicativo consiste num jogo no qual os jogadores
+O aplicativo consiste num jogo ao estilo bolão no qual os jogadores
 (palpiteiros) podem palpitar no resultado de partidas de futebol
-(inseridas no sistema por um membro da equipe de administração)
-e acompanhar os resultados dos seus palpites rodada a rodada, mês a mês
+(inseridas no sistema por um membro da equipe de administração) e
+acompanhar os resultados dos seus palpites rodada a rodada, mês a mês
 e ano a ano, competindo pelo título de melhor Palpiteiro com os demais
 participantes. As partidas são cadastradas e divididas em rodadas,
-geralmente semanais, e os palpiteiros devem tentar adivinhar qual serão
-os resultados. Cada acerto, seja ele total ou parcial, rende uma
+geralmente semanais, e os palpiteiros devem tentar prever quais serão
+seus resultados. Cada acerto, seja ele total ou parcial, rende uma
 determinada pontuação que será computada pelo aplicativo e poderá ser
 consultada na tabela de classificação e detalhes da rodada.
 
@@ -78,14 +78,34 @@ por cada palpite. Além disso, também é possível visualizar os palpites
 dos demais palpiteiros de forma discriminada clicando sobre a sua linha
 na tabela.
 
+* `Web Push Notification:` usuários que do sistema operacional Android
+podem se cadastrar para receber notificações do aplicativo, facilitando
+o acompanhamento de novas rodadas.
+
 **OBS:** Todas as telas citadas são `responsivas`.
 
 ## **Tecnologias utilizadas**
 
-<div style="display:flex">
-<a href="https://www.djangoproject.com/"><img src="https://www.opengis.ch/wp-content/uploads/2020/04/django-python-logo.png" alt="Python e Django" width=100px>
+<div style="display:flex; justify-content:space-around">
+<a href="https://www.djangoproject.com/">
+  <img src="https://icon-library.com/images/django-icon/django-icon-0.jpg" alt="Logos Python e Django" width=100px>
+  <p align="center">Django</p>
 </a>
-<a href="https://www.postgresql.org/"><img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL" width=100px>
+<a href="https://www.postgresql.org/">
+  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Logo PostgreSQL" width=100px>
+  <p align="center">PostgreSQL</p>
+</a>
+<a href="https://www.docker.com/">
+  <img src="https://docs.docker.com/assets/images/docker-icon.svg" alt="Logo Docker" width=100px>
+  <p align="center">Docker</p>
+</a>
+<a href="https://railway.app/">
+  <img src="https://railway.app/brand/logo-light.svg" alt="Logo Railway" width=100px>
+  <p align="center">Railway</p>
+</a>
+<a href="https://onesignal.com/">
+  <img src="https://yt3.googleusercontent.com/ytc/AL5GRJWWfcQqiORg8aP-KqYCD_ttCMw7loNXTDLQjayF=s900-c-k-c0x00ffffff-no-rj" alt="Logo OneSignal" width=100px>
+  <p align="center">OneSignal</p>
 </a>
 </div>
 
