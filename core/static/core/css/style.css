@@ -260,22 +260,24 @@ div.helptext {
 .equipe {
   display: flex;
   align-items: center;
-  width: 30.0%;
+  width: 47.5%;
   line-height: 2.5vh;
   text-align: center;
 }
 
 .mandante {
+  text-align: right;
   justify-content: flex-end;
 }
 
 .visitante {
+  text-align: left;
   justify-content: flex-start;
 }
 
 .gols-palpite-encerrado {
   color: yellowgreen;
-  margin: 0 1vh;
+  margin: 0 1.5vh;
   font-size: 1.1em;
   font-weight: bold;
 }
