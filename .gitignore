@@ -1,3 +1,6 @@
+# Database backup
+db/backup/*
+
 # Excalidraw files
 *.excalidraw
 
