@@ -28,11 +28,10 @@
     <header>
         <span class="logo">
             <a href="{% url 'core:index' %}">
-                <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
-                Palpiteiros
+              <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
             </a>
         </span>
-        <span id="controls">
+        <span>
             {% if request.user.is_authenticated %}
             {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
             {% endif %}

@@ -42,8 +42,7 @@ header a {
 }
 
 .logo img {
-  max-height: 10vh;
-  margin-right: 0.5vh;
+  max-height: 15vh;
 }
 
 main {
@@ -344,7 +343,7 @@ td {
 }
 
 .expand-icon {
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 .detail-table-container {

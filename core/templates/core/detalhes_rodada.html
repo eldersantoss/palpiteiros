@@ -61,21 +61,19 @@
           <thead>
             <tr>
               <th style="width:50%">Partida</th>
-              <th>Resultado</th>
-              <th>Palpite</th>
-              <th>Pontuação</th>
-              <th></th>
+              <th style="width:15%">Resultado</th>
+              <th style="width:15%">Palpite</th>
+              <th style="width:15%">Pontuação</th>
+              <th style="width:5%"></th>
             </tr>
           </thead>
           <tbody>
             {% for partida_palpite in dados_palpiteiro.partidas_e_palpites %}
               <tr>
                 <td>
-                    <p>
-                        {{ partida_palpite.partida.mandante }}</br>
-                        x</br>
-                        {{ partida_palpite.partida.visitante }}
-                    </p>
+                    <p>{{ partida_palpite.partida.mandante }}</p>
+                    <p>x</p>
+                    <p>{{ partida_palpite.partida.visitante }}</p>
                 </td>
                 <td>{{ partida_palpite.partida.resultado|default:"" }}</td>
                 <td>{{ partida_palpite.palpite.resultado|default:"" }}</td>
