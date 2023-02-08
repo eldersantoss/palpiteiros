@@ -75,7 +75,7 @@ TEMPLATES = [
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
-            "debug": config("DEBUG", cast=bool),
+            "debug": config("DEBUG", default=True, cast=bool),
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
