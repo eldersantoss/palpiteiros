@@ -26,16 +26,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", cast=bool)
+DEBUG = config("DEBUG", default=True, cast=bool)
 
 ADMINS = (
     (
-        config("ADMIN_NAME"),
+        config("ADMIN_NAME", default="Admin"),
         config("ADMIN_EMAIL"),
     ),
 )
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="localhost, 127.0.0.1",
+    cast=Csv(),
+)
 
 
 # Application definition
@@ -48,13 +52,13 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "whitenoise.runserver_nostatic",  # TODO: Remover quando adicionar nginx
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # TODO: Remover quando adicionar nginx
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -91,11 +95,11 @@ WSGI_APPLICATION = "palpiteiros.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", cast=int),
+        "NAME": config("DB_NAME", default="palpiteiros"),
+        "USER": config("DB_USER", default="postgres"),
+        "PASSWORD": config("DB_PASSWORD", default="123mudar!"),
+        "HOST": config("DB_HOST", default="postgres"),
+        "PORT": config("DB_PORT", default=5432, cast=int),
     },
 }
 
@@ -128,7 +132,7 @@ TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 
-USE_TZ = config("USE_TZ", default=True, cast=bool)
+USE_TZ = config("USE_TZ", default=False, cast=bool)
 
 
 # Static files (CSS, JavaScript, Images)
@@ -138,7 +142,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = str(BASE_DIR / "static")
 MEDIA_URL = "media/"
 MEDIA_ROOT = str(BASE_DIR / "media")
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # TODO: Remover quando adicionar nginx
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -156,21 +160,26 @@ LOGOUT_URL = "logout"
 
 # Email
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_BACKEND = config("EMAIL_BACKEND")
-EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_BACKEND = config(
+    "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = config("EMAIL_PORT", cast=int)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 # Security
 
-SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
-CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", cast=bool)
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())
-SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=True, cast=bool)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://localhost, https://localhost",
+    cast=Csv(),
+)
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=True, cast=bool)
 
 
 # Logging
