@@ -46,6 +46,8 @@
             🥈
             {% elif forloop.counter == 3 %}
             🥉
+            {% elif forloop.last %}
+            🔦
             {% endif %}
         </td>
         <td>{{ forloop.counter }}º</td>
