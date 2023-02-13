@@ -3,11 +3,18 @@ from django.contrib import admin
 from .models import Equipe, Rodada, Partida, Palpiteiro, Palpite
 
 
+admin.site.site_header = "Administração Palpiteiros"
+admin.site.site_title = "Administração Palpiteiros"
+admin.site.index_title = "Selecione entidade para modificar"
+
+
+@admin.register(Equipe)
 class EquipeAdmin(admin.ModelAdmin):
     list_display = ("__str__", "abreviacao")
     search_fields = ("nome", "abreviacao")
 
 
+@admin.register(Palpiteiro)
 class PalpiteiroAdmin(admin.ModelAdmin):
     list_display = ("__str__", "usuario", "obter_pontuacao_geral")
     search_fields = [
@@ -17,14 +24,21 @@ class PalpiteiroAdmin(admin.ModelAdmin):
     ]
 
 
+@admin.register(Partida)
 class PartidaAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
         "rodada",
         "data_hora",
         "aberta_para_palpites",
+        "gols_mandante",
+        "gols_visitante",
     )
     list_filter = ["rodada"]
+    list_editable = [
+        "gols_mandante",
+        "gols_visitante",
+    ]
 
 
 class PartidaInline(admin.TabularInline):
@@ -33,6 +47,7 @@ class PartidaInline(admin.TabularInline):
     ordering = ["data_hora"]
 
 
+@admin.register(Rodada)
 class RodadaAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
@@ -44,20 +59,10 @@ class RodadaAdmin(admin.ModelAdmin):
     inlines = [PartidaInline]
 
 
+@admin.register(Palpite)
 class PalpitesAdmin(admin.ModelAdmin):
     list_display = ("__str__", "palpiteiro")
     list_filter = [
         "palpiteiro",
         "partida__rodada",
     ]
-
-
-admin.site.register(Equipe, EquipeAdmin)
-admin.site.register(Palpiteiro, PalpiteiroAdmin)
-admin.site.register(Partida, PartidaAdmin)
-admin.site.register(Rodada, RodadaAdmin)
-admin.site.register(Palpite, PalpitesAdmin)
-
-admin.site.site_header = "Administração Palpiteiros"
-admin.site.site_title = "Administração Palpiteiros"
-admin.site.index_title = "Selecione entidade para modificar"

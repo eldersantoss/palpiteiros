@@ -55,6 +55,9 @@ class Rodada(models.Model):
         default=_gerar_label_default,
     )
 
+    class Meta:
+        ordering = ("-id",)
+
     @admin.display(description="Número de partidas")
     def numero_partidas(self) -> int:
         return self.partidas.count()
