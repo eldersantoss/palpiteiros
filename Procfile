@@ -1,1 +1,1 @@
-web: source railway_start.sh
+web: source scripts/railway_start.sh
