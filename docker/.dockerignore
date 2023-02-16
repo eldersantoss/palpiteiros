@@ -1,8 +1,0 @@
-.git/
-.vscode/
-env/
-.coverage
-htmlcov/
-__pycache__/
-*.sqlite3
-celerybeat-schedule
