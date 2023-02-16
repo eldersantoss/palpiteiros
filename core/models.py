@@ -62,10 +62,7 @@ class Rodada(models.Model):
     def numero_partidas(self) -> int:
         return self.partidas.count()
 
-    @admin.display(
-        boolean=True,
-        description="Aberta para palpites?",
-    )
+    @admin.display(boolean=True, description="Aberta para palpites?")
     def aberta_para_palpites(self):
         return any([partida.aberta_para_palpites() for partida in self.partidas.all()])
 
@@ -82,6 +79,14 @@ class Rodada(models.Model):
             return self.partidas.order_by("data_hora").last().data_hora
         except AttributeError:
             return timezone.now()
+
+    def partidas_abertas(self):
+        data_hora_encerramento = timezone.now() + timedelta(minutes=30)
+        return self.partidas.filter(data_hora__gt=data_hora_encerramento)
+
+    def partidas_encerradas(self):
+        data_hora_encerramento = timezone.now() + timedelta(minutes=30)
+        return self.partidas.filter(data_hora__lte=data_hora_encerramento)
 
     def __str__(self) -> str:
         return self.label
