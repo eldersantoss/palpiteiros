@@ -24,67 +24,54 @@ def palpitar(request):
     except Palpiteiro.DoesNotExist:
         return redirect(reverse("core:palpiteiro_nao_encontrado"))
 
-    try:
-        rodada = Rodada.objects.last()
-        data_hora_encerramento = timezone.now() + timedelta(minutes=30)
-        partidas_encerradas = rodada.partidas.filter(
-            data_hora__lte=data_hora_encerramento,
-        )
-        partidas_abertas = rodada.partidas.filter(
-            data_hora__gt=data_hora_encerramento,
-        )
-    except AttributeError:
+    if not Rodada.objects.exists():
         return redirect(reverse("core:rodada_nao_encontrada"))
+
+    rodada_mais_recente = Rodada.objects.first()
+    partidas_encerradas = rodada_mais_recente.partidas_encerradas()
+    partidas_abertas = rodada_mais_recente.partidas_abertas()
 
     if request.method == "POST":
         for partida in partidas_abertas:
             form = EnabledPalpiteForm(request.POST, partida=partida)
-            if form.is_valid():
-                try:
-                    dados_palpites_encerrados = Palpite.objects.get(
-                        palpiteiro=palpiteiro,
-                        partida=partida,
-                    )
-                except ObjectDoesNotExist:
-                    dados_palpites_encerrados = Palpite(
-                        palpiteiro=palpiteiro,
-                        partida=partida,
-                    )
-                dados_palpites_encerrados.gols_mandante = form.cleaned_data[
-                    f"gols_mandante"
-                ]
-                dados_palpites_encerrados.gols_visitante = form.cleaned_data[
-                    f"gols_visitante"
-                ]
-                dados_palpites_encerrados.save()
+            form.is_valid()
+            try:
+                palpite = partida.palpites.get(palpiteiro=palpiteiro)
+            except Palpite.DoesNotExist:
+                palpite = partida.palpites.create(palpiteiro=palpiteiro)
+            palpite.gols_mandante = form.cleaned_data[f"gols_mandante"]
+            palpite.gols_visitante = form.cleaned_data[f"gols_visitante"]
+            palpite.save()
         return redirect(reverse("core:palpitar_sucesso"))
 
     else:
         if not partidas_abertas:
             return redirect(reverse("core:palpites_encerrados"))
 
-        forms_palpites_abertos = []
         dados_palpites_encerrados = []
         for partida in partidas_encerradas:
-            dados = {"partida": partida}
             try:
                 palpite = partida.palpites.get(palpiteiro=palpiteiro)
-                dados["palpite"] = palpite
-            except ObjectDoesNotExist:
-                dados["palpite"] = None
-            dados_palpites_encerrados.append(dados)
+            except Palpite.DoesNotExist:
+                palpite = None
+            dados_palpites_encerrados.append(
+                {"partida": partida, "palpite": palpite},
+            )
 
+        forms_palpites_abertos = []
         for partida in partidas_abertas:
             try:
                 palpite = partida.palpites.get(palpiteiro=palpiteiro)
-                dados = {
+            except Palpite.DoesNotExist:
+                dados_palpite = None
+            else:
+                dados_palpite = {
                     f"gols_mandante_{partida.id}": palpite.gols_mandante,
                     f"gols_visitante_{partida.id}": palpite.gols_visitante,
                 }
-                form = EnabledPalpiteForm(dados, partida=partida)
-            except ObjectDoesNotExist:
-                form = EnabledPalpiteForm(partida=partida)
-            forms_palpites_abertos.append(form)
+            forms_palpites_abertos.append(
+                EnabledPalpiteForm(dados_palpite, partida=partida),
+            )
 
     return render(
         request,
