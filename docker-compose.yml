@@ -1,7 +1,9 @@
 services:
   web:
-    build: .
-    command: bash -c "chmod +x compose_start.sh && ./compose_start.sh"
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: bash -c "chmod +x ./scripts/*.sh && ./scripts/compose_start.sh"
     ports:
       - 8000:8000
     volumes:
