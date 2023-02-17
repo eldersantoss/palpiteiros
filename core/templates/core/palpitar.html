@@ -10,7 +10,7 @@
 
     {% csrf_token %}
 
-    <h3>Palpites encerrados</h3>
+    {% if dados_palpites_encerrados %}<h3>Palpites encerrados</h3>{% endif %}
     {% for dados in dados_palpites_encerrados %}
         <div class="partida-wrapper">
             <p class="horario-partida">
