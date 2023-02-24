@@ -184,9 +184,9 @@ class Palpite(models.Model):
         on_delete=models.CASCADE,
         related_name="palpites",
     )
-    gols_mandante = models.PositiveIntegerField(blank=True, null=True)
-    gols_visitante = models.PositiveIntegerField(blank=True, null=True)
-    pontuacao = models.PositiveIntegerField(default=0)
+    gols_mandante = models.PositiveIntegerField()
+    gols_visitante = models.PositiveIntegerField()
+    pontuacao = models.PositiveIntegerField(blank=True, null=True)
     contabilizado = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -204,7 +204,7 @@ class Palpite(models.Model):
     def resultado(self) -> str:
         return f"{self.gols_mandante} x {self.gols_visitante}"
 
-    def obter_pontuacao(self) -> int:
+    def obter_pontuacao(self) -> int | None:
         if not self.contabilizado:
             self._avaliar_pontuacao_e_contabilizar_palpite()
         return self.pontuacao
