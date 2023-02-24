@@ -141,7 +141,7 @@ class PalpitarViewTests(TestCase):
             Partida,
             data_hora=timezone.now() + timedelta(minutes=60),
         )
-        guesses_count_before = Palpite.objects.count()
+        number_of_guesses_before = Palpite.objects.count()
 
         self.client.post(
             reverse("core:palpitar"),
@@ -152,7 +152,7 @@ class PalpitarViewTests(TestCase):
         )
         created_guess = Palpite.objects.last()
 
-        self.assertEquals(Palpite.objects.count(), guesses_count_before + 1)
+        self.assertEquals(Palpite.objects.count(), number_of_guesses_before + 1)
         self.assertEquals(created_guess.palpiteiro, self.palpiteiro)
         self.assertEquals(created_guess.partida, open_match)
         self.assertEquals(created_guess.gols_mandante, 2)

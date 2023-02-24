@@ -36,10 +36,14 @@ def palpitar(request):
             form.is_valid()
             try:
                 palpite = partida.palpites.get(palpiteiro=palpiteiro)
+                palpite.gols_mandante = form.cleaned_data[f"gols_mandante"]
+                palpite.gols_visitante = form.cleaned_data[f"gols_visitante"]
             except Palpite.DoesNotExist:
-                palpite = partida.palpites.create(palpiteiro=palpiteiro)
-            palpite.gols_mandante = form.cleaned_data[f"gols_mandante"]
-            palpite.gols_visitante = form.cleaned_data[f"gols_visitante"]
+                palpite = partida.palpites.create(
+                    palpiteiro=palpiteiro,
+                    gols_mandante=form.cleaned_data[f"gols_mandante"],
+                    gols_visitante=form.cleaned_data[f"gols_visitante"],
+                )
             palpite.save()
         return redirect(reverse("core:palpitar_sucesso"))
 
