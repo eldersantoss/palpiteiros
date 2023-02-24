@@ -4,13 +4,12 @@ from django.views.generic import TemplateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.urls import reverse
 from django.http import QueryDict, HttpResponse
 
 from .models import Rodada, Partida, Palpite, Palpiteiro
-from .forms import EnabledPalpiteForm, DisabledPalpiteForm
+from .forms import EnabledPalpiteForm
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -165,7 +164,7 @@ def detalhes_rodada(request, id_rodada):
                 if palpite is not None and partida.resultado is not None:
                     dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao()
 
-            except ObjectDoesNotExist:
+            except Palpite.DoesNotExist:
                 palpite = None
 
             dados_palpiteiro["partidas_e_palpites"].append(
@@ -179,6 +178,7 @@ def detalhes_rodada(request, id_rodada):
     )
 
 
+@login_required
 def classificacao(request):
     periodo, inicio, fim = _obter_periodo(request.GET)
     palpiteiros = []
