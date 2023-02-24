@@ -15,8 +15,8 @@
       <th style="width:15%">
         {% if rodada.aberta_para_palpites %}
           Pontuação parcial
-          {% else %}
-          Pontuação
+        {% else %}
+          Pontuação final
         {% endif %}
       </th>
       <th style="width:35%"></th>
@@ -71,23 +71,28 @@
           </thead>
           <tbody>
             {% for partida_palpite in dados_palpiteiro.partidas_e_palpites %}
-              <tr>
-                <td>
-                    <p>{{ partida_palpite.partida.mandante }}</p>
-                    <p>x</p>
-                    <p>{{ partida_palpite.partida.visitante }}</p>
-                </td>
-                <td>{{ partida_palpite.partida.resultado|default:"" }}</td>
-                <td>{{ partida_palpite.palpite.resultado|default:"" }}</td>
-                <td>
-                    {{ partida_palpite.palpite.pontuacao }}
-                </td>
-                <td>
-                    {% if partida_palpite.partida.pontuacao_dobrada %}
-                    🔥
-                    {% endif %}
-                </td>
-              </tr>
+              {% with partida=partida_palpite.partida palpite=partida_palpite.palpite %}
+                <tr>
+                  <td>
+                      <p>{{ partida.mandante }}</p>
+                      <p>x</p>
+                      <p>{{ partida.visitante }}</p>
+                  </td>
+                  <td>{{ partida.resultado|default:"-" }}</td>
+                  {% if palpite %}
+                    <td>{{ palpite.resultado }}</td>
+                    <td>{{ palpite.pontuacao }}</td>
+                  {% else %}
+                    <td>-</td>
+                    <td>-</td>
+                  {% endif %}
+                  <td>
+                      {% if partida.pontuacao_dobrada %}
+                      🔥
+                      {% endif %}
+                  </td>
+                </tr>
+              {% endwith %}
             {% endfor %}
           </tbody>
         </table>
