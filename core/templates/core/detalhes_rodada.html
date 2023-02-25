@@ -81,7 +81,7 @@
                   <td>{{ partida.resultado|default:"-" }}</td>
                   {% if palpite %}
                     <td>{{ palpite.resultado }}</td>
-                    <td>{{ palpite.pontuacao }}</td>
+                    <td>{{ palpite.pontuacao|default_if_none:"-" }}</td>
                   {% else %}
                     <td>-</td>
                     <td>-</td>
