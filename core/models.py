@@ -166,7 +166,7 @@ class Palpiteiro(models.Model):
         )
 
     def calcular_pontuacao(self, palpites: models.QuerySet["Palpite"]):
-        pontuacao = sum([palpite.obter_pontuacao() for palpite in palpites])
+        pontuacao = sum([palpite.obter_pontuacao() or 0 for palpite in palpites])
         return pontuacao
 
     def __str__(self) -> str:
