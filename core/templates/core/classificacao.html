@@ -9,25 +9,25 @@
 <nav class="menu horizontal">
     <a
         href="{% url 'core:classificacao' %}?periodo=mensal"
-        {% if periodo == 'mensal' %}class="ativado"{% endif %}
+        {% if periodo.label == 'mensal' %}class="ativado"{% endif %}
     >
         Mensal
     </a>
     <a
         href="{% url 'core:classificacao' %}?periodo=anual"
-        {% if periodo == 'anual' %}class="ativado"{% endif %}
+        {% if periodo.label == 'anual' %}class="ativado"{% endif %}
     >
         Anual
     </a>
     <a
         href="{% url 'core:classificacao' %}?periodo=geral"
-        {% if periodo == 'geral' %}class="ativado"{% endif %}
+        {% if periodo.label == 'geral' %}class="ativado"{% endif %}
     >
         Geral
     </a>
 </nav>
 
-<p class="periodo-classificacao">Periodo: {{ inicio_periodo }} a {{ fim_periodo }}</p>
+<p class="periodo-classificacao">Periodo: {{ periodo.inicio }} a {{ periodo.fim }}</p>
 
 {% if palpiteiros %}
 <table>
@@ -51,7 +51,7 @@
             {% endif %}
         </td>
         <td>{{ forloop.counter }}º</td>
-        <td>{{ palpiteiro.nome }}</td>
+        <td>{{ palpiteiro }}</td>
         <td>{{ palpiteiro.pontuacao }}</td>
     </tr>
     {% endfor %}

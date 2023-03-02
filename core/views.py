@@ -184,42 +184,33 @@ def detalhes_rodada(request, id_rodada):
 
 @login_required
 def classificacao(request):
-    periodo, inicio, fim = _obter_periodo(request.GET)
-    palpiteiros = []
-    for palpiteiro in Palpiteiro.objects.all():
-        palpiteiros.append(
-            {
-                "nome": palpiteiro,
-                "pontuacao": palpiteiro.obter_pontuacao_no_periodo(inicio, fim),
-            },
+    periodo = _obter_periodo(request.GET)
+    palpiteiros = list(Palpiteiro.objects.all())
+    for palpiteiro in palpiteiros:
+        palpiteiro.pontuacao = palpiteiro.obter_pontuacao_no_periodo(
+            periodo["inicio"],
+            periodo["fim"],
         )
-
-    palpiteiros.sort(key=lambda p: p["pontuacao"], reverse=True)
-
+    palpiteiros.sort(key=lambda p: p.pontuacao, reverse=True)
     return render(
         request,
         "core/classificacao.html",
-        {
-            "periodo": periodo,
-            "inicio_periodo": inicio.date(),
-            "fim_periodo": fim.date(),
-            "palpiteiros": palpiteiros,
-        },
+        {"periodo": periodo, "palpiteiros": palpiteiros},
     )
 
 
 def _obter_periodo(get_params: QueryDict):
-    periodo = get_params.get("periodo") or "mensal"
+    label = get_params.get("periodo") or "mensal"
     inicio_base = timezone.now().replace(day=1, hour=0, minute=0, second=0)
     fim_base = inicio_base.replace(hour=23, minute=59, second=59)
 
     # todos os meses do ano atual
-    if periodo == "anual":
+    if label == "anual":
         inicio = inicio_base.replace(month=1)
         fim = fim_base.replace(day=31, month=12)
 
     # periodo entre data da primeira partida registrada até data atual
-    elif periodo == "geral":
+    elif label == "geral":
         partida = Partida.objects.first()
         if partida is not None:
             inicio = partida.data_hora
@@ -236,7 +227,7 @@ def _obter_periodo(get_params: QueryDict):
             else fim_base.replace(month=1, year=inicio.year + 1)
         ) - timedelta(days=1)
 
-    return (periodo, inicio, fim)
+    return {"label": label, "inicio": inicio, "fim": fim}
 
 
 def one_signal_worker(request):
