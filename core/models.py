@@ -187,8 +187,8 @@ class Palpiteiro(models.Model):
 
     def obter_pontuacao_no_periodo(self, inicio: datetime, fim: datetime):
         palpites = self.palpites.filter(
-            partida__data_hora__gt=inicio,
-            partida__data_hora__lt=fim,
+            partida__data_hora__gt=inicio + timedelta(hours=3),
+            partida__data_hora__lt=fim + timedelta(hours=3),
         )
         pontuacao = self.calcular_pontuacao(palpites)
         return pontuacao
