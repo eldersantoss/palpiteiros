@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.http import QueryDict, HttpResponse
 
 from .models import Rodada, Partida, Palpite, Palpiteiro
-from .forms import EnabledPalpiteForm
+from .forms import EnabledPalpiteForm, RankingPeriodForm
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -184,22 +184,43 @@ def detalhes_rodada(request, id_rodada):
 
 @login_required
 def classificacao(request):
-    periodo = _obter_periodo(request.GET)
+    period = _get_ranking_period(request.GET)
     palpiteiros = list(Palpiteiro.objects.all())
     for palpiteiro in palpiteiros:
         palpiteiro.pontuacao = palpiteiro.obter_pontuacao_no_periodo(
-            periodo["inicio"],
-            periodo["fim"],
+            period["start"],
+            period["end"],
         )
     palpiteiros.sort(key=lambda p: p.pontuacao, reverse=True)
     return render(
         request,
         "core/classificacao.html",
-        {"periodo": periodo, "palpiteiros": palpiteiros},
+        {"period": period, "palpiteiros": palpiteiros},
     )
 
 
-def _obter_periodo(get_params: QueryDict):
+@login_required
+def classificacao_temp(request):
+    current_period = {"mes": timezone.now().month, "ano": timezone.now().year}
+    form = RankingPeriodForm(request.GET or current_period)
+    if form.is_valid():
+        month = int(form.cleaned_data["mes"])
+        year = int(form.cleaned_data["ano"])
+        ranking = Palpiteiro.get_ranking(month, year)
+    else:
+        form = RankingPeriodForm(current_period)
+        ranking = Palpiteiro.get_ranking(
+            current_period["mes"],
+            current_period["ano"],
+        )
+    return render(
+        request,
+        "core/classificacao_temp.html",
+        {"period_form": form, "ranking": ranking},
+    )
+
+
+def _get_ranking_period(get_params: QueryDict):
     label = get_params.get("periodo") or "mensal"
     inicio_base = timezone.now().replace(day=1, hour=0, minute=0, second=0)
     fim_base = inicio_base.replace(hour=23, minute=59, second=59)
@@ -227,7 +248,7 @@ def _obter_periodo(get_params: QueryDict):
             else fim_base.replace(month=1, year=inicio.year + 1)
         ) - timedelta(days=1)
 
-    return {"label": label, "inicio": inicio, "fim": fim}
+    return {"name": label, "start": inicio, "end": fim}
 
 
 def one_signal_worker(request):

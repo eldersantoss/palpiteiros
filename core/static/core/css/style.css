@@ -127,6 +127,20 @@ h3 {
   text-shadow: 2px 2px 5px green;
 }
 
+.period-form {
+  margin-top: 2vh;
+}
+
+.period-form select {
+  background: #202124;
+  border: none;
+  color: greenyellow;
+  text-align: right;
+  font-size: 0.85em;
+  font-weight: bold;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
 .msg-central {
   display: flex;
   flex-direction: column;

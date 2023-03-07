@@ -6,28 +6,32 @@
 
 <h1>Classificação</h1>
 
+<form action={% url 'core:classificacao' %} method="GET">
+  {{ period_form.as_div }}
+</form>
+
 <nav class="menu horizontal">
     <a
         href="{% url 'core:classificacao' %}?periodo=mensal"
-        {% if periodo.label == 'mensal' %}class="ativado"{% endif %}
+        {% if period.name == 'mensal' %}class="ativado"{% endif %}
     >
         Mensal
     </a>
     <a
         href="{% url 'core:classificacao' %}?periodo=anual"
-        {% if periodo.label == 'anual' %}class="ativado"{% endif %}
+        {% if period.name == 'anual' %}class="ativado"{% endif %}
     >
         Anual
     </a>
     <a
         href="{% url 'core:classificacao' %}?periodo=geral"
-        {% if periodo.label == 'geral' %}class="ativado"{% endif %}
+        {% if period.name == 'geral' %}class="ativado"{% endif %}
     >
         Geral
     </a>
 </nav>
 
-<p class="periodo-classificacao">Periodo: {{ periodo.inicio }} a {{ periodo.fim }}</p>
+<p class="periodo-classificacao">Período: {{ period.start }} a {{ period.end }}</p>
 
 {% if palpiteiros %}
 <table>
