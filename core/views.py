@@ -216,7 +216,11 @@ def classificacao_temp(request):
     return render(
         request,
         "core/classificacao_temp.html",
-        {"period_form": form, "ranking": ranking},
+        {
+            "data_hora": timezone.now(),
+            "period_form": form,
+            "ranking": ranking,
+        },
     )
 
 

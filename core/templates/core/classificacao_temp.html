@@ -7,6 +7,7 @@
 <h1>Classificação</h1>
 
 <p class="periodo-classificacao">{% now "DATETIME_FORMAT" %}</p>
+<p class="periodo-classificacao">{{ data_hora }}</p>
 
 <form action="{% url 'core:classificacao_temp' %}" method="GET" class="menu horizontal period-form">
   {{ period_form.as_div }}
