@@ -96,7 +96,6 @@ h3 {
   margin-top: 2vh;
 }
 
-
 .separador {
   width: 100%;
   margin: 5vh 0;
@@ -138,6 +137,10 @@ h3 {
   text-align: right;
   font-size: 0.85em;
   font-weight: bold;
+}
+
+.period-form select option {
+  text-align: right;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
@@ -327,7 +330,7 @@ input[type=submit]:hover {
 
 .periodo-classificacao {
   font-size: 0.7em;
-  margin: 2vh 0;
+  margin: 0 0;
 }
 
 .pagination {
