@@ -206,13 +206,11 @@ def classificacao_temp(request):
     if form.is_valid():
         month = int(form.cleaned_data["mes"])
         year = int(form.cleaned_data["ano"])
-        ranking = Palpiteiro.get_ranking(month, year)
     else:
         form = RankingPeriodForm(current_period)
-        ranking = Palpiteiro.get_ranking(
-            current_period["mes"],
-            current_period["ano"],
-        )
+        month = current_period["mes"]
+        year = current_period["ano"]
+    ranking = Palpiteiro.get_ranking(month, year)
     return render(
         request,
         "core/classificacao_temp.html",

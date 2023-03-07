@@ -1,5 +1,3 @@
-from typing import Self
-
 from datetime import timedelta, datetime
 
 from django.db import models
@@ -147,31 +145,28 @@ class Palpiteiro(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     @classmethod
-    def get_ranking(cls, month: int, year: int) -> list[Self]:
+    def get_ranking(cls, month: int, year: int) -> list["Palpiteiro"]:
         base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
-        base_end = base_start.replace(hour=23, minute=59, second=59)
+        base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
 
         # todos os meses do ano recebido
         if not month and year:
-            start = base_start.replace(month=1)
+            start = base_start.replace(year=year, month=1)
             end = base_end.replace(year=year, month=12, day=31)
 
         # periodo geral (entre data da primeira partida registrada até data atual)
         elif not year:
             oldest_match = Partida.objects.first()
-            if oldest_match is not None:
-                start = oldest_match.data_hora
-            else:
-                start = timezone.now()
+            start = timezone.now() if oldest_match is None else oldest_match.data_hora
             end = timezone.now()
 
         # mes e ano recebidos
         else:
             start = base_start.replace(year=year, month=month)
             end = (
-                base_end.replace(year=year, month=start.month + 1)
-                if start.month < 12
-                else base_end.replace(month=1, year=start.year + 1)
+                base_end.replace(year=year, month=month + 1)
+                if month < 12
+                else base_end.replace(year=year + 1, month=1)
             ) - timedelta(days=1)
 
         guessers = list(cls.objects.all())
@@ -187,19 +182,12 @@ class Palpiteiro(models.Model):
         return pontuacao
 
     def obter_pontuacao_no_periodo(self, inicio: datetime, fim: datetime):
-        palpites = self.obter_palpites_no_periodo(inicio, fim)
-        pontuacao = self.calcular_pontuacao(palpites)
-        return pontuacao
-
-    def obter_palpites_no_periodo(
-        self,
-        inicio: datetime,
-        fim: datetime,
-    ) -> models.QuerySet:
-        return self.palpites.filter(
+        palpites = self.palpites.filter(
             partida__data_hora__gt=inicio,
             partida__data_hora__lt=fim,
         )
+        pontuacao = self.calcular_pontuacao(palpites)
+        return pontuacao
 
     def calcular_pontuacao(self, palpites: models.QuerySet["Palpite"]):
         pontuacao = sum([palpite.obter_pontuacao() or 0 for palpite in palpites])
