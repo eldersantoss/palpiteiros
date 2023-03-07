@@ -169,6 +169,10 @@ class Palpiteiro(models.Model):
                 else base_end.replace(year=year + 1, month=1)
             ) - timedelta(days=1)
 
+        print(f"Start period: {start}")
+        print(f"End period: {end}")
+        print(f"Problmatic math: {Partida.objects.get(id=94).data_hora}")
+
         guessers = list(cls.objects.all())
         for guesser in guessers:
             guesser.score = guesser.obter_pontuacao_no_periodo(start, end)
