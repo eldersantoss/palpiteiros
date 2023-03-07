@@ -127,11 +127,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = "pt-br"
-
-TIME_ZONE = "America/Sao_Paulo"
-
 USE_I18N = True
 
+TIME_ZONE = config("TIME_ZONE", default="America/Sao_Paulo")
 USE_TZ = config("USE_TZ", default=False, cast=bool)
 
 
@@ -169,6 +167,7 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+
 
 # Security
 
