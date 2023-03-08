@@ -26,10 +26,10 @@ class RankingPeriodForm(forms.Form):
     GERAL = 0
 
     YEAR_CHOICE = (
-        (GERAL, "Todos os anos"),
-        ("2022", "2022"),
-        ("2023", "2023"),
-        ("2024", "2024"),
+        (GERAL, "Geral"),
+        (2022, "2022"),
+        (2023, "2023"),
+        (2024, "2024"),
     )
 
     JANEIRO = 1
@@ -46,7 +46,7 @@ class RankingPeriodForm(forms.Form):
     DEZEMBRO = 12
 
     MONTH_CHOICES = (
-        (GERAL, "Todos os meses"),
+        (GERAL, "Anual"),
         (JANEIRO, "Janeiro"),
         (FEVEREIRO, "Fevereiro"),
         (MARCO, "Março"),
