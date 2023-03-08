@@ -47,11 +47,6 @@ urlpatterns = [
         name="classificacao",
     ),
     path(
-        "classificacao_temp/",
-        views.classificacao_temp,
-        name="classificacao_temp",
-    ),
-    path(
         "rodadas/",
         views.RodadasListView.as_view(),
         name="lista_rodadas",

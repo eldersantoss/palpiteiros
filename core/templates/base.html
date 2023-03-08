@@ -56,7 +56,7 @@
         <hr class="separador">
         <nav class="menu vertical">
             <a href="{% url 'core:palpitar' %}">Palpitar</a>
-            <a href="{% url 'core:classificacao_temp' %}">Classificação</a>
+            <a href="{% url 'core:classificacao' %}">Classificação</a>
             <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
             {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'core:manual_administracao' %}">Manual do administrador</a>

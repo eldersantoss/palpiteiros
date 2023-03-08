@@ -25,6 +25,13 @@ class DisabledPalpiteForm(BasePalpiteForm):
 class RankingPeriodForm(forms.Form):
     GERAL = 0
 
+    YEAR_CHOICE = (
+        (GERAL, "Todos os anos"),
+        ("2022", "2022"),
+        ("2023", "2023"),
+        ("2024", "2024"),
+    )
+
     JANEIRO = 1
     FEVEREIRO = 2
     MARCO = 3
@@ -54,20 +61,20 @@ class RankingPeriodForm(forms.Form):
         (DEZEMBRO, "Dezembro"),
     )
 
-    YEAR_CHOICE = (
-        (GERAL, "Todos os anos"),
-        ("2022", "2022"),
-        ("2023", "2023"),
-        ("2024", "2024"),
-    )
-
-    mes = forms.ChoiceField(
-        label="",
-        label_suffix="",
-        choices=MONTH_CHOICES,
-    )
     ano = forms.ChoiceField(
-        label="",
+        label="Temporada",
         label_suffix="",
         choices=YEAR_CHOICE,
     )
+    mes = forms.ChoiceField(
+        label="Mês",
+        label_suffix="",
+        choices=MONTH_CHOICES,
+    )
+
+    def clean(self):
+        cd = super().clean()
+        if not self.errors:
+            if cd["ano"] == "0" and cd["mes"] != "0":
+                cd["mes"] = "0"
+        return cd

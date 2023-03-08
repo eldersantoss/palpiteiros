@@ -160,39 +160,6 @@ class PalpitarViewTests(TestCase):
         self.assertEquals(created_guess.gols_visitante, 1)
 
 
-class ClassificacaoViewTest(TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = get_user_model().objects.create(username="testuser")
-        cls.palpiteiro = Palpiteiro.objects.create(usuario=cls.user)
-
-    def setUp(self) -> None:
-        self.client.force_login(self.user)
-        self.factory = RequestFactory()
-
-    def test_period_especification(self):
-        """Values that should assume month and year according with
-        query params:
-
-        - no query params is provided: use current month and year
-        - only month provided: use provided month and current year
-        - only year provided: use all months and provided year
-        - month and year provided: use month and year provided
-        """
-
-        response = self.client.get(reverse("core:classificacao"))
-        period = response.context.get("period")
-
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertIsNotNone(period)
-
-        self.assertIsInstance(period["name"], str)
-        self.assertIsInstance(period["start"], datetime)
-        self.assertIsInstance(period["end"], datetime)
-        self.assertEquals(period["start"].month, timezone.now().month)
-        self.assertEquals(period["end"].month, timezone.now().month)
-
-
 class ClassificacaoTempViewTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
@@ -204,7 +171,7 @@ class ClassificacaoTempViewTest(TestCase):
         self.factory = RequestFactory()
 
     def test_period_form_in_context_data(self):
-        response = self.client.get(reverse("core:classificacao_temp"))
+        response = self.client.get(reverse("core:classificacao"))
         period_form = response.context.get("period_form")
         current_month = str(timezone.now().month)
         current_year = str(timezone.now().year)
@@ -214,7 +181,7 @@ class ClassificacaoTempViewTest(TestCase):
         self.assertEquals(period_form.cleaned_data["ano"], current_year)
 
         response = self.client.get(
-            reverse("core:classificacao_temp"),
+            reverse("core:classificacao"),
             data={"mes": 1, "ano": 2022},
         )
         period_form = response.context.get("period_form")

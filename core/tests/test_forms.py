@@ -7,7 +7,7 @@ from ..forms import RankingPeriodForm
 class RankingPeriodFormTests(TestCase):
     def test_form_has_correct_fields(self):
         form = RankingPeriodForm()
-        self.assertEquals(list(form.fields.keys()), ["mes", "ano"])
+        self.assertEquals(list(form.fields.keys()), ["ano", "mes"])
 
     def test_period_validation(self):
         form = RankingPeriodForm(data={"mes": "2", "ano": "2023"})
@@ -18,6 +18,10 @@ class RankingPeriodFormTests(TestCase):
 
         form = RankingPeriodForm(data={"mes": 0, "ano": 2022})
         self.assertTrue(form.is_valid())
+
+        form = RankingPeriodForm(data={"mes": 1, "ano": 0})
+        self.assertTrue(form.is_valid())
+        self.assertDictEqual(form.cleaned_data, {"mes": "0", "ano": "0"})
 
         form = RankingPeriodForm(data={"mes": "foo", "ano": "2023"})
         self.assertFalse(form.is_valid())

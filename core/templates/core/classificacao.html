@@ -6,34 +6,11 @@
 
 <h1>Classificação</h1>
 
-<form action={% url 'core:classificacao' %} method="GET">
+<form action="{% url 'core:classificacao' %}" method="GET" class="menu horizontal period-form">
   {{ period_form.as_div }}
 </form>
 
-<nav class="menu horizontal">
-    <a
-        href="{% url 'core:classificacao' %}?periodo=mensal"
-        {% if period.name == 'mensal' %}class="ativado"{% endif %}
-    >
-        Mensal
-    </a>
-    <a
-        href="{% url 'core:classificacao' %}?periodo=anual"
-        {% if period.name == 'anual' %}class="ativado"{% endif %}
-    >
-        Anual
-    </a>
-    <a
-        href="{% url 'core:classificacao' %}?periodo=geral"
-        {% if period.name == 'geral' %}class="ativado"{% endif %}
-    >
-        Geral
-    </a>
-</nav>
-
-<p class="periodo-classificacao">Período: {{ period.start }} a {{ period.end }}</p>
-
-{% if palpiteiros %}
+{% if ranking %}
 <table>
     <tr>
         <th></th>
@@ -41,7 +18,7 @@
         <th></th>
         <th>Pontos</th>
     </tr>
-    {% for palpiteiro in palpiteiros %}
+    {% for guesser in ranking %}
     <tr>
         <td>
             {% if forloop.counter == 1 %}
@@ -55,8 +32,8 @@
             {% endif %}
         </td>
         <td>{{ forloop.counter }}º</td>
-        <td>{{ palpiteiro }}</td>
-        <td>{{ palpiteiro.pontuacao }}</td>
+        <td>{{ guesser }}</td>
+        <td>{{ guesser.score }}</td>
     </tr>
     {% endfor %}
 </table>
