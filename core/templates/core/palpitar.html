@@ -6,6 +6,8 @@
 
 <h1>Palpitar</h1>
 
+<p>{% now "DATETIME_FORMAT" %}</p>
+
 <form action="{% url 'core:palpitar' %}" method="post" class="palpite-form">
 
     {% csrf_token %}
