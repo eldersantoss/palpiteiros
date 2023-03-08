@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.http import QueryDict, HttpResponse
 
 from .models import Rodada, Partida, Palpite, Palpiteiro
-from .forms import EnabledPalpiteForm
+from .forms import EnabledPalpiteForm, RankingPeriodForm
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -184,50 +184,21 @@ def detalhes_rodada(request, id_rodada):
 
 @login_required
 def classificacao(request):
-    periodo = _obter_periodo(request.GET)
-    palpiteiros = list(Palpiteiro.objects.all())
-    for palpiteiro in palpiteiros:
-        palpiteiro.pontuacao = palpiteiro.obter_pontuacao_no_periodo(
-            periodo["inicio"],
-            periodo["fim"],
-        )
-    palpiteiros.sort(key=lambda p: p.pontuacao, reverse=True)
+    current_period = {"mes": timezone.now().month, "ano": timezone.now().year}
+    form = RankingPeriodForm(request.GET or current_period)
+    if form.is_valid():
+        month = int(form.cleaned_data["mes"])
+        year = int(form.cleaned_data["ano"])
+    else:
+        month = current_period["mes"]
+        year = current_period["ano"]
+    form = RankingPeriodForm({"mes": month, "ano": year})
+    ranking = Palpiteiro.get_ranking(month, year)
     return render(
         request,
         "core/classificacao.html",
-        {"periodo": periodo, "palpiteiros": palpiteiros},
+        {"period_form": form, "ranking": ranking},
     )
-
-
-def _obter_periodo(get_params: QueryDict):
-    label = get_params.get("periodo") or "mensal"
-    inicio_base = timezone.now().replace(day=1, hour=0, minute=0, second=0)
-    fim_base = inicio_base.replace(hour=23, minute=59, second=59)
-
-    # todos os meses do ano atual
-    if label == "anual":
-        inicio = inicio_base.replace(month=1)
-        fim = fim_base.replace(day=31, month=12)
-
-    # periodo entre data da primeira partida registrada até data atual
-    elif label == "geral":
-        partida = Partida.objects.first()
-        if partida is not None:
-            inicio = partida.data_hora
-        else:
-            inicio = timezone.now()
-        fim = timezone.now()
-
-    # mes e ano atuais
-    else:
-        inicio = inicio_base
-        fim = (
-            fim_base.replace(month=inicio.month + 1)
-            if inicio.month < 12
-            else fim_base.replace(month=1, year=inicio.year + 1)
-        ) - timedelta(days=1)
-
-    return {"label": label, "inicio": inicio, "fim": fim}
 
 
 def one_signal_worker(request):

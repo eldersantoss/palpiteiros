@@ -96,7 +96,6 @@ h3 {
   margin-top: 2vh;
 }
 
-
 .separador {
   width: 100%;
   margin: 5vh 0;
@@ -125,6 +124,31 @@ h3 {
   color: greenyellow;
   font-weight: bold;
   text-shadow: 2px 2px 5px green;
+}
+
+.period-form {
+  margin-top: 2vh;
+}
+
+.period-form select {
+  background: #202124;
+  border: none;
+  border-bottom: 1px solid greenyellow;
+  color: greenyellow;
+  font-size: 0.85em;
+  font-weight: bold;
+  width: 13vh;
+}
+
+.period-form label {
+  display: block;
+  font-size: 0.55em;
+  margin-bottom: 0.5vh;
+}
+
+.period-form select option {
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .msg-central {
@@ -313,7 +337,7 @@ input[type=submit]:hover {
 
 .periodo-classificacao {
   font-size: 0.7em;
-  margin: 2vh 0;
+  margin: 0 0;
 }
 
 .pagination {

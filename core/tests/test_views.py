@@ -1,10 +1,11 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from http import HTTPStatus
 
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
+from django.http import QueryDict
 
 from model_mommy import mommy
 
@@ -159,5 +160,32 @@ class PalpitarViewTests(TestCase):
         self.assertEquals(created_guess.gols_visitante, 1)
 
 
-class ClassificacaoViewTest(TestCase):
-    ...
+class ClassificacaoTempViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = get_user_model().objects.create(username="testuser")
+        cls.palpiteiro = Palpiteiro.objects.create(usuario=cls.user)
+
+    def setUp(self) -> None:
+        self.client.force_login(self.user)
+        self.factory = RequestFactory()
+
+    def test_period_form_in_context_data(self):
+        response = self.client.get(reverse("core:classificacao"))
+        period_form = response.context.get("period_form")
+        current_month = str(timezone.now().month)
+        current_year = str(timezone.now().year)
+        self.assertIsNotNone(period_form)
+        self.assertTrue(period_form.is_valid())
+        self.assertEquals(period_form.cleaned_data["mes"], current_month)
+        self.assertEquals(period_form.cleaned_data["ano"], current_year)
+
+        response = self.client.get(
+            reverse("core:classificacao"),
+            data={"mes": 1, "ano": 2022},
+        )
+        period_form = response.context.get("period_form")
+        self.assertIsNotNone(period_form)
+        self.assertTrue(period_form.is_valid())
+        self.assertEquals(period_form.cleaned_data["mes"], "1")
+        self.assertEquals(period_form.cleaned_data["ano"], "2022")
