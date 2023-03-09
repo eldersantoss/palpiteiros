@@ -166,7 +166,7 @@ def detalhes_rodada(request, id_rodada):
                 )
 
                 if palpite is not None and partida.resultado is not None:
-                    dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao()
+                    dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao() or 0
 
             except Palpite.DoesNotExist:
                 palpite = None
