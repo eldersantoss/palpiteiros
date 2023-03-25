@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{ rodada }}</h1>
+<h1>{{ round }}</h1>
 
 <table class="main-table">
   <thead>
@@ -13,7 +13,7 @@
       <th style="width:2.5%"></th>
       <th style="width:45%">Palpiteiro</th>
       <th style="width:15%">
-        {% if rodada.aberta_para_palpites %}
+        {% if round.open_to_guesses %}
           Pontuação parcial
         {% else %}
           Pontuação final
@@ -23,11 +23,11 @@
     </tr>
   </thead>
   <tbody>
-  {% for dados_palpiteiro in dados_palpiteiros|dictsortreversed:"pontuacao" %}
+  {% for details in round_details%}
     <tr
       class="clickable-row"
-      name="clickable-row{{ dados_palpiteiro.palpiteiro.usuario.id }}"
-      onclick="expandDetailRow('{{ dados_palpiteiro.palpiteiro.usuario.id }}')"
+      name="clickable-row{{ details.guesser.usuario.id }}"
+      onclick="expandDetailRow('{{ details.guesser.usuario.id }}')"
     >
       <td>
         {% if forloop.counter == 1 %}
@@ -41,10 +41,10 @@
         {% endif %}
       </td>
       <td>{{ forloop.counter }}º</td>
-      <td>{{ dados_palpiteiro.palpiteiro }}</td>
-      <td>{{ dados_palpiteiro.pontuacao }}</td>
+      <td>{{ details.guesser }}</td>
+      <td>{{ details.round_score }}</td>
       <td class="expand-icon">
-      {% if dados_palpiteiro.palpiteiro.usuario == request.user %}
+      {% if details.guesser.usuario == request.user %}
       Palpites 🔼
       {% else %}
       Palpites 🔽
@@ -53,8 +53,8 @@
     </tr>
     <tr
       class="detail-row"
-      name="detail-row{{ dados_palpiteiro.palpiteiro.usuario.id }}"
-      {% if dados_palpiteiro.palpiteiro.usuario == request.user %}
+      name="detail-row{{ details.guesser.usuario.id }}"
+      {% if details.guesser.usuario == request.user %}
       style="display: table-row"
       {% endif %}
     >
@@ -70,29 +70,27 @@
             </tr>
           </thead>
           <tbody>
-            {% for partida_palpite in dados_palpiteiro.partidas_e_palpites %}
-              {% with partida=partida_palpite.partida palpite=partida_palpite.palpite %}
-                <tr>
-                  <td>
-                      <p>{{ partida.mandante }}</p>
-                      <p>x</p>
-                      <p>{{ partida.visitante }}</p>
-                  </td>
-                  <td>{{ partida.resultado|default:"-" }}</td>
-                  {% if palpite %}
-                    <td>{{ palpite.resultado }}</td>
-                    <td>{{ palpite.pontuacao|default_if_none:"-" }}</td>
-                  {% else %}
-                    <td>-</td>
-                    <td>-</td>
+            {% for match_and_guess in details.matches_and_guesses %}
+            <tr>
+              <td>
+                  <p>{{ match_and_guess.match.mandante }}</p>
+                  <p>x</p>
+                  <p>{{ match_and_guess.match.visitante }}</p>
+              </td>
+              <td>{{ match_and_guess.match.resultado|default:"-" }}</td>
+              {% if match_and_guess.guess %}
+                <td>{{ match_and_guess.guess.resultado }}</td>
+                <td>{{ match_and_guess.guess.pontuacao|default_if_none:"-" }}</td>
+              {% else %}
+                <td>-</td>
+                <td>-</td>
+              {% endif %}
+              <td>
+                  {% if match_and_guess.match.pontuacao_dobrada %}
+                  🔥
                   {% endif %}
-                  <td>
-                      {% if partida.pontuacao_dobrada %}
-                      🔥
-                      {% endif %}
-                  </td>
-                </tr>
-              {% endwith %}
+              </td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>

@@ -53,8 +53,8 @@ urlpatterns = [
     ),
     path(
         "rodada/<int:id_rodada>/",
-        views.detalhes_rodada,
-        name="detalhes_rodada",
+        views.round_details,
+        name="round_details",
     ),
     path(
         "OneSignalSDKWorker.js",

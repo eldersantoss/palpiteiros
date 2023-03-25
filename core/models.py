@@ -1,8 +1,10 @@
 from datetime import timedelta, datetime
 
 from django.db import models
+from django.db.models import Sum
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 
@@ -63,8 +65,8 @@ class Rodada(models.Model):
         return self.partidas.count()
 
     @admin.display(boolean=True, description="Aberta para palpites?")
-    def aberta_para_palpites(self):
-        return any([partida.aberta_para_palpites() for partida in self.partidas.all()])
+    def open_to_guesses(self):
+        return any([partida.open_to_guesses() for partida in self.partidas.all()])
 
     @property
     def abertura(self):
@@ -87,6 +89,28 @@ class Rodada(models.Model):
     def partidas_encerradas(self):
         data_hora_encerramento = timezone.now() + timedelta(minutes=30)
         return self.partidas.filter(data_hora__lte=data_hora_encerramento)
+
+    def get_details(self, logged_user: User) -> list[dict[str, any]]:
+        round_details = []
+        for guesser in Palpiteiro.objects.all():
+            detail = {
+                "guesser": guesser,
+                "round_score": guesser.get_round_score(self),
+                "matches_and_guesses": [],
+            }
+            for match in self.get_matches():
+                guess = (
+                    match.get_guess_by_guesser(guesser)
+                    if logged_user.palpiteiro == guesser or not match.open_to_guesses()
+                    else None
+                )
+                detail["matches_and_guesses"].append({"match": match, "guess": guess})
+            round_details.append(detail)
+        round_details.sort(key=lambda e: e["round_score"], reverse=True)
+        return round_details
+
+    def get_matches(self) -> models.QuerySet["Partida"]:
+        return self.partidas.all()
 
     def __str__(self) -> str:
         return self.label
@@ -137,8 +161,14 @@ class Partida(models.Model):
         boolean=True,
         description="Aberta para palpites?",
     )
-    def aberta_para_palpites(self):
+    def open_to_guesses(self):
         return timezone.now() + timedelta(minutes=30) < self.data_hora
+
+    def get_guess_by_guesser(self, guesser: "Palpiteiro"):
+        try:
+            return self.palpites.get(palpiteiro=guesser)
+        except Palpite.DoesNotExist:
+            return None
 
 
 class Palpiteiro(models.Model):
@@ -175,12 +205,6 @@ class Palpiteiro(models.Model):
         guessers.sort(key=lambda p: p.score, reverse=True)
         return guessers
 
-    @admin.display(description="Pontuação geral")
-    def obter_pontuacao_geral(self):
-        palpites = self.palpites.all()
-        pontuacao = self.calcular_pontuacao(palpites)
-        return pontuacao
-
     def obter_pontuacao_no_periodo(self, inicio: datetime, fim: datetime):
         palpites = self.palpites.filter(
             partida__data_hora__gt=inicio + timedelta(hours=3),
@@ -192,6 +216,25 @@ class Palpiteiro(models.Model):
     def calcular_pontuacao(self, palpites: models.QuerySet["Palpite"]):
         pontuacao = sum([palpite.obter_pontuacao() or 0 for palpite in palpites])
         return pontuacao
+
+    def get_round_score(self, round_: "Rodada") -> int:
+        return (
+            self.get_round_guesses(round_).aggregate(Sum("pontuacao"))["pontuacao__sum"]
+            or 0
+        )
+
+    def get_round_guesses(self, round_: "Rodada") -> models.QuerySet["Palpite"]:
+        return self.palpites.filter(partida__rodada=round_)
+
+    @admin.display(
+        boolean=True,
+        description="Palpitou na última rodada",
+    )
+    def guessed_on_last_round(self):
+        last_guess = self.palpites.last()
+        if last_guess is not None:
+            return last_guess.partida.rodada == Rodada.objects.first()
+        return False
 
     def __str__(self) -> str:
         return f"{self.usuario.get_full_name()} ({self.usuario.username})"
@@ -210,7 +253,7 @@ class Palpite(models.Model):
     )
     gols_mandante = models.PositiveIntegerField()
     gols_visitante = models.PositiveIntegerField()
-    pontuacao = models.PositiveIntegerField(blank=True, null=True)
+    pontuacao = models.PositiveIntegerField(default=0)
     contabilizado = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -228,15 +271,12 @@ class Palpite(models.Model):
     def resultado(self) -> str:
         return f"{self.gols_mandante} x {self.gols_visitante}"
 
-    def obter_pontuacao(self) -> int | None:
-        if not self.contabilizado:
+    def obter_pontuacao(self) -> int:
+        if self.partida.resultado is not None and not self.contabilizado:
             self._avaliar_pontuacao_e_contabilizar_palpite()
         return self.pontuacao
 
     def _avaliar_pontuacao_e_contabilizar_palpite(self):
-        if self.partida.resultado is None:
-            return
-
         ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.gols_mandante
         ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.gols_visitante
         ACERTO_MANDANTE_VENCEDOR = (self.gols_mandante > self.gols_visitante) and (

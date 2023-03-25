@@ -1,11 +1,10 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from http import HTTPStatus
 
 from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
-from django.http import QueryDict
 
 from model_mommy import mommy
 
@@ -160,7 +159,7 @@ class PalpitarViewTests(TestCase):
         self.assertEquals(created_guess.gols_visitante, 1)
 
 
-class ClassificacaoTempViewTest(TestCase):
+class ClassificacaoViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = get_user_model().objects.create(username="testuser")
@@ -189,3 +188,31 @@ class ClassificacaoTempViewTest(TestCase):
         self.assertTrue(period_form.is_valid())
         self.assertEquals(period_form.cleaned_data["mes"], "1")
         self.assertEquals(period_form.cleaned_data["ano"], "2022")
+
+
+class RoundDetailViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = get_user_model().objects.create(username="testuser")
+        cls.guesser = Palpiteiro.objects.create(usuario=cls.user)
+
+    def setUp(self) -> None:
+        self.client.force_login(self.user)
+        self.factory = RequestFactory()
+
+    def test_correct_round_in_and_all_guessers_in_context(self):
+        round_ = mommy.make(Rodada)
+        guessers = mommy.make(Palpiteiro, _quantity=3) + [self.guesser]
+
+        response = self.client.get(
+            reverse(
+                "core:round_details",
+                kwargs={"id_rodada": round_.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("round", response.context)
+        self.assertEqual(response.context["round"], round_)
+        self.assertIn("round_details", response.context)
+        self.assertEqual(len(guessers), len(response.context["round_details"]))
