@@ -21,5 +21,5 @@ class PartidaModelTests(TestCase):
             Partida,
             data_hora=timezone.now() + timedelta(minutes=30),
         )
-        self.assertTrue(open_match.aberta_para_palpites())
-        self.assertFalse(on_limit_closed_match.aberta_para_palpites())
+        self.assertTrue(open_match.open_to_guesses())
+        self.assertFalse(on_limit_closed_match.open_to_guesses())

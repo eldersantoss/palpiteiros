@@ -1,14 +1,12 @@
-from datetime import timedelta
-
 from django.views.generic import TemplateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.urls import reverse
-from django.http import QueryDict, HttpResponse
+from django.http import HttpResponse
 
-from .models import Rodada, Partida, Palpite, Palpiteiro
+from .models import Rodada, Palpite, Palpiteiro
 from .forms import EnabledPalpiteForm, RankingPeriodForm
 
 
@@ -134,51 +132,20 @@ class RodadasListView(LoginRequiredMixin, ListView):
 
 
 @login_required
-def detalhes_rodada(request, id_rodada):
+def round_details(request, id_rodada):
     """Busca todas as partidas de uma rodada e os palpites pertencentes
     ao usuário logado para cada uma das partidas. Então, renderiza o
-    template core/detalhes_rodada.html com os dados das partidas e seus
+    template core/round_details.html com os dados das partidas e seus
     respectivos palpites"""
 
-    palpiteiro_logado = request.user.palpiteiro
-    rodada = get_object_or_404(Rodada, pk=id_rodada)
-    partidas = rodada.partidas.all()
-
-    dados_palpiteiros = [
-        {
-            "palpiteiro": palpiteiro,
-            "partidas_e_palpites": [],
-            "pontuacao": 0,
-        }
-        for palpiteiro in Palpiteiro.objects.all()
-    ]
-
-    for dados_palpiteiro in dados_palpiteiros:
-        palpiteiro = dados_palpiteiro["palpiteiro"]
-
-        for partida in partidas:
-            try:
-                palpite = (
-                    partida.palpites.get(palpiteiro=dados_palpiteiro["palpiteiro"])
-                    if not partida.aberta_para_palpites()
-                    or palpiteiro == palpiteiro_logado
-                    else None
-                )
-
-                if palpite is not None and partida.resultado is not None:
-                    dados_palpiteiro["pontuacao"] += palpite.obter_pontuacao() or 0
-
-            except Palpite.DoesNotExist:
-                palpite = None
-
-            dados_palpiteiro["partidas_e_palpites"].append(
-                {"partida": partida, "palpite": palpite}
-            )
-
+    round_ = get_object_or_404(Rodada, pk=id_rodada)
     return render(
         request,
-        "core/detalhes_rodada.html",
-        {"rodada": rodada, "dados_palpiteiros": dados_palpiteiros},
+        "core/round_details.html",
+        {
+            "round": round_,
+            "round_details": round_.get_details(request.user),
+        },
     )
 
 
