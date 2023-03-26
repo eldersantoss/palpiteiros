@@ -151,14 +151,13 @@ def round_details(request, id_rodada):
 
 @login_required
 def classificacao(request):
-    current_period = {"mes": timezone.now().month, "ano": timezone.now().year}
-    form = RankingPeriodForm(request.GET or current_period)
+    form = RankingPeriodForm(request.GET)
     if form.is_valid():
         month = int(form.cleaned_data["mes"])
         year = int(form.cleaned_data["ano"])
     else:
-        month = current_period["mes"]
-        year = current_period["ano"]
+        month = timezone.now().month
+        year = timezone.now().year
     form = RankingPeriodForm({"mes": month, "ano": year})
     ranking = Palpiteiro.get_ranking(month, year)
     return render(

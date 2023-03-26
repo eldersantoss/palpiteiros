@@ -77,11 +77,11 @@
                   <p>x</p>
                   <p>{{ match_and_guess.match.visitante }}</p>
               </td>
-              <td>{{ match_and_guess.match.resultado|default:"-" }}</td>
+              <td>{{ match_and_guess.match.result_str|default:"-" }}</td>
               {% if match_and_guess.guess %}
-                <td>{{ match_and_guess.guess.resultado }}</td>
-                {% if match_and_guess.match.resultado %}
-                  <td>{{ match_and_guess.guess.pontuacao }}</td>
+                <td>{{ match_and_guess.guess.result_str }}</td>
+                {% if match_and_guess.match.result_str %}
+                  <td>{{ match_and_guess.guess.get_score }}</td>
                 {% else %}
                   <td>-</td>
                 {% endif %}

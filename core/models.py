@@ -143,6 +143,11 @@ class Partida(models.Model):
     def __str__(self):
         return f"{self.mandante.nome} x {self.visitante.nome}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        for guess in self.palpites.all():
+            guess.evaluate_and_consolidate()
+
     @property
     def abreviacao(self):
         return (
@@ -150,7 +155,7 @@ class Partida(models.Model):
         )
 
     @property
-    def resultado(self):
+    def result_str(self):
         return (
             f"{self.gols_mandante} x {self.gols_visitante}"
             if self.gols_mandante is not None and self.gols_visitante is not None
@@ -201,30 +206,26 @@ class Palpiteiro(models.Model):
 
         guessers = list(cls.objects.all())
         for guesser in guessers:
-            guesser.score = guesser.obter_pontuacao_no_periodo(start, end)
+            guesser.score = guesser.get_period_score(start, end)
         guessers.sort(key=lambda p: p.score, reverse=True)
         return guessers
 
-    def obter_pontuacao_no_periodo(self, inicio: datetime, fim: datetime):
-        palpites = self.palpites.filter(
-            partida__data_hora__gt=inicio + timedelta(hours=3),
-            partida__data_hora__lt=fim + timedelta(hours=3),
-        )
-        pontuacao = self.calcular_pontuacao(palpites)
-        return pontuacao
-
-    def calcular_pontuacao(self, palpites: models.QuerySet["Palpite"]):
-        pontuacao = sum([palpite.obter_pontuacao() or 0 for palpite in palpites])
-        return pontuacao
-
-    def get_round_score(self, round_: "Rodada") -> int:
+    def get_period_score(self, period_start: datetime, period_end: datetime):
         return (
-            self.get_round_guesses(round_).aggregate(Sum("pontuacao"))["pontuacao__sum"]
+            self.palpites.filter(
+                partida__data_hora__gt=period_start + timedelta(hours=3),
+                partida__data_hora__lt=period_end + timedelta(hours=3),
+            ).aggregate(Sum("pontuacao"))["pontuacao__sum"]
             or 0
         )
 
-    def get_round_guesses(self, round_: "Rodada") -> models.QuerySet["Palpite"]:
-        return self.palpites.filter(partida__rodada=round_)
+    def get_round_score(self, round_: "Rodada") -> int:
+        return (
+            self.palpites.filter(partida__rodada=round_).aggregate(Sum("pontuacao"))[
+                "pontuacao__sum"
+            ]
+            or 0
+        )
 
     @admin.display(
         boolean=True,
@@ -263,20 +264,21 @@ class Palpite(models.Model):
             + f"{self.gols_visitante} {self.partida.visitante.nome}"
         )
 
-    @property
-    def aberto(self):
-        return timezone.now() - timedelta(minutes=30) > self.partida.data_hora
-
-    @property
-    def resultado(self) -> str:
-        return f"{self.gols_mandante} x {self.gols_visitante}"
-
-    def obter_pontuacao(self) -> int:
-        if self.partida.resultado is not None and not self.contabilizado:
-            self._avaliar_pontuacao_e_contabilizar_palpite()
+    def get_score(self) -> int:
+        self.evaluate_and_consolidate()
         return self.pontuacao
 
-    def _avaliar_pontuacao_e_contabilizar_palpite(self):
+    def evaluate_and_consolidate(self):
+        if self.partida.result_str is not None and not self.contabilizado:
+            self.pontuacao = self._evaluate()
+            self.contabilizado = True
+            self.save()
+
+    @property
+    def result_str(self) -> str:
+        return f"{self.gols_mandante} x {self.gols_visitante}"
+
+    def _evaluate(self):
         ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.gols_mandante
         ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.gols_visitante
         ACERTO_MANDANTE_VENCEDOR = (self.gols_mandante > self.gols_visitante) and (
@@ -304,20 +306,19 @@ class Palpite(models.Model):
         PONTUACAO_ACERTO_SOMENTE_GOLS = 1
 
         if ACERTO_CRAVADO:
-            self.pontuacao = PONTUACAO_ACERTO_CRAVADO
+            score = PONTUACAO_ACERTO_CRAVADO
         elif ACERTO_PARCIAL_COM_GOLS:
-            self.pontuacao = PONTUACAO_ACERTO_PARCIAL_COM_GOLS
+            score = PONTUACAO_ACERTO_PARCIAL_COM_GOLS
         elif ACERTO_EMPATE:
-            self.pontuacao = PONTUACAO_ACERTO_EMPATE
+            score = PONTUACAO_ACERTO_EMPATE
         elif ACERTO_PARCIAL:
-            self.pontuacao = PONTUACAO_ACERTO_PARCIAL
+            score = PONTUACAO_ACERTO_PARCIAL
         elif ACERTO_SOMENTE_GOLS:
-            self.pontuacao = PONTUACAO_ACERTO_SOMENTE_GOLS
+            score = PONTUACAO_ACERTO_SOMENTE_GOLS
         else:
-            self.pontuacao = 0
+            score = 0
 
         if self.partida.pontuacao_dobrada:
-            self.pontuacao *= 2
+            score *= 2
 
-        self.contabilizado = True
-        self.save()
+        return score

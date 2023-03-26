@@ -25,6 +25,43 @@ class PartidaModelTests(TestCase):
         self.assertTrue(open_match.open_to_guesses())
         self.assertFalse(on_limit_closed_match.open_to_guesses())
 
+    def test_save_is_evaluating_and_consolidating_guesses(self):
+        """Save method should call evaluate_and_consolidate() for all
+        guesses they are related to"""
+
+        # Given a match and your guesses
+        match = mommy.make(
+            Partida,
+            data_hora=timezone.now() - timedelta(hours=6),
+        )
+        spiked_guess = mommy.make(
+            Palpite,
+            partida=match,
+            gols_mandante=2,
+            gols_visitante=0,
+        )
+        partially_correct_guess = mommy.make(
+            Palpite,
+            partida=match,
+            gols_mandante=3,
+            gols_visitante=1,
+        )
+
+        # Initially the score must be zero for all guesses
+        self.assertEqual(spiked_guess.get_score(), 0)
+        self.assertEqual(partially_correct_guess.get_score(), 0)
+
+        # When the match is updated
+        match.gols_mandante = 2
+        match.gols_visitante = 0
+        match.save()
+
+        # Then the guesses must have been evaluated and consolidated
+        self.assertEqual(spiked_guess.get_score(), 10)
+        self.assertTrue(spiked_guess.contabilizado)
+        self.assertEqual(partially_correct_guess.get_score(), 3)
+        self.assertTrue(partially_correct_guess.contabilizado)
+
 
 class RodadaModelTests(PalpiteirosTestCase):
     def test_round_detail_has_all_guessers_of_the_pool(self):
@@ -69,7 +106,7 @@ class RodadaModelTests(PalpiteirosTestCase):
         round_ = Rodada.objects.last()
         self.assertIsNotNone(round_)
         for guess in Palpite.objects.all():
-            guess.obter_pontuacao()
+            guess.get_score()
 
         round_detail = round_.get_details(self.guesser01.usuario)
         self.assertEqual(round_detail[0]["round_score"], 34)
