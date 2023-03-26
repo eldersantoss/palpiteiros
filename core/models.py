@@ -211,20 +211,20 @@ class Palpiteiro(models.Model):
         return guessers
 
     def get_period_score(self, period_start: datetime, period_end: datetime):
-        return (
-            self.palpites.filter(
-                partida__data_hora__gt=period_start + timedelta(hours=3),
-                partida__data_hora__lt=period_end + timedelta(hours=3),
-            ).aggregate(Sum("pontuacao"))["pontuacao__sum"]
-            or 0
+        return sum(
+            guess.get_score()
+            for guess in (
+                self.palpites.filter(
+                    partida__data_hora__gt=period_start + timedelta(hours=3),
+                    partida__data_hora__lt=period_end + timedelta(hours=3),
+                )
+            )
         )
 
     def get_round_score(self, round_: "Rodada") -> int:
-        return (
-            self.palpites.filter(partida__rodada=round_).aggregate(Sum("pontuacao"))[
-                "pontuacao__sum"
-            ]
-            or 0
+        return sum(
+            guess.get_score()
+            for guess in (self.palpites.filter(partida__rodada=round_))
         )
 
     @admin.display(
