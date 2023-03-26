@@ -80,7 +80,11 @@
               <td>{{ match_and_guess.match.resultado|default:"-" }}</td>
               {% if match_and_guess.guess %}
                 <td>{{ match_and_guess.guess.resultado }}</td>
-                <td>{{ match_and_guess.guess.pontuacao|default_if_none:"-" }}</td>
+                {% if match_and_guess.match.resultado %}
+                  <td>{{ match_and_guess.guess.pontuacao }}</td>
+                {% else %}
+                  <td>-</td>
+                {% endif %}
               {% else %}
                 <td>-</td>
                 <td>-</td>
