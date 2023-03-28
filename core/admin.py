@@ -16,7 +16,7 @@ class EquipeAdmin(admin.ModelAdmin):
 
 @admin.register(Palpiteiro)
 class PalpiteiroAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "usuario", "obter_pontuacao_geral")
+    list_display = ("__str__", "usuario", "guessed_on_last_round")
     search_fields = [
         "usuario__username",
         "usuario__first_name",
@@ -30,7 +30,7 @@ class PartidaAdmin(admin.ModelAdmin):
         "__str__",
         "rodada",
         "data_hora",
-        "aberta_para_palpites",
+        "open_to_guesses",
         "gols_mandante",
         "gols_visitante",
     )
@@ -54,7 +54,7 @@ class RodadaAdmin(admin.ModelAdmin):
         "numero_partidas",
         "abertura",
         "fechamento",
-        "aberta_para_palpites",
+        "open_to_guesses",
     )
     inlines = [PartidaInline]
 
