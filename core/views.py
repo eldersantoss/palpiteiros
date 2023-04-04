@@ -7,8 +7,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponse
 
-from .models import Rodada, Palpite, Palpiteiro, Partida
-from .forms import GuessForm, RankingPeriodForm
+from .models import Rodada, Palpiteiro, Partida
+from .forms import RankingPeriodForm
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -56,13 +56,13 @@ class RodadasListView(LoginRequiredMixin, ListView):
 
 
 @login_required
-def round_details(request, id_rodada):
+def round_details(request, slug):
     """Busca todas as partidas de uma rodada e os palpites pertencentes
     ao usuário logado para cada uma das partidas. Então, renderiza o
     template core/round_details.html com os dados das partidas e seus
     respectivos palpites"""
 
-    round_ = get_object_or_404(Rodada, pk=id_rodada)
+    round_ = get_object_or_404(Rodada, slug=slug)
     return render(
         request,
         "core/round_details.html",

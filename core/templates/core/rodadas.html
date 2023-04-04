@@ -8,7 +8,7 @@
 
 <nav class="menu vertical">
     {% for rodada in rodadas %}
-    <a href="{% url 'core:round_details' rodada.id %}">{{ rodada }}</a>
+    <a href="{% url 'core:round_details' rodada.slug %}">{{ rodada }}</a>
     {% endfor %}
 </nav>
 

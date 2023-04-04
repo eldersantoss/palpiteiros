@@ -32,7 +32,7 @@ urlpatterns = [
         name="lista_rodadas",
     ),
     path(
-        "rodada/<int:id_rodada>/",
+        "rodada/<slug:slug>/",
         views.round_details,
         name="round_details",
     ),
