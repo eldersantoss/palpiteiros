@@ -51,11 +51,14 @@ class PartidaInline(admin.TabularInline):
 class RodadaAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
+        "created",
+        "modified",
         "numero_partidas",
         "abertura",
         "fechamento",
         "open_to_guesses",
     )
+    prepopulated_fields = {"slug": ("label",)}
     inlines = [PartidaInline]
 
 

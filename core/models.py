@@ -1,11 +1,20 @@
 from datetime import timedelta, datetime
 
-from django.db import models
-from django.db.models import Sum
+from django.db import models, transaction
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+from .forms import GuessForm
+
+
+class TimeStampedModel(models.Model):
+    created = models.DateTimeField("Criação", auto_now_add=True)
+    modified = models.DateTimeField("Atualização", auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
 class Equipe(models.Model):
@@ -19,7 +28,7 @@ class Equipe(models.Model):
         return self.nome
 
 
-class Rodada(models.Model):
+class Rodada(TimeStampedModel):
     def _gerar_label_default():
         nome_meses = [
             "janeiro",
@@ -52,10 +61,9 @@ class Rodada(models.Model):
 
         return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
 
-    label = models.CharField(
-        max_length=50,
-        default=_gerar_label_default,
-    )
+    label = models.CharField(max_length=100, default=_gerar_label_default)
+    active = models.BooleanField("Ativa", default=False)
+    slug = models.SlugField(default="")
 
     class Meta:
         ordering = ("-id",)
@@ -112,6 +120,10 @@ class Rodada(models.Model):
     def get_matches(self) -> models.QuerySet["Partida"]:
         return self.partidas.all()
 
+    class Meta:
+        verbose_name = "Rodada"
+        verbose_name_plural = "Rodadas"
+
     def __str__(self) -> str:
         return self.label
 
@@ -147,6 +159,78 @@ class Partida(models.Model):
         super().save(*args, **kwargs)
         for guess in self.palpites.all():
             guess.evaluate_and_consolidate()
+
+    @classmethod
+    def have_open_matches_for_any_active_round(cls):
+        return cls.objects.filter(
+            rodada__active=True,
+            data_hora__gt=timezone.now() + timedelta(minutes=30),
+        ).exists()
+
+    @classmethod
+    def get_closed_matches_with_guesses(cls, guesser: "Palpiteiro"):
+        """For each closed match of the the active rounds, it searches
+        and appends the guess of the provided guesser, if exists."""
+
+        closed_matches = cls.objects.filter(
+            rodada__active=True,
+            data_hora__lte=timezone.now() + timedelta(minutes=30),
+        )
+        for cm in closed_matches:
+            try:
+                cm.guess = cm.palpites.get(palpiteiro=guesser)
+            except Palpite.DoesNotExist:
+                cm.guess = None
+        return closed_matches
+
+    @classmethod
+    def create_update_or_retrieve_guesses_from_your_forms(
+        cls,
+        guesser: "Palpiteiro",
+        post_data: dict = {},
+    ):
+        """For each open match, if post_data was provided, instantiate
+        a form with the post_data and create or update the guess for
+        the provided guesser. Otherwise, for GET requests, instantiate
+        a clean form or with data from a guess already created for this
+        match. Also, appends a guess_form attribute with the instance
+        of the created form for all matches."""
+
+        open_matches = cls.objects.filter(
+            rodada__active=True,
+            data_hora__gt=timezone.now() + timedelta(minutes=30),
+        )
+
+        with transaction.atomic():
+            for om in open_matches:
+                form = GuessForm(post_data, partida=om)
+                if form.is_valid():
+                    obj, created = om.palpites.get_or_create(
+                        palpiteiro=guesser,
+                        defaults={
+                            "gols_mandante": form.cleaned_data[f"gols_mandante"],
+                            "gols_visitante": form.cleaned_data[f"gols_visitante"],
+                        },
+                    )
+                    if not created:
+                        obj.gols_mandante = form.cleaned_data[f"gols_mandante"]
+                        obj.gols_visitante = form.cleaned_data[f"gols_visitante"]
+                        obj.save()
+
+                else:
+                    try:
+                        guess = om.palpites.get(palpiteiro=guesser)
+                        initial_data = {
+                            f"gols_mandante_{om.id}": guess.gols_mandante,
+                            f"gols_visitante_{om.id}": guess.gols_visitante,
+                        }
+                    except Palpite.DoesNotExist:
+                        initial_data = {}
+                    form = GuessForm(initial_data, partida=om)
+
+                om.guess_form = form
+
+        return open_matches
 
     @property
     def abreviacao(self):

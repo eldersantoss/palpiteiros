@@ -12,29 +12,9 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "palpitar/",
-        views.palpitar,
-        name="palpitar",
-    ),
-    path(
-        "palpitar/sucesso/",
-        views.PalpitarSucessoView.as_view(),
-        name="palpitar_sucesso",
-    ),
-    path(
-        "palpitar/encerrado/",
-        views.PalpitesEncerradosView.as_view(),
-        name="palpites_encerrados",
-    ),
-    path(
-        "palpitar/palpiteiro_nao_encontrado/",
-        views.PalpiteiroNaoEncontradoView.as_view(),
-        name="palpiteiro_nao_encontrado",
-    ),
-    path(
-        "palpitar/rodada_nao_encontrada/",
-        views.RodadaNaoEncontradaView.as_view(),
-        name="rodada_nao_encontrada",
+        "palpites/",
+        views.guesses,
+        name="guesses",
     ),
     path(
         "manual_administracao/",
@@ -43,8 +23,8 @@ urlpatterns = [
     ),
     path(
         "classificacao/",
-        views.classificacao,
-        name="classificacao",
+        views.ranking,
+        name="ranking",
     ),
     path(
         "rodadas/",
