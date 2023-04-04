@@ -82,22 +82,21 @@ h3 {
   color: yellowgreen;
 }
 
-.paragrafo-comum {
+.common-paragraph {
   line-height: 25px;
   margin: 5vh 0 0 0;
 }
 
-.lista-comum {
+.common-list {
   line-height: 25px;
   padding-left: 5vw;
 }
 
-.item-lista-comum {
+.common-list-item {
   margin-top: 2vh;
 }
 
-
-.separador {
+.spacer {
   width: 100%;
   margin: 5vh 0;
   border: 0;
@@ -121,13 +120,32 @@ h3 {
   justify-content: space-evenly;
 }
 
-.ativado {
-  color: greenyellow;
-  font-weight: bold;
-  text-shadow: 2px 2px 5px green;
+.period-form {
+  margin-top: 2vh;
 }
 
-.msg-central {
+.period-form select {
+  background: #202124;
+  border: none;
+  border-bottom: 1px solid greenyellow;
+  color: greenyellow;
+  font-size: 0.85em;
+  font-weight: bold;
+  width: 13vh;
+}
+
+.period-form label {
+  display: block;
+  font-size: 0.55em;
+  margin-bottom: 0.5vh;
+}
+
+.period-form select option {
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.main-msg {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -163,10 +181,6 @@ h3 {
   flex-grow: 1;
 }
 
-.help-links .msg-central {
-  flex-grow: 0;
-}
-
 .login-form label {
   display: flex;
 }
@@ -194,6 +208,30 @@ div.helptext {
   text-align: center;
 }
 
+
+.messages {
+  list-style: none;
+  font-weight: bold;
+  padding: 1.5vh;
+  border-radius: 1vh;
+  text-align: center;
+  color: white;
+  width: 100%;
+}
+
+.temp-msg {
+  padding: 1.5vh;
+  border-radius: 1vh;
+}
+
+.error {
+  background-color: rgba(255, 50, 75, 0.25);
+}
+
+.success {
+  background-color: rgba(125, 255, 75, 0.25);
+}
+
 .login-form input {
   margin-top: 1vh;
   padding: 1vw;
@@ -203,7 +241,7 @@ div.helptext {
   font-size: 0.9em;
 }
 
-.palpite-form {
+.guess-form {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -211,15 +249,15 @@ div.helptext {
   align-items: center;
 }
 
-.palpite-form div {
+.guess-form div {
   margin-top: 1vh;
 }
 
-.palpite-form label {
+.guess-form label {
   margin: 0 1vw;
 }
 
-.palpite-form input {
+.guess-form input {
   text-align: center;
   padding: 1vw;
   margin: 0 1vw;
@@ -230,33 +268,27 @@ div.helptext {
   font-weight: bold;
 }
 
-.partida-wrapper {
+.match-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
   margin: 0 0 5vh 0;
 }
 
-.aviso-partida-dobrada {
-  margin: 0;
-  font-size: 0.7em;
-  align-self: center;
-}
-
-.horario-partida {
+.match-time {
   text-align: center;
   font-size: 0.75em;
   margin: 0 0;
 }
 
-.palpite-wrapper {
+.guess-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 0.7em;
 }
 
-.equipe {
+.team {
   display: flex;
   align-items: center;
   width: 47.5%;
@@ -264,12 +296,12 @@ div.helptext {
   text-align: center;
 }
 
-.mandante {
+.home {
   text-align: right;
   justify-content: flex-end;
 }
 
-.visitante {
+.away {
   text-align: left;
   justify-content: flex-start;
 }
@@ -292,34 +324,12 @@ input[type=submit]:hover {
   background-color: greenyellow;
 }
 
-.palpite-form input[type=submit] {
+.guess-form input[type=submit] {
   margin-top: 5vh;
 }
 
 .login-form input[type=submit] {
   margin-top: 2vh;
-}
-
-.classificacao-form {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 15px 0;
-}
-
-.classificacao-form div {
-  margin: 0 10px;
-}
-
-.periodo-classificacao {
-  font-size: 0.7em;
-  margin: 2vh 0;
-}
-
-.pagination {
-  align-self: center;
-  position: absolute;
-  bottom: 7em;
 }
 
 table {
