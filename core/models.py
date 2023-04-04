@@ -138,7 +138,10 @@ class Partida(models.Model):
     pontuacao_dobrada = models.BooleanField(default=False)
 
     class Meta:
+        verbose_name = "partida"
+        verbose_name_plural = "partidas"
         ordering = ("data_hora",)
+        unique_together = ["rodada", "mandante", "visitante"]
 
     def __str__(self):
         return f"{self.mandante.nome} x {self.visitante.nome}"
@@ -328,6 +331,11 @@ class Palpite(models.Model):
     gols_visitante = models.PositiveIntegerField()
     pontuacao = models.PositiveIntegerField(default=0)
     contabilizado = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "palpite"
+        verbose_name_plural = "palpites"
+        unique_together = ["palpiteiro", "partida"]
 
     def __str__(self) -> str:
         return (
