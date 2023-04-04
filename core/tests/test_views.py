@@ -213,7 +213,7 @@ class RoundDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "core:round_details",
-                kwargs={"id_rodada": round_.id},
+                kwargs={"slug": round_.slug},
             )
         )
 
