@@ -46,24 +46,12 @@ class Rodada(TimeStampedModel):
         ]
         mes_atual = timezone.now().month
         ano_atual = timezone.now().year
-
-        try:
-            ultima_partida = Partida.objects.order_by("data_hora").last()
-            numero_ultima_rodada = int(ultima_partida.rodada.label.split(" ")[0][:-1])
-            numero_rodada = (
-                numero_ultima_rodada + 1
-                if mes_atual == ultima_partida.data_hora.month
-                else 1
-            )
-
-        except AttributeError:
-            numero_rodada = 1
-
+        numero_rodada = Rodada.objects.filter(created__month=mes_atual).count() + 1
         return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
 
     label = models.CharField(max_length=100, default=_gerar_label_default)
     active = models.BooleanField("Ativa", default=False)
-    slug = models.SlugField(default="")
+    slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ("-id",)
