@@ -40,23 +40,22 @@
 
     <main>
         {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">
-                    {{ message|safe }}
-                    <a href="#" class="close-message">x</a>
-                </li>
-            {% endfor %}
-        </ul>
+          <ul class="messages">
+              {% for message in messages %}
+                  <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                      {{ message|safe }}
+                  </li>
+              {% endfor %}
+          </ul>
         {% endif %}
 
         {% block content %}{% endblock content %}
 
         {% if request.user.is_authenticated %}
-        <hr class="separador">
+        <hr class="spacer">
         <nav class="menu vertical">
-            <a href="{% url 'core:palpitar' %}">Palpitar</a>
-            <a href="{% url 'core:classificacao' %}">Classificação</a>
+            <a href="{% url 'core:guesses' %}">Palpitar</a>
+            <a href="{% url 'core:ranking' %}">Classificação</a>
             <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
             {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'core:manual_administracao' %}">Manual do administrador</a>

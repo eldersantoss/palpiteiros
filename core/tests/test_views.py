@@ -1,7 +1,7 @@
 from datetime import timedelta
 from http import HTTPStatus
 
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
@@ -11,7 +11,7 @@ from model_mommy import mommy
 from ..models import Palpiteiro, Partida, Rodada, Palpite
 
 
-class PalpitarViewTests(TestCase):
+class GuessesViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = get_user_model().objects.create(username="testuser")
@@ -21,39 +21,36 @@ class PalpitarViewTests(TestCase):
         self.client.force_login(self.user)
 
     def test_no_guesser_found(self):
-        """When no guesser is found the response should be a
-        redirect to palpiteiro_nao_encontrado"""
+        """When no guesser is found the response should be a redirect
+        to index view"""
 
         self.palpiteiro.delete()
 
-        response = self.client.get(reverse("core:palpitar"))
+        response = self.client.get(reverse("core:guesses"))
 
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, reverse("core:palpiteiro_nao_encontrado"))
+        self.assertRedirects(response, reverse("core:index"), 302)
 
     def test_no_round_found(self):
         """When no round is found the response should be a
-        redirect to rodada_nao_encontrada"""
+        redirect to index view"""
 
-        response = self.client.get(reverse("core:palpitar"))
+        response = self.client.get(reverse("core:guesses"))
 
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, reverse("core:rodada_nao_encontrada"))
+        self.assertRedirects(response, reverse("core:index"), 302)
 
     def test_no_open_matches(self):
         """When no open matches are found, the response should be a
-        redirect to palpites_encerrados"""
-        mommy.make(Rodada)
+        redirect to index"""
+        mommy.make(Rodada, active=True)
 
-        response = self.client.get(reverse("core:palpitar"))
+        response = self.client.get(reverse("core:guesses"))
 
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, reverse("core:palpites_encerrados"))
+        self.assertRedirects(response, reverse("core:index"), 302)
 
     def test_form_count_for_open_matches(self):
         """The number of forms in the context should be equals to the
         number of open matches"""
-        rodada = mommy.make(Rodada)
+        rodada = mommy.make(Rodada, active=True)
         open_matches = mommy.make(
             Partida,
             _quantity=5,
@@ -61,18 +58,23 @@ class PalpitarViewTests(TestCase):
             data_hora=timezone.now() + timedelta(minutes=60),
         )
 
-        response = self.client.get(reverse("core:palpitar"))
-        forms_palpites_abertos = response.context["forms_palpites_abertos"]
+        response = self.client.get(reverse("core:guesses"))
+
+        open_matches_guess_forms = [
+            om.guess_form for om in response.context["open_matches"]
+        ]
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertEquals(len(forms_palpites_abertos), len(open_matches))
+        self.assertEquals(len(open_matches_guess_forms), len(open_matches))
 
     def test_populated_forms_for_open_matches_that_have_a_guess(self):
         """Forms for matches that already been filled out should
         still be filled in with the same values"""
 
+        rodada = mommy.make(Rodada, active=True)
         open_match = mommy.make(
             Partida,
+            rodada=rodada,
             data_hora=timezone.now() + timedelta(minutes=60),
         )
 
@@ -84,12 +86,14 @@ class PalpitarViewTests(TestCase):
             gols_visitante=0,
         )
 
-        response = self.client.get(reverse("core:palpitar"))
-        forms = response.context["forms_palpites_abertos"]
+        response = self.client.get(reverse("core:guesses"))
+        open_matches_guess_forms = [
+            om.guess_form for om in response.context["open_matches"]
+        ]
 
-        self.assertEquals(len(forms), 1)
+        self.assertEquals(len(open_matches_guess_forms), 1)
 
-        palpite_form = forms[0]
+        palpite_form = open_matches_guess_forms[0]
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertEquals(
@@ -107,7 +111,7 @@ class PalpitarViewTests(TestCase):
         dicts referent to closed matches should be in context of the
         get request response"""
 
-        rodada = mommy.make(Rodada)
+        rodada = mommy.make(Rodada, active=True)
 
         open_match = mommy.make(
             Partida, rodada=rodada, data_hora=timezone.now() + timedelta(minutes=31)
@@ -123,28 +127,32 @@ class PalpitarViewTests(TestCase):
             data_hora=timezone.now() - timedelta(minutes=30),
         )
 
-        response = self.client.get(reverse("core:palpitar"))
-        dados_palpites_encerrados = response.context["dados_palpites_encerrados"]
-        forms_palpites_abertos = response.context["forms_palpites_abertos"]
+        response = self.client.get(reverse("core:guesses"))
+        closed_matches = response.context["closed_matches"]
+        open_matches_guess_forms = [
+            om.guess_form for om in response.context["open_matches"]
+        ]
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertEquals(Partida.objects.count(), 3)
-        self.assertEquals(len(dados_palpites_encerrados), 2)
-        self.assertEquals(len(forms_palpites_abertos), 1)
-        self.assertEquals(forms_palpites_abertos[0].partida, open_match)
+        self.assertEquals(len(closed_matches), 2)
+        self.assertEquals(len(open_matches_guess_forms), 1)
+        self.assertEquals(open_matches_guess_forms[0].partida, open_match)
 
     def test_send_a_guess(self):
         """When send a guess for a open match via post request, a
         Palpite instance should be created"""
 
+        rodada = mommy.make(Rodada, active=True)
         open_match = mommy.make(
             Partida,
+            rodada=rodada,
             data_hora=timezone.now() + timedelta(minutes=60),
         )
         number_of_guesses_before = Palpite.objects.count()
 
         self.client.post(
-            reverse("core:palpitar"),
+            reverse("core:guesses"),
             data={
                 f"gols_mandante_{open_match.id}": 2,
                 f"gols_visitante_{open_match.id}": 1,
@@ -167,10 +175,9 @@ class ClassificacaoViewTests(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
-        self.factory = RequestFactory()
 
     def test_period_form_in_context_data(self):
-        response = self.client.get(reverse("core:classificacao"))
+        response = self.client.get(reverse("core:ranking"))
         period_form = response.context.get("period_form")
         current_month = str(timezone.now().month)
         current_year = str(timezone.now().year)
@@ -180,7 +187,7 @@ class ClassificacaoViewTests(TestCase):
         self.assertEquals(period_form.cleaned_data["ano"], current_year)
 
         response = self.client.get(
-            reverse("core:classificacao"),
+            reverse("core:ranking"),
             data={"mes": 1, "ano": 2022},
         )
         period_form = response.context.get("period_form")
@@ -198,7 +205,6 @@ class RoundDetailViewTests(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
-        self.factory = RequestFactory()
 
     def test_correct_round_in_and_all_guessers_in_context(self):
         round_ = mommy.make(Rodada)
