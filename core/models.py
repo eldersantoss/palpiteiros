@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from .forms import GuessForm
 
@@ -55,14 +56,27 @@ class Rodada(TimeStampedModel):
 
     class Meta:
         ordering = ("-id",)
+        verbose_name = "Rodada"
+        verbose_name_plural = "Rodadas"
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.active and Rodada.objects.filter(active=True).exists():
+            raise ValidationError(
+                {
+                    "active": [
+                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
+                    ]
+                }
+            )
 
     @admin.display(description="Número de partidas")
     def numero_partidas(self) -> int:
         return self.partidas.count()
-
-    @admin.display(boolean=True, description="Aberta para palpites?")
-    def open_to_guesses(self):
-        return any([partida.open_to_guesses() for partida in self.partidas.all()])
 
     @property
     def abertura(self):
@@ -107,10 +121,6 @@ class Rodada(TimeStampedModel):
 
     def get_matches(self) -> models.QuerySet["Partida"]:
         return self.partidas.all()
-
-    class Meta:
-        verbose_name = "Rodada"
-        verbose_name_plural = "Rodadas"
 
     def __str__(self) -> str:
         return self.label

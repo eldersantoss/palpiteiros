@@ -2,10 +2,11 @@ from datetime import timedelta
 
 from django.utils import timezone
 from django.test import TestCase
-from core.models import Partida, Rodada, Palpite
+from django.core.exceptions import ValidationError
 
 from model_mommy import mommy
 
+from core.models import Partida, Rodada, Palpite
 from .base import PalpiteirosTestCase
 
 
@@ -64,10 +65,14 @@ class MatchModelTests(TestCase):
 
 
 class RoundModelTests(PalpiteirosTestCase):
+    def test_only_one_active_round_is_allowed(self):
+        with self.assertRaises(ValidationError):
+            mommy.make(Rodada, active=True)
+
     def test_round_detail_has_all_guessers_of_the_pool(self):
         """All guessers of the pool should be in the returned data"""
 
-        round_ = Rodada.objects.last()
+        round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
         round_detail = round_.get_details(self.guesser01.usuario)
@@ -77,7 +82,7 @@ class RoundModelTests(PalpiteirosTestCase):
     def test_round_datail_has_all_matches_of_the_round(self):
         """All matches of the round should be in each dict of the
         returned data"""
-        round_ = Rodada.objects.last()
+        round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
         round_detail = round_.get_details(self.guesser01.usuario)
@@ -92,7 +97,7 @@ class RoundModelTests(PalpiteirosTestCase):
             self.assertCountEqual(match_set, self.all_matches)
 
     def test_round_detail_guessers_are_correctly_ordered_by_round_score(self):
-        round_ = Rodada.objects.last()
+        round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
         round_detail = round_.get_details(self.guesser01.usuario)
@@ -103,7 +108,7 @@ class RoundModelTests(PalpiteirosTestCase):
             )
 
     def test_round_detail_has_correct_round_score_for_guessers(self):
-        round_ = Rodada.objects.last()
+        round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
         for guess in Palpite.objects.all():
             guess.get_score()
@@ -114,7 +119,7 @@ class RoundModelTests(PalpiteirosTestCase):
         self.assertEqual(round_detail[2]["round_score"], 0)
 
     def test_round_detail_has_omitted_guesses_for_open_matches(self):
-        round_ = Rodada.objects.last()
+        round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
         round_detail = round_.get_details(self.guesser01.usuario)

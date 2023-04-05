@@ -56,7 +56,7 @@ class RodadaAdmin(admin.ModelAdmin):
         "numero_partidas",
         "abertura",
         "fechamento",
-        "open_to_guesses",
+        "active",
     )
     prepopulated_fields = {"slug": ("label",)}
     inlines = [PartidaInline]
