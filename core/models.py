@@ -308,8 +308,9 @@ class Palpiteiro(models.Model):
     )
     def guessed_on_last_round(self):
         last_guess = self.palpites.last()
+        last_active_round = Rodada.objects.filter(active=True).first()
         if last_guess is not None:
-            return last_guess.partida.rodada == Rodada.objects.first()
+            return last_guess.partida.rodada == last_active_round
         return False
 
     def __str__(self) -> str:

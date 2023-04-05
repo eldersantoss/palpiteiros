@@ -21,47 +21,48 @@ class PalpiteirosTestCase(TestCase):
         ]
 
         # Rodadas e Partidas
-        cls.round = mommy.make(Rodada)
+        cls.inactive_round = mommy.make(Rodada)
+        cls.active_round = mommy.make(Rodada, active=True)
         cls.open_matches = mommy.make(
             Partida,
             _quantity=3,
-            rodada=cls.round,
+            rodada=cls.active_round,
             data_hora=timezone.now() + timedelta(hours=6),
         )
         cls.closed_match1_double_home_1_x_0_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=1,
             gols_visitante=0,
             pontuacao_dobrada=True,
         )
         cls.closed_match2_home_0_x_0_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=0,
             gols_visitante=0,
         )
         cls.closed_match3_home_1_x_2_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=1,
             gols_visitante=2,
         )
         cls.closed_match4_home_0_x_2_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=0,
             gols_visitante=2,
         )
         cls.closed_match5_home_2_x_2_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=2,
             gols_visitante=2,
         )
         cls.closed_match6_home_4_x_2_away = mommy.make(
             Partida,
-            rodada=cls.round,
+            rodada=cls.active_round,
             gols_mandante=4,
             gols_visitante=2,
         )

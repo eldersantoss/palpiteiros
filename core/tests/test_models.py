@@ -9,7 +9,7 @@ from model_mommy import mommy
 from .base import PalpiteirosTestCase
 
 
-class PartidaModelTests(TestCase):
+class MatchModelTests(TestCase):
     def test_open_to_predictions_half_hour_before_match_time(self):
         """Should return True if the match time is at least half an
         hour before current time and False otherwise"""
@@ -63,7 +63,7 @@ class PartidaModelTests(TestCase):
         self.assertTrue(partially_correct_guess.contabilizado)
 
 
-class RodadaModelTests(PalpiteirosTestCase):
+class RoundModelTests(PalpiteirosTestCase):
     def test_round_detail_has_all_guessers_of_the_pool(self):
         """All guessers of the pool should be in the returned data"""
 
@@ -129,3 +129,14 @@ class RodadaModelTests(PalpiteirosTestCase):
                 self.assertEqual(len(guesses), len(self.all_matches))
             else:
                 self.assertLessEqual(len(guesses), len(self.closed_matches))
+
+
+class GuesserModelTests(PalpiteirosTestCase):
+    def test_guessed_on_last_round(self):
+        """PalpiteirosTestCasa provides a active round and three
+        guessers of which two guessed (01 and 02), whose method must
+        return True, and one that did not guess (03), whose the method
+        must return False"""
+        self.assertTrue(self.guesser01.guessed_on_last_round())
+        self.assertTrue(self.guesser02.guessed_on_last_round())
+        self.assertFalse(self.guesser03.guessed_on_last_round())
