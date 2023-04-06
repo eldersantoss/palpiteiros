@@ -53,9 +53,7 @@ class RodadaAdmin(admin.ModelAdmin):
         "__str__",
         "created",
         "modified",
-        "numero_partidas",
-        "abertura",
-        "fechamento",
+        "number_of_matches",
         "active",
     )
     prepopulated_fields = {"slug": ("label",)}

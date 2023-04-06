@@ -48,11 +48,13 @@ class ManualAdminView(LoginRequiredMixin, TemplateView):
     template_name = "core/manual_administracao.html"
 
 
-class RodadasListView(LoginRequiredMixin, ListView):
-    model = Rodada
+class RoundsListView(LoginRequiredMixin, ListView):
     template_name = "core/rodadas.html"
     context_object_name = "rodadas"
     ordering = "-id"
+
+    def get_queryset(self):
+        return Rodada.get_visible_rounds()
 
 
 @login_required

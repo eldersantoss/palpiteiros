@@ -28,11 +28,11 @@ urlpatterns = [
     ),
     path(
         "rodadas/",
-        views.RodadasListView.as_view(),
+        views.RoundsListView.as_view(),
         name="lista_rodadas",
     ),
     path(
-        "rodada/<slug:slug>/",
+        "rodadas/<slug:slug>/",
         views.round_details,
         name="round_details",
     ),

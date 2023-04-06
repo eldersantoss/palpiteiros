@@ -55,7 +55,7 @@ class Rodada(TimeStampedModel):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        ordering = ("-id",)
+        ordering = ("-created",)
         verbose_name = "Rodada"
         verbose_name_plural = "Rodadas"
 
@@ -65,7 +65,10 @@ class Rodada(TimeStampedModel):
 
     def clean(self) -> None:
         super().clean()
-        if self.active and Rodada.objects.filter(active=True).exists():
+        if (
+            self.active
+            and Rodada.objects.filter(active=True).exclude(id=self.id).exists()
+        ):
             raise ValidationError(
                 {
                     "active": [
@@ -75,30 +78,21 @@ class Rodada(TimeStampedModel):
             )
 
     @admin.display(description="Número de partidas")
-    def numero_partidas(self) -> int:
+    def number_of_matches(self) -> int:
         return self.partidas.count()
 
-    @property
-    def abertura(self):
-        try:
-            return self.partidas.order_by("data_hora").first().data_hora
-        except AttributeError:
-            return timezone.now()
-
-    @property
-    def fechamento(self):
-        try:
-            return self.partidas.order_by("data_hora").last().data_hora
-        except AttributeError:
-            return timezone.now()
-
-    def partidas_abertas(self):
-        data_hora_encerramento = timezone.now() + timedelta(minutes=30)
-        return self.partidas.filter(data_hora__gt=data_hora_encerramento)
-
-    def partidas_encerradas(self):
-        data_hora_encerramento = timezone.now() + timedelta(minutes=30)
-        return self.partidas.filter(data_hora__lte=data_hora_encerramento)
+    @classmethod
+    def get_visible_rounds(cls):
+        """Filter queryset to exclude inactive future rounds"""
+        inactive_future_rounds = models.Q(active=False) & models.Q(
+            opening__gt=timezone.now()
+        )
+        visible_rounds = (
+            cls.objects.annotate(opening=models.Min("partidas__data_hora"))
+            .exclude(inactive_future_rounds)
+            .order_by("-created")
+        )
+        return visible_rounds
 
     def get_details(self, logged_user: User) -> list[dict[str, any]]:
         round_details = []
@@ -232,12 +226,6 @@ class Partida(models.Model):
                 om.guess_form = form
 
         return open_matches
-
-    @property
-    def abreviacao(self):
-        return (
-            f"{self.mandante.abreviacao.upper()} x {self.visitante.abreviacao.upper()}"
-        )
 
     @property
     def result_str(self):
