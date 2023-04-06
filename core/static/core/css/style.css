@@ -291,7 +291,7 @@ div.helptext {
 .team {
   display: flex;
   align-items: center;
-  width: 47.5%;
+  width: 35%;
   line-height: 2.5vh;
   text-align: center;
 }
