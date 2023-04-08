@@ -10,7 +10,6 @@
   {{ period_form.as_div }}
 </form>
 
-{% if ranking %}
 <table>
     <tr>
         <th></th>
@@ -37,10 +36,5 @@
     </tr>
     {% endfor %}
 </table>
-
-{% else %}
-<p class="main-msg">Não existem palpiteiros cadastrados no bolão 😕</p>
-
-{% endif %}
 
 {% endblock content %}

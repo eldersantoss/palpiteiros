@@ -92,6 +92,13 @@ def ranking(request):
         year = timezone.now().year
     form = RankingPeriodForm({"mes": month, "ano": year})
     ranking = Palpiteiro.get_ranking(month, year)
+    if not ranking:
+        messages.error(
+            request,
+            "Não existem palpiteiros cadastrados no bolão 😕",
+            "temp-msg",
+        )
+        return redirect(reverse_lazy("core:index"))
     return render(
         request,
         "core/ranking.html",
