@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 
 from .models import Rodada, Palpiteiro, Partida
@@ -21,15 +21,15 @@ def guesses(request):
         guesser = request.user.palpiteiro
     except Palpiteiro.DoesNotExist:
         messages.error(request, "Nenhum palpiteiro cadastrado! ❌", "temp-msg")
-        return redirect(reverse("core:index"))
+        return redirect(reverse_lazy("core:index"))
 
     if not Rodada.objects.exists():
         messages.error(request, "Nenhuma rodada cadastrada! ❌", "temp-msg")
-        return redirect(reverse("core:index"))
+        return redirect(reverse_lazy("core:index"))
 
     if not Partida.have_open_matches_for_any_active_round():
         messages.error(request, "Rodada encerrada! ❌", "temp-msg")
-        return redirect(reverse("core:index"))
+        return redirect(reverse_lazy("core:index"))
 
     context = {
         "closed_matches": Partida.get_closed_matches_with_guesses(guesser),
@@ -52,6 +52,12 @@ class RoundsListView(LoginRequiredMixin, ListView):
     template_name = "core/rodadas.html"
     context_object_name = "rodadas"
     ordering = "-id"
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_queryset().exists():
+            messages.error(request, "Nenhuma rodada encontrada 😕", "temp-msg")
+            return redirect(reverse_lazy("core:index"))
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         return Rodada.get_visible_rounds()

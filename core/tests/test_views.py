@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.urls import reverse
+from django.urls import reverse_lazy
 
 from model_mommy import mommy
 
@@ -26,26 +26,26 @@ class GuessesViewTests(TestCase):
 
         self.palpiteiro.delete()
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
 
-        self.assertRedirects(response, reverse("core:index"), 302)
+        self.assertRedirects(response, reverse_lazy("core:index"), 302)
 
     def test_no_round_found(self):
         """When no round is found the response should be a
         redirect to index view"""
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
 
-        self.assertRedirects(response, reverse("core:index"), 302)
+        self.assertRedirects(response, reverse_lazy("core:index"), 302)
 
     def test_no_open_matches(self):
         """When no open matches are found, the response should be a
         redirect to index"""
         mommy.make(Rodada, active=True)
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
 
-        self.assertRedirects(response, reverse("core:index"), 302)
+        self.assertRedirects(response, reverse_lazy("core:index"), 302)
 
     def test_form_count_for_open_matches(self):
         """The number of forms in the context should be equals to the
@@ -58,7 +58,7 @@ class GuessesViewTests(TestCase):
             data_hora=timezone.now() + timedelta(minutes=60),
         )
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
 
         open_matches_guess_forms = [
             om.guess_form for om in response.context["open_matches"]
@@ -86,7 +86,7 @@ class GuessesViewTests(TestCase):
             gols_visitante=0,
         )
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
         open_matches_guess_forms = [
             om.guess_form for om in response.context["open_matches"]
         ]
@@ -127,7 +127,7 @@ class GuessesViewTests(TestCase):
             data_hora=timezone.now() - timedelta(minutes=30),
         )
 
-        response = self.client.get(reverse("core:guesses"))
+        response = self.client.get(reverse_lazy("core:guesses"))
         closed_matches = response.context["closed_matches"]
         open_matches_guess_forms = [
             om.guess_form for om in response.context["open_matches"]
@@ -152,7 +152,7 @@ class GuessesViewTests(TestCase):
         number_of_guesses_before = Palpite.objects.count()
 
         self.client.post(
-            reverse("core:guesses"),
+            reverse_lazy("core:guesses"),
             data={
                 f"gols_mandante_{open_match.id}": 2,
                 f"gols_visitante_{open_match.id}": 1,
@@ -177,7 +177,7 @@ class ClassificacaoViewTests(TestCase):
         self.client.force_login(self.user)
 
     def test_period_form_in_context_data(self):
-        response = self.client.get(reverse("core:ranking"))
+        response = self.client.get(reverse_lazy("core:ranking"))
         period_form = response.context.get("period_form")
         current_month = str(timezone.now().month)
         current_year = str(timezone.now().year)
@@ -187,7 +187,7 @@ class ClassificacaoViewTests(TestCase):
         self.assertEquals(period_form.cleaned_data["ano"], current_year)
 
         response = self.client.get(
-            reverse("core:ranking"),
+            reverse_lazy("core:ranking"),
             data={"mes": 1, "ano": 2022},
         )
         period_form = response.context.get("period_form")
@@ -211,7 +211,7 @@ class RoundDetailViewTests(TestCase):
         guessers = mommy.make(Palpiteiro, _quantity=3) + [self.guesser]
 
         response = self.client.get(
-            reverse(
+            reverse_lazy(
                 "core:round_details",
                 kwargs={"slug": round_.slug},
             )
