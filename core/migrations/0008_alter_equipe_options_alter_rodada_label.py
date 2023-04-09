@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             model_name="rodada",
             name="label",
             field=models.CharField(
-                default=core.models.Rodada._gerar_label_default,
+                default=core.models.Rodada._generate_label,
                 editable=False,
                 max_length=50,
             ),

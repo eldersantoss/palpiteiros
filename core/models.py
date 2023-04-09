@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 
 from .forms import GuessForm
@@ -23,6 +24,8 @@ class Equipe(models.Model):
     abreviacao = models.CharField(max_length=3, default="???")
 
     class Meta:
+        verbose_name = "equipe"
+        verbose_name_plural = "equipes"
         ordering = ("nome",)
 
     def __str__(self) -> str:
@@ -30,7 +33,47 @@ class Equipe(models.Model):
 
 
 class Rodada(TimeStampedModel):
-    def _gerar_label_default():
+    label = models.CharField(max_length=100)
+    slug = models.SlugField()
+    active = models.BooleanField("Ativa", default=False)
+    pool = models.ForeignKey(
+        "GuessPool",
+        verbose_name="Bolão",
+        on_delete=models.CASCADE,
+        related_name="rounds",
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = "Rodada"
+        verbose_name_plural = "Rodadas"
+        unique_together = ["slug", "pool"]
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        self.label = self._generate_label()
+        self.slug = slugify(self.label)
+        super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        super().clean()
+        if (
+            self.active
+            and Rodada.objects.filter(active=True, pool=self.pool)
+            .exclude(id=self.id)
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "active": [
+                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
+                    ]
+                }
+            )
+
+    def _generate_label(self):
         nome_meses = [
             "janeiro",
             "fevereiro",
@@ -47,35 +90,10 @@ class Rodada(TimeStampedModel):
         ]
         mes_atual = timezone.now().month
         ano_atual = timezone.now().year
-        numero_rodada = Rodada.objects.filter(created__month=mes_atual).count() + 1
+        numero_rodada = (
+            Rodada.objects.filter(created__month=mes_atual, pool=self.pool).count() + 1
+        )
         return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
-
-    label = models.CharField(max_length=100, default=_gerar_label_default)
-    active = models.BooleanField("Ativa", default=False)
-    slug = models.SlugField(unique=True)
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = "Rodada"
-        verbose_name_plural = "Rodadas"
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
-    def clean(self) -> None:
-        super().clean()
-        if (
-            self.active
-            and Rodada.objects.filter(active=True).exclude(id=self.id).exists()
-        ):
-            raise ValidationError(
-                {
-                    "active": [
-                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
-                    ]
-                }
-            )
 
     @admin.display(description="Número de partidas")
     def number_of_matches(self) -> int:
@@ -117,15 +135,11 @@ class Rodada(TimeStampedModel):
         return self.partidas.all()
 
     def __str__(self) -> str:
-        return self.label
+        return f"{self.label} do bolão {self.pool}"
 
 
 class Partida(models.Model):
-    rodada = models.ForeignKey(
-        Rodada,
-        on_delete=models.CASCADE,
-        related_name="partidas",
-    )
+    rodada = models.ManyToManyField(Rodada, related_name="partidas")
     mandante = models.ForeignKey(
         Equipe,
         on_delete=models.CASCADE,
@@ -145,7 +159,7 @@ class Partida(models.Model):
         verbose_name = "partida"
         verbose_name_plural = "partidas"
         ordering = ("data_hora",)
-        unique_together = ["rodada", "mandante", "visitante"]
+        unique_together = ["mandante", "visitante", "data_hora"]
 
     def __str__(self):
         return f"{self.mandante.nome} x {self.visitante.nome}"
@@ -401,3 +415,40 @@ class Palpite(models.Model):
             score *= 2
 
         return score
+
+
+class GuessPool(TimeStampedModel):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+    owner = models.ForeignKey(
+        Palpiteiro,
+        related_name="own_pools",
+        on_delete=models.PROTECT,
+    )
+    teams = models.ManyToManyField(Equipe, related_name="pools")
+    guessers = models.ManyToManyField(Palpiteiro, related_name="pools")
+
+    class Meta:
+        verbose_name = "bolão"
+        verbose_name_plural = "bolões"
+
+    def __str__(self) -> str:
+        return self.name
+
+    @admin.display(description="Equipes")
+    def number_of_teams(self):
+        return self.teams.count()
+
+    @admin.display(description="Palpiteiros")
+    def number_of_guessers(self):
+        return self.guessers.count()
+
+    @admin.display(description="Rodadas")
+    def number_of_rounds(self):
+        return self.rounds.count()
+
+    def get_owners(self):
+        return self.memberships.filter(is_owner=True)
+
+    def get_admins(self):
+        return self.memberships.filter(is_admin=True)
