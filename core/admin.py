@@ -52,6 +52,7 @@ class RodadaAdmin(admin.ModelAdmin):
         "number_of_matches",
         "active",
     )
+    list_filter = ["pool"]
 
 
 @admin.register(models.Palpite)
@@ -70,6 +71,7 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "number_of_teams",
         "number_of_guessers",
         "number_of_rounds",
+        "number_of_matches",
     )
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ["teams", "guessers"]

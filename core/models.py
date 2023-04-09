@@ -447,8 +447,8 @@ class GuessPool(TimeStampedModel):
     def number_of_rounds(self):
         return self.rounds.count()
 
-    def get_owners(self):
-        return self.memberships.filter(is_owner=True)
-
-    def get_admins(self):
-        return self.memberships.filter(is_admin=True)
+    @admin.display(description="Partidas")
+    def number_of_matches(self):
+        return self.rounds.annotate(matches=models.Count("partidas")).aggregate(
+            number_of_matches=models.Sum("matches")
+        )["number_of_matches"]
