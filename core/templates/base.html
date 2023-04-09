@@ -4,75 +4,79 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href={% static 'core/css/style.css' %}>
-    <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href={% static 'core/css/style.css' %}>
+  <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
 
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-        window.OneSignal = window.OneSignal || [];
-        OneSignal.push(function() {
-            OneSignal.init({
-            appId: "eb1979ac-e89d-4e32-b059-9e1ecd5471c5",
-            });
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+  <script>
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function() {
+        OneSignal.init({
+        appId: "eb1979ac-e89d-4e32-b059-9e1ecd5471c5",
         });
-    </script>
+    });
+  </script>
 
-    <title>{% block title %}{% endblock title %}</title>
+  <title>{% block title %}{% endblock title %}</title>
 </head>
 
 <body>
 
-    <header>
-        <span class="logo">
-            <a href="{% url 'core:index' %}">
-              <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
-            </a>
-        </span>
-        <span>
-            {% if request.user.is_authenticated %}
-            {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
-            {% endif %}
-        </span>
-    </header>
+  <header>
+    <span class="logo">
+      <a href="{% url 'core:index' %}">
+        <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
+      </a>
+    </span>
+    <span>
+      {% if request.user.is_authenticated %}
+      {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
+      {% endif %}
+    </span>
+  </header>
 
-    <main>
-        {% if messages %}
-          <ul class="messages">
-              {% for message in messages %}
-                  <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
-                      {{ message|safe }}
-                  </li>
-              {% endfor %}
-          </ul>
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+            {{ message|safe }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+
+    {% if pool %}
+      <hr class="spacer">
+      <nav class="menu vertical">
+        <a href="{% url 'core:guesses' %}">Palpitar</a>
+        <a href="{% url 'core:ranking' %}">Classificação</a>
+        <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
+        {% if request.user.palpiteiro == pool.owner%}
+          <a href="{% url 'core:manual_administracao' %}">
+            Manual do administrador
+          </a>
+          <a href="{% url 'admin:index' %}">
+            Acessar área de administração
+          </a>
         {% endif %}
+      </nav>
+    {% endif %}
+  </main>
 
-        {% block content %}{% endblock content %}
+  <footer>
+    {% block footer %}{% endblock footer %}
+    <address>
+      Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
+    </address>
+  </footer>
 
-        {% if request.user.is_authenticated %}
-        <hr class="spacer">
-        <nav class="menu vertical">
-            <a href="{% url 'core:guesses' %}">Palpitar</a>
-            <a href="{% url 'core:ranking' %}">Classificação</a>
-            <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
-            {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'core:manual_administracao' %}">Manual do administrador</a>
-            <a href="{% url 'admin:index' %}">Acessar área de administração</a>
-            {% endif %}
-        </nav>
-        {% endif %}
-    </main>
-
-    <footer>
-
-        {% block footer %}{% endblock footer %}
-
-        <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
-    </footer>
-
-    <script src={% static 'core/js/base.js' %}></script>
+  <script src={% static 'core/js/base.js' %}></script>
 </body>
 
 </html>

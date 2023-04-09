@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pool }} | Palpiteiros{% endblock title %}
+
+{% block content %}
+
+<h1>{{ pool }}</h1>
+
+<p>
+  🏃‍♂️ Equipes: {{ pool.number_of_teams }}
+  | 😎 Palpiteiros: {{ pool.number_of_guessers }}
+  | 📆 Rodadas: {{ pool.number_of_rounds }}
+  | ⚽ Partidas: {{ pool.number_of_matches }}
+</p>
+
+{% endblock content %}

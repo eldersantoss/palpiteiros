@@ -1,3 +1,17 @@
 {% extends 'base.html' %}
 
 {% block title %}Palpiteiros{% endblock title %}
+
+{% block content %}
+
+<h1>Meus bolões</h1>
+
+<nav class="menu vertical">
+  {% for pool in pools %}
+    <a href={% url 'core:pool_home' pool.slug %}>{{ pool }}</a>
+  {% empty %}
+    <p>Você ainda não está cadastrado em nenhum bolão. 😕</p>
+  {% endfor %}
+</nav>
+
+{% endblock content %}

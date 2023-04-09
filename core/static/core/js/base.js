@@ -4,10 +4,20 @@ window.onload = function () {
 }
 
 function removeTempMessagesAfterTimeout() {
-  const TIME_TO_REMOVE_TEMP_MESSAGES = 5
+  const SHORT_TIME_MESSAGES = 5
+  const MID_TIME_MESSAGES = 10
+  const LONG_TIME_MESSAGES = 30
   setTimeout(
-    () => document.querySelectorAll(".temp-msg").forEach((e) => e.remove()),
-    TIME_TO_REMOVE_TEMP_MESSAGES * 1000
+    () => document.querySelectorAll(".short-time-msg").forEach((e) => e.remove()),
+    SHORT_TIME_MESSAGES * 1000
+  )
+  setTimeout(
+    () => document.querySelectorAll(".mid-time-msg").forEach((e) => e.remove()),
+    MID_TIME_MESSAGES * 1000
+  )
+  setTimeout(
+    () => document.querySelectorAll(".long-time-msg").forEach((e) => e.remove()),
+    LONG_TIME_MESSAGES * 1000
   )
 }
 
