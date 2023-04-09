@@ -9,10 +9,25 @@ from django.http import HttpResponse
 
 from .models import Rodada, Palpiteiro, Partida
 from .forms import RankingPeriodForm
+from .viewmixins import PoolRegisterRequiredMixin
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "core/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pools"] = self.request.user.palpiteiro.pools.all()
+        return context
+
+
+class PoolHome(PoolRegisterRequiredMixin, LoginRequiredMixin, TemplateView):
+    template_name = "core/pool_home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pool"] = self.get_pool()
+        return context
 
 
 @login_required
@@ -20,15 +35,27 @@ def guesses(request):
     try:
         guesser = request.user.palpiteiro
     except Palpiteiro.DoesNotExist:
-        messages.error(request, "Nenhum palpiteiro cadastrado! ❌", "temp-msg")
+        messages.error(
+            request,
+            "Nenhum palpiteiro cadastrado! ❌",
+            "temp-msg short-time-msg",
+        )
         return redirect(reverse_lazy("core:index"))
 
     if not Rodada.objects.exists():
-        messages.error(request, "Nenhuma rodada cadastrada! ❌", "temp-msg")
+        messages.error(
+            request,
+            "Nenhuma rodada cadastrada! ❌",
+            "temp-msg short-time-msg",
+        )
         return redirect(reverse_lazy("core:index"))
 
     if not Partida.have_open_matches_for_any_active_round():
-        messages.error(request, "Rodada encerrada! ❌", "temp-msg")
+        messages.error(
+            request,
+            "Rodada encerrada! ❌",
+            "temp-msg short-time-msg",
+        )
         return redirect(reverse_lazy("core:index"))
 
     context = {
@@ -39,7 +66,11 @@ def guesses(request):
     }
 
     if request.method == "POST":
-        messages.success(request, "Palpites salvos! ✅", "temp-msg")
+        messages.success(
+            request,
+            "Palpites salvos! ✅",
+            "temp-msg short-time-msg",
+        )
 
     return render(request, "core/guesses.html", context)
 
@@ -55,7 +86,11 @@ class RoundsListView(LoginRequiredMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         if not self.get_queryset().exists():
-            messages.error(request, "Nenhuma rodada encontrada 😕", "temp-msg")
+            messages.error(
+                request,
+                "Nenhuma rodada encontrada 😕",
+                "temp-msg short-time-msg",
+            )
             return redirect(reverse_lazy("core:index"))
         return super().get(request, *args, **kwargs)
 
