@@ -54,7 +54,7 @@
     {% if pool %}
       <hr class="spacer">
       <nav class="menu vertical">
-        <a href="{% url 'core:guesses' %}">Palpitar</a>
+        <a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>
         <a href="{% url 'core:ranking' %}">Classificação</a>
         <a href="{% url 'core:round_list' pool.slug %}">Rodadas</a>
         {% if request.user.palpiteiro == pool.owner%}

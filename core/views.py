@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -40,7 +40,12 @@ def guesses(request):
             "Nenhum palpiteiro cadastrado! ❌",
             "temp-msg short-time-msg",
         )
-        return redirect(reverse_lazy("core:index"))
+        return redirect(
+            reverse_lazy(
+                "core:pool_home",
+                kwargs={"pool_slug": pool.slug},
+            )
+        )
 
     if not Rodada.objects.exists():
         messages.error(
@@ -48,7 +53,12 @@ def guesses(request):
             "Nenhuma rodada cadastrada! ❌",
             "temp-msg short-time-msg",
         )
-        return redirect(reverse_lazy("core:index"))
+        return redirect(
+            reverse_lazy(
+                "core:pool_home",
+                kwargs={"pool_slug": pool.slug},
+            )
+        )
 
     if not Partida.have_open_matches_for_any_active_round():
         messages.error(
@@ -56,7 +66,12 @@ def guesses(request):
             "Rodada encerrada! ❌",
             "temp-msg short-time-msg",
         )
-        return redirect(reverse_lazy("core:index"))
+        return redirect(
+            reverse_lazy(
+                "core:pool_home",
+                kwargs={"pool_slug": pool.slug},
+            )
+        )
 
     context = {
         "closed_matches": Partida.get_closed_matches_with_guesses(guesser),
@@ -73,6 +88,65 @@ def guesses(request):
         )
 
     return render(request, "core/guesses.html", context)
+
+
+class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pool = self.get_pool()
+
+        try:
+            guesser = request.user.palpiteiro
+        except Palpiteiro.DoesNotExist:
+            messages.error(
+                request,
+                "Nenhum palpiteiro cadastrado! ❌",
+                "temp-msg short-time-msg",
+            )
+            return redirect(
+                reverse_lazy(
+                    "core:pool_home",
+                    kwargs={"pool_slug": pool.slug},
+                )
+            )
+
+        open_matches = pool.get_open_matches_with_guesses_forms(guesser)
+        if not open_matches.exists():
+            messages.error(
+                request,
+                "Não existem partidas abertas nesse momento! ❌",
+                "temp-msg short-time-msg",
+            )
+            return redirect(
+                reverse_lazy(
+                    "core:pool_home",
+                    kwargs={"pool_slug": pool.slug},
+                )
+            )
+
+        return render(
+            self.request,
+            "core/guesses.html",
+            {"pool": pool, "open_matches": open_matches},
+        )
+
+    def post(self, request, *args, **kwargs):
+        pool = self.get_pool()
+        guesser = self.request.user.palpiteiro
+        messages.success(
+            request,
+            "Palpites salvos! ✅",
+            "temp-msg short-time-msg",
+        )
+        return render(
+            self.request,
+            "core/guesses.html",
+            {
+                "pool": pool,
+                "open_matches": pool.get_open_matches_with_guesses_forms(
+                    guesser, self.request.POST
+                ),
+            },
+        )
 
 
 @login_required
@@ -92,7 +166,12 @@ def ranking(request):
             "Não existem palpiteiros cadastrados no bolão 😕",
             "temp-msg",
         )
-        return redirect(reverse_lazy("core:index"))
+        return redirect(
+            reverse_lazy(
+                "core:pool_home",
+                kwargs={"pool_slug": pool.slug},
+            )
+        )
     return render(
         request,
         "core/ranking.html",
@@ -112,7 +191,12 @@ class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, ListView):
                 "Nenhuma rodada encontrada 😕",
                 "temp-msg short-time-msg",
             )
-            return redirect(reverse_lazy("core:index"))
+            return redirect(
+                reverse_lazy(
+                    "core:pool_home",
+                    kwargs={"pool_slug": pool.slug},
+                )
+            )
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):

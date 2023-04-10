@@ -17,8 +17,8 @@ urlpatterns = [
         name="pool_home",
     ),
     path(
-        "palpites/",
-        views.guesses,
+        "boloes/<slug:pool_slug>/palpites/",
+        views.GuessesView.as_view(),
         name="guesses",
     ),
     path(

@@ -244,7 +244,9 @@ class Partida(models.Model):
         description="Aberta para palpites?",
     )
     def open_to_guesses(self):
-        return timezone.now() + timedelta(minutes=30) < self.data_hora
+        return (self.data_hora > timezone.now() + timedelta(minutes=30)) and (
+            self.data_hora <= timezone.now() + timedelta(hours=72)
+        )
 
     def get_guess_by_guesser(self, guesser: "Palpiteiro"):
         try:
@@ -408,6 +410,10 @@ class Palpite(models.Model):
 
 
 class GuessPool(TimeStampedModel):
+
+    MINUTES_BEFORE_START_MATCH = 30
+    HOURS_BEFORE_START_MATCH = 72
+
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     owner = models.ForeignKey(
@@ -468,3 +474,62 @@ class GuessPool(TimeStampedModel):
         return self.rounds.annotate(matches=models.Count("partidas")).aggregate(
             number_of_matches=models.Sum("matches")
         )["number_of_matches"]
+
+    def get_open_matches_with_guesses_forms(
+        self,
+        guesser: "Palpiteiro",
+        post_data: dict = {},
+    ):
+        open_matches = self.get_open_matches()
+        with transaction.atomic():
+            for om in open_matches:
+                form = GuessForm(post_data, partida=om)
+                if form.is_valid():
+                    obj, created = om.palpites.get_or_create(
+                        palpiteiro=guesser,
+                        defaults={
+                            "gols_mandante": form.cleaned_data[f"gols_mandante"],
+                            "gols_visitante": form.cleaned_data[f"gols_visitante"],
+                        },
+                    )
+                    if not created:
+                        obj.gols_mandante = form.cleaned_data[f"gols_mandante"]
+                        obj.gols_visitante = form.cleaned_data[f"gols_visitante"]
+                        obj.save()
+
+                else:
+                    try:
+                        guess = om.palpites.get(palpiteiro=guesser)
+                        initial_data = {
+                            f"gols_mandante_{om.id}": guess.gols_mandante,
+                            f"gols_visitante_{om.id}": guess.gols_visitante,
+                        }
+                    except Palpite.DoesNotExist:
+                        initial_data = {}
+                    form = GuessForm(initial_data, partida=om)
+
+                om.guess_form = form
+
+        return open_matches
+
+    def get_open_matches(self):
+        """Returns all open matches envolving registered teams"""
+        return self.get_matches().filter(
+            data_hora__gt=timezone.now()
+            + timedelta(minutes=self.MINUTES_BEFORE_START_MATCH),
+            data_hora__lte=timezone.now()
+            + timedelta(hours=self.HOURS_BEFORE_START_MATCH),
+        )
+
+    def get_closed_matches(self):
+        """Returns all closed matches envolving registered teams"""
+        return self.get_matches().exclude(
+            data_hora__gt=timezone.now() + timedelta(minutes=30)
+        )
+
+    def get_matches(self):
+        """Returns all matches envolving registered teams"""
+        home_or_away_member_team = models.Q(mandante__in=self.teams.all()) | models.Q(
+            visitante__in=self.teams.all()
+        )
+        return Partida.objects.filter(home_or_away_member_team)
