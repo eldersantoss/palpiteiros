@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 
 from model_mommy import mommy
 
-from ..models import Palpiteiro, Partida, Rodada, Palpite
+from ..models import Palpiteiro, Partida, Rodada, Palpite, GuessPool
 
 
 class GuessesViewTests(TestCase):
@@ -200,20 +200,48 @@ class ClassificacaoViewTests(TestCase):
 class RoundDetailViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = get_user_model().objects.create(username="testuser")
-        cls.guesser = Palpiteiro.objects.create(usuario=cls.user)
+        cls.guesser = mommy.make(Palpiteiro)
 
     def setUp(self) -> None:
-        self.client.force_login(self.user)
+        self.client.force_login(self.guesser.usuario)
 
-    def test_correct_round_in_and_all_guessers_in_context(self):
-        round_ = mommy.make(Rodada)
+    def test_round_list(self):
+        """Should have correct rounds in context, this is, all rounds
+        excluding inactive future rounds"""
+        pool = mommy.make(GuessPool, owner=self.guesser)
+        visible_rounds = mommy.make(Rodada, pool=pool, _quantity=5)
+        [mommy.make(Partida, rodada=[vr]) for vr in visible_rounds[1:]]
+        visible_rounds.pop(0)
+        invisible_round = mommy.make(Rodada, pool=pool)
+        mommy.make(
+            Partida,
+            data_hora=timezone.now() + timedelta(days=1),
+            rodada=[invisible_round],
+        )
+
+        response = self.client.get(
+            reverse_lazy(
+                "core:round_list",
+                kwargs={"pool_slug": pool.slug},
+            )
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertCountEqual(visible_rounds, response.context["rodadas"])
+
+    def test_round_detail_has_correct_context_data(self):
+        """Should have corrects round and round_detail in context"""
         guessers = mommy.make(Palpiteiro, _quantity=3) + [self.guesser]
+        pool = mommy.make(GuessPool, owner=self.guesser, guessers=guessers)
+        round_ = mommy.make(Rodada, pool=pool)
 
         response = self.client.get(
             reverse_lazy(
                 "core:round_details",
-                kwargs={"slug": round_.slug},
+                kwargs={
+                    "pool_slug": pool.slug,
+                    "round_slug": round_.slug,
+                },
             )
         )
 

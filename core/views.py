@@ -1,15 +1,15 @@
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 
 from .models import Rodada, Palpiteiro, Partida
 from .forms import RankingPeriodForm
-from .viewmixins import PoolRegisterRequiredMixin
+from .viewmixins import GuessPoolMembershipMixin
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -21,7 +21,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class PoolHome(PoolRegisterRequiredMixin, LoginRequiredMixin, TemplateView):
+class PoolHome(GuessPoolMembershipMixin, LoginRequiredMixin, TemplateView):
     template_name = "core/pool_home.html"
 
     def get_context_data(self, **kwargs):
@@ -75,47 +75,6 @@ def guesses(request):
     return render(request, "core/guesses.html", context)
 
 
-class ManualAdminView(LoginRequiredMixin, TemplateView):
-    template_name = "core/manual_administracao.html"
-
-
-class RoundsListView(LoginRequiredMixin, ListView):
-    template_name = "core/rodadas.html"
-    context_object_name = "rodadas"
-    ordering = "-id"
-
-    def get(self, request, *args, **kwargs):
-        if not self.get_queryset().exists():
-            messages.error(
-                request,
-                "Nenhuma rodada encontrada 😕",
-                "temp-msg short-time-msg",
-            )
-            return redirect(reverse_lazy("core:index"))
-        return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return Rodada.get_visible_rounds()
-
-
-@login_required
-def round_details(request, slug):
-    """Busca todas as partidas de uma rodada e os palpites pertencentes
-    ao usuário logado para cada uma das partidas. Então, renderiza o
-    template core/round_details.html com os dados das partidas e seus
-    respectivos palpites"""
-
-    round_ = get_object_or_404(Rodada, slug=slug)
-    return render(
-        request,
-        "core/round_details.html",
-        {
-            "round": round_,
-            "round_details": round_.get_details(request.user),
-        },
-    )
-
-
 @login_required
 def ranking(request):
     form = RankingPeriodForm(request.GET)
@@ -139,6 +98,52 @@ def ranking(request):
         "core/ranking.html",
         {"period_form": form, "ranking": ranking},
     )
+
+
+class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, ListView):
+    template_name = "core/rodadas.html"
+    context_object_name = "rodadas"
+    ordering = "-id"
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_queryset().exists():
+            messages.error(
+                request,
+                "Nenhuma rodada encontrada 😕",
+                "temp-msg short-time-msg",
+            )
+            return redirect(reverse_lazy("core:index"))
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.get_pool().get_visible_rounds()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pool"] = self.get_pool()
+        return context
+
+
+class RoundDetailView(GuessPoolMembershipMixin, LoginRequiredMixin, DetailView):
+    """Busca todas as partidas de uma rodada e os palpites do usuário
+    logado. Então, renderiza o template core/round_details.html com os
+    dados das partidas e seus respectivos palpites"""
+
+    context_object_name = "round"
+    template_name = "core/round_details.html"
+    slug_url_kwarg = "round_slug"
+
+    def get_queryset(self):
+        return self.get_pool().get_rounds()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["round_details"] = self.object.get_details(self.request.user)
+        return context
+
+
+class ManualAdminView(LoginRequiredMixin, TemplateView):
+    template_name = "core/manual_administracao.html"
 
 
 def one_signal_worker(request):

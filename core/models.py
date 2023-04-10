@@ -59,19 +59,33 @@ class Rodada(TimeStampedModel):
 
     def clean(self) -> None:
         super().clean()
-        if (
-            self.active
-            and Rodada.objects.filter(active=True, pool=self.pool)
-            .exclude(id=self.id)
-            .exists()
-        ):
-            raise ValidationError(
-                {
-                    "active": [
-                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
-                    ]
-                }
-            )
+        self._validate_active_round()
+
+    @admin.display(description="Número de partidas")
+    def number_of_matches(self) -> int:
+        return self.partidas.count()
+
+    def get_details(self, logged_user: User) -> list[dict[str, any]]:
+        round_details = []
+        for guesser in Palpiteiro.objects.all():
+            detail = {
+                "guesser": guesser,
+                "round_score": guesser.get_round_score(self),
+                "matches_and_guesses": [],
+            }
+            for match in self.get_matches():
+                guess = (
+                    match.get_guess_by_guesser(guesser)
+                    if logged_user.palpiteiro == guesser or not match.open_to_guesses()
+                    else None
+                )
+                detail["matches_and_guesses"].append({"match": match, "guess": guess})
+            round_details.append(detail)
+        round_details.sort(key=lambda e: e["round_score"], reverse=True)
+        return round_details
+
+    def get_matches(self) -> models.QuerySet["Partida"]:
+        return self.partidas.all()
 
     def _generate_label(self):
         nome_meses = [
@@ -95,44 +109,20 @@ class Rodada(TimeStampedModel):
         )
         return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
 
-    @admin.display(description="Número de partidas")
-    def number_of_matches(self) -> int:
-        return self.partidas.count()
-
-    @classmethod
-    def get_visible_rounds(cls):
-        """Filter queryset to exclude inactive future rounds"""
-        inactive_future_rounds = models.Q(active=False) & models.Q(
-            opening__gt=timezone.now()
-        )
-        visible_rounds = (
-            cls.objects.annotate(opening=models.Min("partidas__data_hora"))
-            .exclude(inactive_future_rounds)
-            .order_by("-created")
-        )
-        return visible_rounds
-
-    def get_details(self, logged_user: User) -> list[dict[str, any]]:
-        round_details = []
-        for guesser in Palpiteiro.objects.all():
-            detail = {
-                "guesser": guesser,
-                "round_score": guesser.get_round_score(self),
-                "matches_and_guesses": [],
-            }
-            for match in self.get_matches():
-                guess = (
-                    match.get_guess_by_guesser(guesser)
-                    if logged_user.palpiteiro == guesser or not match.open_to_guesses()
-                    else None
-                )
-                detail["matches_and_guesses"].append({"match": match, "guess": guess})
-            round_details.append(detail)
-        round_details.sort(key=lambda e: e["round_score"], reverse=True)
-        return round_details
-
-    def get_matches(self) -> models.QuerySet["Partida"]:
-        return self.partidas.all()
+    def _validate_active_round(self):
+        if (
+            self.active
+            and Rodada.objects.filter(active=True, pool=self.pool)
+            .exclude(id=self.id)
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "active": [
+                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
+                    ]
+                }
+            )
 
     def __str__(self) -> str:
         return f"{self.label} do bolão {self.pool}"
@@ -425,8 +415,8 @@ class GuessPool(TimeStampedModel):
         related_name="own_pools",
         on_delete=models.PROTECT,
     )
-    teams = models.ManyToManyField(Equipe, related_name="pools")
     guessers = models.ManyToManyField(Palpiteiro, related_name="pools")
+    teams = models.ManyToManyField(Equipe, related_name="pools")
 
     class Meta:
         verbose_name = "bolão"
@@ -435,6 +425,10 @@ class GuessPool(TimeStampedModel):
     def __str__(self) -> str:
         return self.name
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.guessers.add(self.owner)
+
     @admin.display(description="Equipes")
     def number_of_teams(self):
         return self.teams.count()
@@ -442,6 +436,28 @@ class GuessPool(TimeStampedModel):
     @admin.display(description="Palpiteiros")
     def number_of_guessers(self):
         return self.guessers.count()
+
+    def get_visible_rounds(self):
+        """Filter queryset to exclude inactive future rounds"""
+        rounds_with_matches = (
+            self.get_rounds()
+            .annotate(match_count=models.Count("partidas"))
+            .filter(match_count__gt=0)
+        )
+        inactive_future_rounds = models.Q(active=False) & models.Q(
+            opening__gt=timezone.now()
+        )
+        visible_rounds = (
+            rounds_with_matches.annotate(
+                opening=models.Min("partidas__data_hora"),
+            )
+            .exclude(inactive_future_rounds)
+            .order_by("-created")
+        )
+        return visible_rounds
+
+    def get_rounds(self):
+        return self.rounds.all()
 
     @admin.display(description="Rodadas")
     def number_of_rounds(self):

@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from .models import GuessPool
 
 
-class PoolRegisterRequiredMixin(object):
+class GuessPoolMembershipMixin(object):
     pool_slug_url_kwarg = "pool_slug"
     redirect_url = "core:index"
 
