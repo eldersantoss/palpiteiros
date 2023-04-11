@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 
-from .models import Rodada, Palpiteiro, Partida
+from .models import Palpiteiro
 from .forms import RankingPeriodForm
 from .viewmixins import GuessPoolMembershipMixin
 
@@ -24,128 +24,34 @@ class IndexView(LoginRequiredMixin, TemplateView):
 class PoolHome(GuessPoolMembershipMixin, LoginRequiredMixin, TemplateView):
     template_name = "core/pool_home.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["pool"] = self.get_pool()
-        return context
-
-
-@login_required
-def guesses(request):
-    try:
-        guesser = request.user.palpiteiro
-    except Palpiteiro.DoesNotExist:
-        messages.error(
-            request,
-            "Nenhum palpiteiro cadastrado! ❌",
-            "temp-msg short-time-msg",
-        )
-        return redirect(
-            reverse_lazy(
-                "core:pool_home",
-                kwargs={"pool_slug": pool.slug},
-            )
-        )
-
-    if not Rodada.objects.exists():
-        messages.error(
-            request,
-            "Nenhuma rodada cadastrada! ❌",
-            "temp-msg short-time-msg",
-        )
-        return redirect(
-            reverse_lazy(
-                "core:pool_home",
-                kwargs={"pool_slug": pool.slug},
-            )
-        )
-
-    if not Partida.have_open_matches_for_any_active_round():
-        messages.error(
-            request,
-            "Rodada encerrada! ❌",
-            "temp-msg short-time-msg",
-        )
-        return redirect(
-            reverse_lazy(
-                "core:pool_home",
-                kwargs={"pool_slug": pool.slug},
-            )
-        )
-
-    context = {
-        "closed_matches": Partida.get_closed_matches_with_guesses(guesser),
-        "open_matches": Partida.create_update_or_retrieve_guesses_from_your_forms(
-            guesser, request.POST
-        ),
-    }
-
-    if request.method == "POST":
-        messages.success(
-            request,
-            "Palpites salvos! ✅",
-            "temp-msg short-time-msg",
-        )
-
-    return render(request, "core/guesses.html", context)
-
 
 class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        pool = self.get_pool()
-
-        try:
-            guesser = request.user.palpiteiro
-        except Palpiteiro.DoesNotExist:
-            messages.error(
-                request,
-                "Nenhum palpiteiro cadastrado! ❌",
-                "temp-msg short-time-msg",
-            )
-            return redirect(
-                reverse_lazy(
-                    "core:pool_home",
-                    kwargs={"pool_slug": pool.slug},
-                )
-            )
-
-        open_matches = pool.get_open_matches_with_guesses_forms(guesser)
+    def get(self, *args, **kwargs):
+        open_matches = self.pool.get_update_or_create_guesses(self.guesser)
         if not open_matches.exists():
-            messages.error(
-                request,
-                "Não existem partidas abertas nesse momento! ❌",
-                "temp-msg short-time-msg",
+            return self.redirect_to_pool_home_with_error_msg(
+                "Não existem partidas abertas nesse momento! ❌"
             )
-            return redirect(
-                reverse_lazy(
-                    "core:pool_home",
-                    kwargs={"pool_slug": pool.slug},
-                )
-            )
-
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": pool, "open_matches": open_matches},
+            {"pool": self.pool, "open_matches": open_matches},
         )
 
-    def post(self, request, *args, **kwargs):
-        pool = self.get_pool()
-        guesser = self.request.user.palpiteiro
+    def post(self, *args, **kwargs):
+        open_matches = self.pool.get_update_or_create_guesses(
+            self.guesser,
+            self.request.POST,
+        )
         messages.success(
-            request,
+            self.request,
             "Palpites salvos! ✅",
             "temp-msg short-time-msg",
         )
         return render(
             self.request,
             "core/guesses.html",
-            {
-                "pool": pool,
-                "open_matches": pool.get_open_matches_with_guesses_forms(
-                    guesser, self.request.POST
-                ),
-            },
+            {"pool": self.pool, "open_matches": open_matches},
         )
 
 
@@ -200,12 +106,7 @@ class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.get_pool().get_visible_rounds()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["pool"] = self.get_pool()
-        return context
+        return self.pool.get_visible_rounds()
 
 
 class RoundDetailView(GuessPoolMembershipMixin, LoginRequiredMixin, DetailView):
@@ -218,7 +119,7 @@ class RoundDetailView(GuessPoolMembershipMixin, LoginRequiredMixin, DetailView):
     slug_url_kwarg = "round_slug"
 
     def get_queryset(self):
-        return self.get_pool().get_rounds()
+        return self.pool.get_rounds()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

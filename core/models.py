@@ -475,42 +475,50 @@ class GuessPool(TimeStampedModel):
             number_of_matches=models.Sum("matches")
         )["number_of_matches"]
 
-    def get_open_matches_with_guesses_forms(
+    def get_update_or_create_guesses(
         self,
         guesser: "Palpiteiro",
         post_data: dict = {},
     ):
+        """For each open match, try to update or create the guess with
+        post_data. If it fails, it generates a empty form or one with
+        an existing guess for the match. In addition, adds a guess
+        form instance for each open match and returns them"""
+
         open_matches = self.get_open_matches()
         with transaction.atomic():
-            for om in open_matches:
-                form = GuessForm(post_data, partida=om)
+            for match in open_matches:
+                form = GuessForm(post_data, partida=match)
                 if form.is_valid():
-                    obj, created = om.palpites.get_or_create(
-                        palpiteiro=guesser,
-                        defaults={
-                            "gols_mandante": form.cleaned_data[f"gols_mandante"],
-                            "gols_visitante": form.cleaned_data[f"gols_visitante"],
-                        },
-                    )
-                    if not created:
-                        obj.gols_mandante = form.cleaned_data[f"gols_mandante"]
-                        obj.gols_visitante = form.cleaned_data[f"gols_visitante"]
-                        obj.save()
-
+                    self._update_or_create_guesses(match, guesser, form)
                 else:
-                    try:
-                        guess = om.palpites.get(palpiteiro=guesser)
-                        initial_data = {
-                            f"gols_mandante_{om.id}": guess.gols_mandante,
-                            f"gols_visitante_{om.id}": guess.gols_visitante,
-                        }
-                    except Palpite.DoesNotExist:
-                        initial_data = {}
-                    form = GuessForm(initial_data, partida=om)
-
-                om.guess_form = form
-
+                    form = self._generate_empty_form_or_with_old_guess(match, guesser)
+                match.guess_form = form
         return open_matches
+
+    def _update_or_create_guesses(self, match, guesser, form):
+        obj, created = match.palpites.get_or_create(
+            palpiteiro=guesser,
+            defaults={
+                "gols_mandante": form.cleaned_data["gols_mandante"],
+                "gols_visitante": form.cleaned_data["gols_visitante"],
+            },
+        )
+        if not created:
+            obj.gols_mandante = form.cleaned_data["gols_mandante"]
+            obj.gols_visitante = form.cleaned_data["gols_visitante"]
+            obj.save()
+
+    def _generate_empty_form_or_with_old_guess(self, match, guesser):
+        try:
+            guess = match.palpites.get(palpiteiro=guesser)
+            initial_data = {
+                f"gols_mandante_{match.id}": guess.gols_mandante,
+                f"gols_visitante_{match.id}": guess.gols_visitante,
+            }
+        except Palpite.DoesNotExist:
+            initial_data = {}
+        return GuessForm(initial_data, partida=match)
 
     def get_open_matches(self):
         """Returns all open matches envolving registered teams"""
