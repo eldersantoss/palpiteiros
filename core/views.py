@@ -1,13 +1,10 @@
 from django.views.generic import TemplateView, ListView, DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.utils import timezone
-from django.urls import reverse_lazy
 from django.http import HttpResponse
 
-from .models import Palpiteiro
 from .forms import RankingPeriodForm
 from .viewmixins import GuessPoolMembershipMixin
 
