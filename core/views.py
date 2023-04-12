@@ -55,34 +55,22 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, View):
         )
 
 
-@login_required
-def ranking(request):
-    form = RankingPeriodForm(request.GET)
-    if form.is_valid():
-        month = int(form.cleaned_data["mes"])
-        year = int(form.cleaned_data["ano"])
-    else:
-        month = timezone.now().month
-        year = timezone.now().year
-    form = RankingPeriodForm({"mes": month, "ano": year})
-    ranking = Palpiteiro.get_ranking(month, year)
-    if not ranking:
-        messages.error(
-            request,
-            "Não existem palpiteiros cadastrados no bolão 😕",
-            "temp-msg",
-        )
-        return redirect(
-            reverse_lazy(
-                "core:pool_home",
-                kwargs={"pool_slug": pool.slug},
-            )
-        )
-    return render(
-        request,
-        "core/ranking.html",
-        {"period_form": form, "ranking": ranking},
-    )
+class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, TemplateView):
+    template_name = "core/ranking.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = RankingPeriodForm(self.request.GET)
+        if form.is_valid():
+            month = int(form.cleaned_data["mes"])
+            year = int(form.cleaned_data["ano"])
+        else:
+            month = timezone.now().month
+            year = timezone.now().year
+            form = RankingPeriodForm({"mes": month, "ano": year})
+        context["period_form"] = form
+        context["ranking"] = self.pool.get_ranking(month, year)
+        return context
 
 
 class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, ListView):
@@ -92,16 +80,8 @@ class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         if not self.get_queryset().exists():
-            messages.error(
-                request,
+            return self.redirect_to_pool_home_with_error_msg(
                 "Nenhuma rodada encontrada 😕",
-                "temp-msg short-time-msg",
-            )
-            return redirect(
-                reverse_lazy(
-                    "core:pool_home",
-                    kwargs={"pool_slug": pool.slug},
-                )
             )
         return super().get(request, *args, **kwargs)
 
@@ -123,7 +103,10 @@ class RoundDetailView(GuessPoolMembershipMixin, LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["round_details"] = self.object.get_details(self.request.user)
+        context["round_details"] = self.object.get_details(
+            self.pool,
+            self.guesser,
+        )
         return context
 
 

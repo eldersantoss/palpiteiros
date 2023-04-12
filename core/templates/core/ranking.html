@@ -6,7 +6,7 @@
 
 <h1>Classificação</h1>
 
-<form action="{% url 'core:ranking' %}" method="GET" class="menu horizontal period-form">
+<form action="{% url 'core:ranking' pool.slug %}" method="GET" class="menu horizontal period-form">
   {{ period_form.as_div }}
 </form>
 

@@ -22,8 +22,8 @@ urlpatterns = [
         name="guesses",
     ),
     path(
-        "classificacao/",
-        views.ranking,
+        "boloes/<slug:pool_slug>/classificacao/",
+        views.RankingView.as_view(),
         name="ranking",
     ),
     path(
