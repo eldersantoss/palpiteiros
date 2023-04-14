@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Palpiteiro, Rodada, Partida, Palpite
+from core.models import Equipe, GuessPool, Palpiteiro, Partida, Rodada
 
 
 class PalpiteirosTestCase(TestCase):
@@ -20,167 +20,39 @@ class PalpiteirosTestCase(TestCase):
             cls.guesser03,
         ]
 
-        # Rodadas e Partidas
-        cls.inactive_round = mommy.make(Rodada)
+        # Equipes
+        cls.teams = mommy.make(Equipe, _quantity=16)
+
+        # Bolões
+        cls.pool01 = mommy.make(
+            GuessPool, owner=cls.guesser01, guessers=cls.guessers, teams=cls.teams[:8]
+        )
+        cls.pool02 = mommy.make(
+            GuessPool, owner=cls.guesser02, guessers=cls.guessers, teams=cls.teams[8:]
+        )
+        cls.pool03 = mommy.make(
+            GuessPool,
+            owner=cls.guesser03,
+            guessers=[cls.guesser01],
+            teams=cls.teams[4:12],
+        )
+
+        # Partidas
         cls.active_round = mommy.make(Rodada, active=True)
-        cls.open_matches = mommy.make(
-            Partida,
-            _quantity=3,
-            rodada=cls.active_round,
-            data_hora=timezone.now() + timedelta(hours=6),
-        )
-        cls.closed_match1_double_home_1_x_0_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=1,
-            gols_visitante=0,
-            pontuacao_dobrada=True,
-        )
-        cls.closed_match2_home_0_x_0_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=0,
-            gols_visitante=0,
-        )
-        cls.closed_match3_home_1_x_2_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=1,
-            gols_visitante=2,
-        )
-        cls.closed_match4_home_0_x_2_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=0,
-            gols_visitante=2,
-        )
-        cls.closed_match5_home_2_x_2_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=2,
-            gols_visitante=2,
-        )
-        cls.closed_match6_home_4_x_2_away = mommy.make(
-            Partida,
-            rodada=cls.active_round,
-            gols_mandante=4,
-            gols_visitante=2,
-        )
-        cls.closed_matches = [
-            cls.closed_match1_double_home_1_x_0_away,
-            cls.closed_match2_home_0_x_0_away,
-            cls.closed_match3_home_1_x_2_away,
-            cls.closed_match4_home_0_x_2_away,
-            cls.closed_match5_home_2_x_2_away,
-            cls.closed_match6_home_4_x_2_away,
-        ]
-        cls.all_matches = cls.open_matches + cls.closed_matches
-
-        # Palpites
-        # Guesser01
-        for idx, match in enumerate(cls.open_matches):
-            mommy.make(
-                Palpite,
-                palpiteiro=cls.guesser01,
-                partida=match,
-                gols_mandante=idx,
-                gols_visitante=idx,
+        cls.matches = []
+        for i in range(0, len(cls.teams), 2):
+            cls.matches.append(
+                mommy.make(
+                    Partida,
+                    rodada=[cls.active_round],
+                    mandante=cls.teams[i],
+                    visitante=cls.teams[i + 1],
+                    gols_mandante=i,
+                    gols_visitante=2 * i,
+                )
             )
-        # Acerto cravada dobrada (20 pontos)
-        cls.guess1_guesser1_home_1_x_0_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match1_double_home_1_x_0_away,
-            gols_mandante=1,
-            gols_visitante=0,
-        )
-        # Acerto empate (5 pontos)
-        cls.guess2_guesser1_home_1_x_1_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match2_home_0_x_0_away,
-            gols_mandante=1,
-            gols_visitante=1,
-        )
-        # Acerto parcial COM gols (5 pontos)
-        cls.guess3_guesser1_home_1_x_3_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match3_home_1_x_2_away,
-            gols_mandante=1,
-            gols_visitante=3,
-        )
-        # Acerto parcial SEM gols (3 pontos)
-        cls.guess4_guesser1_home_2_x_3_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match4_home_0_x_2_away,
-            gols_mandante=2,
-            gols_visitante=3,
-        )
-        # Acerto somente gols (1 ponto)
-        cls.guess5_guesser1_home_2_x_0_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match5_home_2_x_2_away,
-            gols_mandante=2,
-            gols_visitante=0,
-        )
-        # Erro (0 pontos)
-        cls.guess6_guesser1_home_0_x_1_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser01,
-            partida=cls.closed_match6_home_4_x_2_away,
-            gols_mandante=0,
-            gols_visitante=1,
-        )
-
-        # Guesser02
-        for idx, match in enumerate(cls.open_matches):
-            mommy.make(
-                Palpite,
-                palpiteiro=cls.guesser02,
-                partida=match,
-                gols_mandante=idx,
-                gols_visitante=idx,
-            )
-        # Acerto somente gols (2 pontos)
-        cls.guess1_guesser2_home_1_x_1_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser02,
-            partida=cls.closed_match1_double_home_1_x_0_away,
-            gols_mandante=1,
-            gols_visitante=1,
-        )
-        # Acerto empate (5 pontos)
-        cls.guess2_guesser2_home_1_x_1_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser02,
-            partida=cls.closed_match2_home_0_x_0_away,
-            gols_mandante=1,
-            gols_visitante=1,
-        )
-        # Acerto parcial COM gol (5 pontos)
-        cls.guess3_guesser2_home_0_x_2_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser02,
-            partida=cls.closed_match3_home_1_x_2_away,
-            gols_mandante=0,
-            gols_visitante=2,
-        )
-        # Erro (0 pontos)
-        cls.guess5_guesser2_home_1_x_0_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser02,
-            partida=cls.closed_match5_home_2_x_2_away,
-            gols_mandante=1,
-            gols_visitante=0,
-        )
-        # Acerto cravada (10 pontos)
-        cls.guess6_guesser2_home_4_x_2_away = mommy.make(
-            Palpite,
-            palpiteiro=cls.guesser02,
-            partida=cls.closed_match6_home_4_x_2_away,
-            gols_mandante=4,
-            gols_visitante=2,
-        )
+        cls.open_matches = cls.matches[3:5]
+        for m in cls.open_matches:
+            m.data_hora = timezone.now() + timedelta(hours=6)
+            m.save()
+        cls.closed_matches = list(set(cls.matches) - set(cls.open_matches))

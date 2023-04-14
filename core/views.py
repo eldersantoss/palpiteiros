@@ -1,9 +1,9 @@
-from django.views.generic import TemplateView, ListView, DetailView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
-from django.http import HttpResponse
+from django.views.generic import DetailView, ListView, TemplateView, View
 
 from .forms import RankingPeriodForm
 from .viewmixins import GuessPoolMembershipMixin
@@ -14,7 +14,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["pools"] = self.request.user.palpiteiro.pools.all()
+        context["pools"] = self.request.user.palpiteiro.pools.order_by("name")
         return context
 
 
@@ -64,7 +64,7 @@ class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, TemplateView):
         else:
             month = timezone.now().month
             year = timezone.now().year
-            form = RankingPeriodForm({"mes": month, "ano": year})
+        form = RankingPeriodForm({"mes": month, "ano": year})
         context["period_form"] = form
         context["ranking"] = self.pool.get_ranking(month, year)
         return context

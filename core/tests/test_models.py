@@ -1,12 +1,12 @@
 from datetime import timedelta
 
-from django.utils import timezone
-from django.test import TestCase
 from django.core.exceptions import ValidationError
-
+from django.test import TestCase
+from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Partida, Rodada, Palpite
+from core.models import Palpite, Palpiteiro, Partida, Rodada
+
 from .base import PalpiteirosTestCase
 
 
@@ -136,12 +136,309 @@ class RoundModelTests(PalpiteirosTestCase):
                 self.assertLessEqual(len(guesses), len(self.closed_matches))
 
 
-class GuesserModelTests(PalpiteirosTestCase):
-    def test_guessed_on_last_round(self):
-        """PalpiteirosTestCasa provides a active round and three
-        guessers of which two guessed (01 and 02), whose method must
-        return True, and one that did not guess (03), whose the method
-        must return False"""
-        self.assertTrue(self.guesser01.guessed_on_last_round())
-        self.assertTrue(self.guesser02.guessed_on_last_round())
-        self.assertFalse(self.guesser03.guessed_on_last_round())
+class GuessPoolModelTests(PalpiteirosTestCase):
+    def test_number_of_teams(self):
+        """pool01, pool02 and pool03 should have 8 teams each"""
+        self.assertEqual(self.pool01.number_of_teams(), 8)
+        self.assertEqual(self.pool02.number_of_teams(), 8)
+        self.assertEqual(self.pool03.number_of_teams(), 8)
+
+    def test_number_of_guessers(self):
+        """pool01, pool02 should have 3 guessers and pool03 should
+        have 2"""
+        self.assertEqual(self.pool01.number_of_guessers(), 3)
+        self.assertEqual(self.pool02.number_of_guessers(), 3)
+        self.assertEqual(self.pool03.number_of_guessers(), 2)
+
+    def test_get_update_or_create_guesses_before_create_any_guess(self):
+        open_matches = self.pool01.get_update_or_create_guesses(self.pool01.owner)
+        self.assertEqual(open_matches.count(), 1)
+        self.assertTrue(all(not m.guess_form.is_bound for m in open_matches))
+
+        open_matches = self.pool02.get_update_or_create_guesses(self.pool02.owner)
+        self.assertEqual(open_matches.count(), 1)
+        self.assertTrue(all(not m.guess_form.is_bound for m in open_matches))
+
+        open_matches = self.pool03.get_update_or_create_guesses(self.pool03.owner)
+        self.assertEqual(open_matches.count(), 2)
+        self.assertTrue(all(not m.guess_form.is_bound for m in open_matches))
+
+    def test_creating_exclusive_guesses(self):
+        post_data = self._generate_post_data(self.pool01)
+        self.pool01.get_update_or_create_guesses(self.pool01.owner, post_data)
+        self.assertEqual(self.pool01.guesses.count(), 1)
+
+        post_data = self._generate_post_data(self.pool02)
+        self.pool02.get_update_or_create_guesses(
+            self.pool02.owner, post_data
+        )
+        self.assertEqual(self.pool02.guesses.count(), 1)
+
+        post_data = self._generate_post_data(self.pool03)
+        self.pool03.get_update_or_create_guesses(self.pool03.owner, post_data)
+        self.assertEqual(self.pool03.guesses.count(), 2)
+
+        self.assertNotIn(self.pool01.guesses.get(), self.pool03.guesses.all())
+        self.assertNotIn(self.pool02.guesses.get(), self.pool03.guesses.all())
+
+
+    def test_creating_for_all_pools_guesses(self):
+        post_data = self._generate_post_data(self.pool01, True)
+        self.pool01.get_update_or_create_guesses(self.pool01.owner, post_data)
+        self.assertEqual(self.pool01.guesses.count(), 1)
+        self.assertEqual(self.pool02.guesses.count(), 0)
+        self.assertEqual(self.pool03.guesses.count(), 1)
+        self.assertIn(self.pool01.guesses.get(), self.pool03.guesses.all())
+
+        post_data = self._generate_post_data(self.pool02, True)
+        self.pool02.get_update_or_create_guesses(self.pool02.owner, post_data)
+        self.assertEqual(self.pool01.guesses.count(), 1)
+        self.assertEqual(self.pool02.guesses.count(), 1)
+        self.assertEqual(self.pool03.guesses.count(), 1)
+        self.assertNotIn(self.pool02.guesses.get(), self.pool03.guesses.all())
+
+        post_data = self._generate_post_data(self.pool02, True)
+        self.pool02.get_update_or_create_guesses(self.guesser01, post_data)
+        self.assertEqual(self.pool01.guesses.count(), 1)
+        self.assertEqual(self.pool02.guesses.count(), 2)
+        self.assertEqual(self.pool03.guesses.count(), 2)
+        self.assertIn(
+            self.pool02.guesses.get(palpiteiro=self.guesser01),
+            self.pool03.guesses.all(),
+        )
+
+        post_data = self._generate_post_data(self.pool03, True)
+        self.pool03.get_update_or_create_guesses(self.pool03.owner, post_data)
+        self.assertEqual(self.pool01.guesses.count(), 2)
+        self.assertEqual(self.pool02.guesses.count(), 3)
+        self.assertEqual(self.pool03.guesses.count(), 4)
+
+        post_data = self._generate_post_data(self.pool03, True, 1)
+        self.pool03.get_update_or_create_guesses(self.guesser01, post_data)
+        self.assertEqual(self.pool03.guesses.count(), 4)
+
+    def test_get_update_or_create_guesses_updating_guesses(self):
+        ...
+
+    def _generate_post_data(self, pool, for_all_pools=False, goals=0):
+        post_data = {"for_all_pools": True} if for_all_pools else {}
+        for m in pool.get_open_matches():
+            post_data[f"gols_mandante_{m.id}"] = goals
+            post_data[f"gols_visitante_{m.id}"] = goals
+        return post_data
+
+    def test_get_open_matches(self):
+        """pool01, pool02 should have 1 open match and pool03 should
+        have 2"""
+        self.assertEqual(self.pool01.get_open_matches().count(), 1)
+        self.assertEqual(self.pool02.get_open_matches().count(), 1)
+        self.assertEqual(self.pool03.get_open_matches().count(), 2)
+
+    def test_number_of_matches(self):
+        """pool01, pool02 and pool03 should have 4 matches each"""
+        self.assertEqual(self.pool01.number_of_matches(), 4)
+        self.assertEqual(self.pool02.number_of_matches(), 4)
+        self.assertEqual(self.pool03.number_of_matches(), 4)
+
+    def test_get_matches(self):
+        self.assertTrue(
+            all([m.data_hora > self.pool01.created for m in self.pool01.get_matches()])
+        )
+        self.assertTrue(
+            all(
+                [
+                    (
+                        m.mandante in self.pool01.teams.all()
+                        or m.visitante in self.pool01.teams.all()
+                    )
+                    for m in self.pool01.get_matches()
+                ]
+            )
+        )
+
+        self.assertTrue(
+            all([m.data_hora > self.pool02.created for m in self.pool02.get_matches()])
+        )
+        self.assertTrue(
+            all(
+                [
+                    (
+                        m.mandante in self.pool02.teams.all()
+                        or m.visitante in self.pool02.teams.all()
+                    )
+                    for m in self.pool02.get_matches()
+                ]
+            )
+        )
+
+        self.assertTrue(
+            all([m.data_hora > self.pool03.created for m in self.pool03.get_matches()])
+        )
+        self.assertTrue(
+            all(
+                [
+                    (
+                        m.mandante in self.pool03.teams.all()
+                        or m.visitante in self.pool03.teams.all()
+                    )
+                    for m in self.pool03.get_matches()
+                ]
+            )
+        )
+
+    def test_get_ranking_with_no_guesses(self):
+        """Guessers of pool01, pool02 and pools3 should have your score
+        attribute equals to 0"""
+
+        # general period
+        self.assertTrue(all([g.score == 0 for g in self.pool01.get_ranking(0, 0)]))
+        self.assertTrue(all([g.score == 0 for g in self.pool02.get_ranking(0, 0)]))
+        self.assertTrue(all([g.score == 0 for g in self.pool03.get_ranking(0, 0)]))
+
+        # annual period
+        year = timezone.now().year
+        self.assertTrue(all([g.score == 0 for g in self.pool01.get_ranking(0, year)]))
+        self.assertTrue(all([g.score == 0 for g in self.pool02.get_ranking(0, year)]))
+        self.assertTrue(all([g.score == 0 for g in self.pool03.get_ranking(0, year)]))
+
+        # monthly period
+        month, year = timezone.now().month, timezone.now().year
+        self.assertTrue(
+            all([g.score == 0 for g in self.pool01.get_ranking(month, year)])
+        )
+        self.assertTrue(
+            all([g.score == 0 for g in self.pool02.get_ranking(month, year)])
+        )
+        self.assertTrue(
+            all([g.score == 0 for g in self.pool03.get_ranking(month, year)])
+        )
+
+
+    def test_get_ranking_with_exclusive_guesses(self):
+        """
+        equipes:
+        ------- p1
+        0 1
+        2 3
+        ------ p1-p3
+        4 5
+        6 7 (O)
+        ------ p2-p3
+        8 9 (O)
+        10 11
+        ------ p2
+        12 13
+        14 15
+
+        placares:
+        ------ p1
+        0 0
+        2 4
+        ------ p1-p3
+        4 8
+        6 12 (O)
+        ------ p2-p3
+        8 16 (O)
+        10 20
+        ------ p2
+        12 24
+        14 28
+        """
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser01,
+            partida=self.matches[0],
+            gols_mandante=1,
+            gols_visitante=1,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser01,
+            partida=self.matches[1],
+            gols_mandante=2,
+            gols_visitante=4,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser01,
+            partida=self.matches[2],
+            gols_mandante=0,
+            gols_visitante=8,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser01,
+            partida=self.matches[3],
+            gols_mandante=0,
+            gols_visitante=1,
+        ))
+
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser03,
+            partida=self.matches[0],
+            gols_mandante=0,
+            gols_visitante=0,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser03,
+            partida=self.matches[1],
+            gols_mandante=2,
+            gols_visitante=3,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser03,
+            partida=self.matches[2],
+            gols_mandante=4,
+            gols_visitante=0,
+        ))
+        self.pool01.guesses.add(Palpite.objects.create(
+            palpiteiro=self.guesser03,
+            partida=self.matches[3],
+            gols_mandante=2,
+            gols_visitante=1,
+        ))
+
+
+        for g in self.pool01.guesses.all():
+            g.evaluate_and_consolidate()
+
+        month, year = timezone.now().month, timezone.now().year
+        ranking = self.pool01.get_ranking(month, year)
+        self.assertEqual(ranking.get(id=self.guesser01.id).score, 23)
+        self.assertEqual(ranking.get(id=self.guesser02.id).score, 0)
+        self.assertEqual(ranking.get(id=self.guesser03.id).score, 16)
+
+
+        open_match_without_result = mommy.make(
+            Partida,
+            rodada=[self.active_round],
+            mandante=self.teams[0],
+            visitante=self.teams[3],
+            data_hora=timezone.now() + timedelta(hours=6),
+        )
+        self.assertIsNone(open_match_without_result.result_str)
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser01,
+                partida=open_match_without_result,
+                gols_mandante=10,
+                gols_visitante=10,
+            )
+        )
+        month, year = 0, 0
+        ranking = self.pool01.get_ranking(month, year)
+        self.assertEqual(ranking.get(id=self.guesser01.id).score, 23)
+        self.assertEqual(ranking.get(id=self.guesser02.id).score, 0)
+        self.assertEqual(ranking.get(id=self.guesser03.id).score, 16)
+
+        date_in_next_month = timezone.now() + timedelta(weeks=6)
+        month, year = date_in_next_month.month, date_in_next_month.year
+        ranking = self.pool01.get_ranking(month, year)
+        self.assertEqual(ranking.get(id=self.guesser01.id).score, 0)
+        self.assertEqual(ranking.get(id=self.guesser02.id).score, 0)
+        self.assertEqual(ranking.get(id=self.guesser03.id).score, 0)
+
+        for g in self.pool03.guesses.all():
+            g.evaluate_and_consolidate()
+
+        ranking = self.pool03.get_ranking(0, 0)
+        self.assertEqual(ranking.get(id=self.guesser01.id).score, 0)
+        with self.assertRaises(Palpiteiro.DoesNotExist):
+            ranking.get(id=self.guesser02.id)
+        self.assertEqual(ranking.get(id=self.guesser03.id).score, 0)

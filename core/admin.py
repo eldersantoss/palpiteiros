@@ -74,4 +74,4 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "number_of_matches",
     )
     prepopulated_fields = {"slug": ("name",)}
-    filter_horizontal = ["teams", "guessers"]
+    filter_horizontal = ["teams", "guessers", "guesses"]

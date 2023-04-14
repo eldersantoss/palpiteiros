@@ -12,6 +12,7 @@
   {% empty %}
     <p>Você ainda não está cadastrado em nenhum bolão. 😕</p>
   {% endfor %}
+  <a href="{% url 'core:index' %}">Novo bolão</a>
 </nav>
 
 {% endblock content %}

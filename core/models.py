@@ -1,13 +1,13 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
+from django.conf import settings
+from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
-from django.conf import settings
-from django.contrib import admin
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
 
 from .forms import GuessForm
 
@@ -75,15 +75,17 @@ class Rodada(TimeStampedModel):
         for guesser in pool.guessers.all():
             detail = {
                 "guesser": guesser,
-                "round_score": guesser.get_round_score(self),
+                "round_score": guesser.get_round_score(self, pool),
                 "matches_and_guesses": [],
             }
             for match in self.partidas.all():
-                guess = (
-                    match.get_guess_by_guesser(guesser)
-                    if logged_guesser == guesser or not match.open_to_guesses()
-                    else None
-                )
+                if logged_guesser == guesser or not match.open_to_guesses():
+                    try:
+                        guess = pool.guesses.get(partida=match, palpiteiro=guesser)
+                    except Palpite.DoesNotExist:
+                        guess = None
+                else:
+                    guess = None
                 detail["matches_and_guesses"].append({"match": match, "guess": guess})
             round_details.append(detail)
         round_details.sort(key=lambda e: e["round_score"], reverse=True)
@@ -202,6 +204,9 @@ class Partida(models.Model):
             self.data_hora <= timezone.now() + timedelta(hours=72)
         )
 
+    def get_pools(self):
+        return self.mandante.pools.all().union(self.visitante.pools.all())
+
     def get_guess_by_guesser(self, guesser: "Palpiteiro"):
         try:
             return self.palpites.get(palpiteiro=guesser)
@@ -212,10 +217,9 @@ class Partida(models.Model):
 class Palpiteiro(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    def get_round_score(self, round_: "Rodada") -> int:
+    def get_round_score(self, round_: "Rodada", pool: "GuessPool") -> int:
         return sum(
-            guess.get_score()
-            for guess in (self.palpites.filter(partida__rodada=round_))
+            guess.get_score() for guess in (pool.guesses.filter(partida__rodada=round_))
         )
 
     @admin.display(
@@ -252,7 +256,6 @@ class Palpite(models.Model):
     class Meta:
         verbose_name = "palpite"
         verbose_name_plural = "palpites"
-        unique_together = ["palpiteiro", "partida"]
 
     def __str__(self) -> str:
         return (
@@ -262,11 +265,12 @@ class Palpite(models.Model):
         )
 
     def get_score(self) -> int:
-        self.evaluate_and_consolidate()
+        if not self.contabilizado:
+            self.evaluate_and_consolidate()
         return self.pontuacao
 
     def evaluate_and_consolidate(self):
-        if self.partida.result_str is not None and not self.contabilizado:
+        if self.partida.result_str is not None:
             self.pontuacao = self._evaluate()
             self.contabilizado = True
             self.save()
@@ -342,6 +346,11 @@ class GuessPool(TimeStampedModel):
         Equipe,
         related_name="pools",
     )
+    guesses = models.ManyToManyField(
+        Palpite,
+        related_name="pools",
+        blank=True,
+    )
 
     class Meta:
         verbose_name = "bolão"
@@ -352,7 +361,8 @@ class GuessPool(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.guessers.add(self.owner)
+        if not self.guessers.filter(id=self.owner.id).exists():
+            self.guessers.add(self.owner)
 
     @admin.display(description="Equipes")
     def number_of_teams(self):
@@ -396,80 +406,23 @@ class GuessPool(TimeStampedModel):
         an existing guess for the match. In addition, adds a guess
         form instance for each open match and returns them"""
 
+        for_all_pools = bool(post_data.get("for_all_pools"))
         open_matches = self.get_open_matches()
         with transaction.atomic():
             for match in open_matches:
-                form = GuessForm(post_data, partida=match)
-                if form.is_valid():
-                    self._update_or_create_guesses(match, guesser, form)
+                guess_form = GuessForm(post_data, partida=match)
+                if guess_form.is_valid():
+                    guess = self._update_or_create_guesses(
+                        for_all_pools, match, guesser, guess_form
+                    )
+                    self._add_guess_to_pools(for_all_pools, match, guesser, guess)
                 else:
-                    form = self._generate_empty_form_or_with_old_guess(match, guesser)
-                match.guess_form = form
+                    guess_form = self._generate_empty_form_or_with_existing_guess(
+                        match, guesser
+                    )
+                match.guess_form = guess_form
+            self._delete_orphans_guesses()
         return open_matches
-
-    def _update_or_create_guesses(self, match, guesser, form):
-        obj, created = match.palpites.get_or_create(
-            palpiteiro=guesser,
-            defaults={
-                "gols_mandante": form.cleaned_data["gols_mandante"],
-                "gols_visitante": form.cleaned_data["gols_visitante"],
-            },
-        )
-        if not created:
-            obj.gols_mandante = form.cleaned_data["gols_mandante"]
-            obj.gols_visitante = form.cleaned_data["gols_visitante"]
-            obj.save()
-
-    def _generate_empty_form_or_with_old_guess(self, match, guesser):
-        try:
-            guess = match.palpites.get(palpiteiro=guesser)
-            initial_data = {
-                f"gols_mandante_{match.id}": guess.gols_mandante,
-                f"gols_visitante_{match.id}": guess.gols_visitante,
-            }
-        except Palpite.DoesNotExist:
-            initial_data = {}
-        return GuessForm(initial_data, partida=match)
-
-    def get_ranking(self, month: int, year: int) -> list["Palpiteiro"]:
-        start, end = self._assemble_datetime_period(month, year)
-        matches = self.get_matches_on_period(start, end)
-        guesses_of_this_pool_in_the_period = Q(palpites__partida__in=matches)
-        sum_expr = Sum(
-            "palpites__pontuacao",
-            filter=guesses_of_this_pool_in_the_period,
-        )
-        return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by("-score")
-
-    def _assemble_datetime_period(self, month, year):
-        base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
-        base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
-
-        # todos os meses do ano recebido
-        if not month and year:
-            start = base_start.replace(year=year, month=1)
-            end = base_end.replace(year=year, month=12, day=31)
-
-        # periodo geral (entre data da primeira partida registrada até data atual)
-        elif not year:
-            oldest_match = Partida.objects.first()
-            start = timezone.now() if oldest_match is None else oldest_match.data_hora
-            end = timezone.now()
-
-        # mes e ano recebidos
-        else:
-            start = base_start.replace(year=year, month=month)
-            end = (
-                base_end.replace(year=year, month=month + 1)
-                if month < 12
-                else base_end.replace(year=year + 1, month=1)
-            ) - timedelta(days=1)
-
-        return start, end
-
-    def get_matches_on_period(self, start: datetime, end: datetime):
-        """Returns all open matches envolving registered teams"""
-        return self.get_matches().filter(data_hora__gt=start, data_hora__lte=end)
 
     def get_open_matches(self):
         """Returns all open matches envolving registered teams"""
@@ -480,11 +433,65 @@ class GuessPool(TimeStampedModel):
             + timedelta(hours=self.HOURS_BEFORE_START_MATCH),
         )
 
-    def get_closed_matches(self):
-        """Returns all closed matches envolving registered teams"""
-        return self.get_matches().exclude(
-            data_hora__gt=timezone.now() + timedelta(minutes=30)
-        )
+    def _update_or_create_guesses(self, for_all_pools, match, guesser, form):
+        if for_all_pools:
+            try:
+                guess = self.guesses.get(
+                    partida=match,
+                    palpiteiro=guesser,
+                )
+                guess.gols_mandante = form.cleaned_data["gols_mandante"]
+                guess.gols_visitante = form.cleaned_data["gols_visitante"]
+            except Palpite.DoesNotExist:
+                guess = Palpite(
+                    partida=match,
+                    palpiteiro=guesser,
+                    gols_mandante=form.cleaned_data["gols_mandante"],
+                    gols_visitante=form.cleaned_data["gols_visitante"],
+                )
+        else:
+            guess = Palpite(
+                partida=match,
+                palpiteiro=guesser,
+                gols_mandante=form.cleaned_data["gols_mandante"],
+                gols_visitante=form.cleaned_data["gols_visitante"],
+            )
+        guess.save()
+        return guess
+
+    def _add_guess_to_pools(self, for_all_pools, match, guesser, guess):
+        if for_all_pools:
+            pools_that_match_and_guesser_are_members = match.get_pools().intersection(
+                guesser.pools.all()
+            )
+            for pool in pools_that_match_and_guesser_are_members:
+                self._replace_guess_in_pool_guesses(guess, match, guesser, pool)
+        else:
+            self._replace_guess_in_pool_guesses(guess, match, guesser)
+
+    def _replace_guess_in_pool_guesses(self, guess, match, guesser, pool=None):
+        target_pool = pool or self
+        try:
+            old_guess = target_pool.guesses.get(partida=match, palpiteiro=guesser)
+            target_pool.guesses.remove(old_guess)
+        except Palpite.DoesNotExist:
+            pass
+        target_pool.guesses.add(guess)
+
+    @classmethod
+    def _delete_orphans_guesses(cls):
+        Palpite.objects.exclude(pools__in=cls.objects.all()).delete()
+
+    def _generate_empty_form_or_with_existing_guess(self, match, guesser):
+        try:
+            guess = self.guesses.get(partida=match, palpiteiro=guesser)
+            initial_data = {
+                f"gols_mandante_{match.id}": guess.gols_mandante,
+                f"gols_visitante_{match.id}": guess.gols_visitante,
+            }
+        except Palpite.DoesNotExist:
+            initial_data = None
+        return GuessForm(initial_data, partida=match)
 
     @admin.display(description="Partidas")
     def number_of_matches(self):
@@ -496,6 +503,48 @@ class GuessPool(TimeStampedModel):
         is_home_or_away_team = Q(mandante__in=self.teams.all()) | Q(
             visitante__in=self.teams.all()
         )
-        return Partida.objects.filter(is_home_or_away_team).filter(
-            data_hora__gte=self.created
+        return Partida.objects.filter(data_hora__gte=self.created).filter(
+            is_home_or_away_team
         )
+
+    def get_ranking(self, month: int, year: int):
+        start, end = self._assemble_datetime_period(month, year)
+        matches = self._get_matches_on_period(start, end)
+        guesses = self.guesses.all()
+        guesses_of_this_pool_in_the_period = Q(palpites__partida__in=matches) & Q(
+            palpites__in=guesses
+        )
+        sum_expr = Sum(
+            "palpites__pontuacao",
+            filter=guesses_of_this_pool_in_the_period,
+        )
+        return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by("-score")
+
+    def _assemble_datetime_period(self, month: int, year: int):
+        base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
+        base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
+
+        # todos os meses do ano recebido
+        if month == 0 and year != 0:
+            start = base_start.replace(year=year, month=1)
+            end = base_end.replace(year=year, month=12, day=31)
+
+        # periodo geral (entre data de criação do bolão até data atual)
+        elif year == 0:
+            start = self.created
+            end = timezone.now().replace(hour=23, minute=59, second=59)
+
+        # mes e ano recebidos
+        elif month != 0 and year != 0:
+            start = base_start.replace(year=year, month=month)
+            end = (
+                base_end.replace(year=year, month=month + 1)
+                if month < 12
+                else base_end.replace(year=year + 1, month=1)
+            ) - timedelta(days=1)
+
+        return start, end
+
+    def _get_matches_on_period(self, start: datetime, end: datetime):
+        """Returns all open matches envolving registered teams"""
+        return self.get_matches().filter(data_hora__gt=start, data_hora__lte=end)

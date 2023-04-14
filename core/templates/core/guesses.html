@@ -7,67 +7,71 @@
 <h1>Palpitar</h1>
 
 <form action="{% url 'core:guesses' pool.slug %}" method="post" class="guess-form">
-    {% csrf_token %}
-    {% if closed_matches %}<h3>Palpites encerrados</h3>{% endif %}
-    {% for match in closed_matches %}
-        <div class="match-wrapper">
-            <p class="match-time">
-                {{ match.data_hora }}
-                {% if match.pontuacao_dobrada %}
-                  <strong>(x2 🔥)</strong>
-                {% endif %}
-            </p>
-            <div class="guess-wrapper">
-              <div class="team home">
-                {{ match.mandante }}
-              </div>
-              <div>
-                <span class="gols-palpite-encerrado">
-                  {% if match.guess %}
-                    {{ match.guess.gols_mandante }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </span>
-              </div>
-              <div class="separador-equipes">x</div>
-              <div>
-                <span class="gols-palpite-encerrado">
-                  {% if match.guess %}
-                    {{ match.guess.gols_visitante }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </span>
-              </div>
-              <div class="team away">
-                {{ match.visitante }}
-              </div>
-            </div>
-        </div>
-    {% endfor %}
-
-    <h3>Palpites abertos</h3>
-    {% for match in open_matches %}
-      <div class="match-wrapper">
-        <p class="match-time">
-          {{ match.data_hora }}
-          {% if match.pontuacao_dobrada %}
-            <strong>(x2 🔥)</strong>
-          {% endif %}
-        </p>
-        <div class="guess-wrapper">
-          <div class="team home">
-            {{ match.guess_form.gols_mandante.label_tag }} {{ match.guess_form.gols_mandante }}
-          </div>
-          <div class="separador-equipes">x</div>
-          <div class="team away">
-            {{ match.guess_form.gols_visitante }} {{ match.guess_form.gols_visitante.label_tag }}
-          </div>
-        </div>
+  {% csrf_token %}
+  {% if closed_matches %}<h3>Palpites encerrados</h3>{% endif %}
+  {% for match in closed_matches %}
+  <div class="match-wrapper">
+    <p class="match-time">
+      {{ match.data_hora }}
+      {% if match.pontuacao_dobrada %}
+      <strong>(x2 🔥)</strong>
+      {% endif %}
+    </p>
+    <div class="guess-wrapper">
+      <div class="team home">
+        {{ match.mandante }}
       </div>
-    {% endfor %}
-    <input type="submit" value="Salvar palpites">
+      <div>
+        <span class="gols-palpite-encerrado">
+          {% if match.guess %}
+          {{ match.guess.gols_mandante }}
+          {% else %}
+          -
+          {% endif %}
+        </span>
+      </div>
+      <div class="separador-equipes">x</div>
+      <div>
+        <span class="gols-palpite-encerrado">
+          {% if match.guess %}
+          {{ match.guess.gols_visitante }}
+          {% else %}
+          -
+          {% endif %}
+        </span>
+      </div>
+      <div class="team away">
+        {{ match.visitante }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <h3>Palpites abertos</h3>
+  <div class="guesses-checkbox">
+    <label for="id_for_all_pools">Aproveitar palpites em todos os bolões</label>
+    <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
+  </div>
+  {% for match in open_matches %}
+  <div class="match-wrapper">
+    <p class="match-time">
+      {{ match.data_hora }}
+      {% if match.pontuacao_dobrada %}
+      <strong>(x2 🔥)</strong>
+      {% endif %}
+    </p>
+    <div class="guess-wrapper">
+      <div class="team home">
+        {{ match.guess_form.gols_mandante.label_tag }} {{ match.guess_form.gols_mandante }}
+      </div>
+      <div class="separador-equipes">x</div>
+      <div class="team away">
+        {{ match.guess_form.gols_visitante }} {{ match.guess_form.gols_visitante.label_tag }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <input type="submit" value="Salvar palpites">
 </form>
 
 {% endblock content %}
