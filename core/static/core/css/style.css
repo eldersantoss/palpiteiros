@@ -59,10 +59,6 @@ main h1 {
   align-self: flex-start;
 }
 
-main a {
-  margin: 2vh 0;
-}
-
 main p {
   margin: 5vh 0;
   line-height: 2.75vh;
@@ -98,7 +94,7 @@ h3 {
 
 .spacer {
   width: 100%;
-  margin: 5vh 0;
+  margin: 2vh 0;
   border: 0;
   height: 0.5vh;
   background-image: linear-gradient(to right, transparent, #9acd32, transparent);
@@ -113,6 +109,10 @@ h3 {
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
+}
+
+.vertical a {
+  margin: 2vh 0;
 }
 
 .horizontal {
@@ -170,7 +170,13 @@ h3 {
 .login-form div {
   display: flex;
   flex-direction: column;
-  margin: 1vh;
+  margin: 1vh 0;
+}
+
+.forget-password {
+  font-size: 0.75rem;
+  align-self: flex-end;
+  margin-top: 1vh;
 }
 
 .help-links {
@@ -183,6 +189,7 @@ h3 {
 
 .login-form label {
   display: flex;
+  max-width: 80vw;
 }
 
 div.helptext {
@@ -205,13 +212,14 @@ div.helptext {
   color: red;
   list-style: none;
   padding: 0;
-  text-align: center;
+  text-align: justify;
+  font-size: 0.75rem;
+  width: 80vw;
+  line-height: 1rem;
 }
-
 
 .messages {
   list-style: none;
-  font-weight: bold;
   padding: 1.5vh;
   border-radius: 1vh;
   text-align: center;
@@ -220,8 +228,10 @@ div.helptext {
 }
 
 .temp-msg {
+  margin: 1vh 0;
   padding: 1.5vh;
   border-radius: 1vh;
+  line-height: 2.75vh;
 }
 
 .error {
@@ -232,6 +242,10 @@ div.helptext {
   background-color: rgba(125, 255, 75, 0.25);
 }
 
+input {
+  border-radius: 3px;
+}
+
 .login-form input {
   margin-top: 1vh;
   padding: 1vw;
@@ -239,6 +253,86 @@ div.helptext {
   min-height: 5vh;
   min-width: 80vw;
   font-size: 0.9em;
+}
+
+.signin-pool-url {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2vh 0;
+  text-align: center;
+}
+
+.signin-pool-url p {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+#pool-url {
+  margin-top: 2vh;
+  color: #9acd32;
+  padding: 2vh 3vh;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.copy-btn {
+  margin-top: 2vh;
+  height: 4vh;
+  width: 12vh;
+  background-color: #9acd32;
+  border: none;
+  border-radius: 3px;
+  color: darkgreen;
+  font-weight: bold;
+}
+
+.guesspool-create-form {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.guesspool-create-form div {
+  margin-top: 1vh;
+  width: 100%;
+}
+
+.guesspool-create-form > div {
+  margin-top: 3vh;
+}
+
+.guesspool-create-form fieldset {
+  border-radius: 3px;
+}
+
+.guesspool-create-form input[type=text] {
+  text-align: center;
+  padding: 1vw;
+  margin: 1vh 0;
+  min-height: 5vh;
+  width: 100%;
+  border: none;
+  color: darkgreen;
+  font-weight: bold;
+}
+
+.guesspool-create-form input[type=submit] {
+  min-height: 5vh;
+  margin-top: 5vh;
+  border: none;
+}
+
+#id_teams {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#id_teams div {
+  max-width: 30%;
 }
 
 .guess-form {
@@ -334,18 +428,11 @@ input[type=submit] {
   color: darkgreen;
   font-weight: bold;
   min-width: 80vw;
+  margin: 5vh 0;
 }
 
 input[type=submit]:hover {
   background-color: greenyellow;
-}
-
-.guess-form input[type=submit] {
-  margin-top: 5vh;
-}
-
-.login-form input[type=submit] {
-  margin-top: 2vh;
 }
 
 table {
@@ -411,3 +498,69 @@ footer {
   align-items: center;
   font-size: 0.75em;
 }
+
+/* .cookieConsentContainer {
+  z-index: 999;
+  width: 350px;
+  min-height: 20px;
+  box-sizing: border-box;
+  padding: 30px 30px 30px 30px;
+  background: #232323;
+  overflow: hidden;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: none
+}
+
+.cookieConsentContainer .cookieTitle a {
+  font-family: OpenSans, arial, sans-serif;
+  color: #fff;
+  font-size: 22px;
+  line-height: 20px;
+  display: block
+}
+
+.cookieConsentContainer .cookieDesc p {
+  margin: 0;
+  padding: 0;
+  font-family: OpenSans, arial, sans-serif;
+  color: #fff;
+  font-size: 13px;
+  line-height: 20px;
+  display: block;
+  margin-top: 10px
+}
+
+.cookieConsentContainer .cookieDesc a {
+  font-family: OpenSans, arial, sans-serif;
+  color: #fff;
+  text-decoration: underline
+}
+
+.cookieConsentContainer .cookieButton a {
+  display: inline-block;
+  font-family: OpenSans, arial, sans-serif;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 14px;
+  background: #000;
+  box-sizing: border-box;
+  padding: 15px 24px;
+  text-align: center;
+  transition: background .3s
+}
+
+.cookieConsentContainer .cookieButton a:hover {
+  cursor: pointer;
+  background: #3e9b67
+}
+
+@media (max-width:980px) {
+  .cookieConsentContainer {
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important
+  }
+} */

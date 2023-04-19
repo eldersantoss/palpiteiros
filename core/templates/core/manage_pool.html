@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Bolão | Palpiteiros{% endblock title %}
+
+{% block content %}
+
+<div class="signin-pool-url">
+  <p>Link para ingresso no bolão:</p>
+  <p id="pool-url">{{ request.scheme }}://{{ request.get_host }}{{ pool.get_signin_url }}</p>
+  <button class="copy-btn" onclick="copyUrlToClipboard(this)">Copiar</button>
+</div>
+
+<form method="post" class="guesspool-create-form">
+  {% csrf_token %}
+  {{ form.as_div }}
+  <input type="submit" value="Salvar alterações">
+</form>
+
+{% endblock content %}

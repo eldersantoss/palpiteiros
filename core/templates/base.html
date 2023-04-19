@@ -48,25 +48,31 @@
         {% endfor %}
       </ul>
     {% endif %}
+    {% if pool %}
+      <h1>{{ pool }}</h1>
+    {% endif %}
 
     {% block content %}{% endblock content %}
 
     {% if pool %}
-      <h1>{{ pool }}</h1>
       <hr class="spacer">
       <nav class="menu vertical">
-        <a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>
+        {% if pool.user_is_guesser%}
+          <a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>
+        {% endif %}
         <a href="{% url 'core:ranking' pool.slug %}">Classificação</a>
+        {% comment %} # TODO: remover comentários {% endcomment %}
         <!-- <a href="{% url 'core:round_list' pool.slug %}">Rodadas</a> -->
-        {% if request.user.palpiteiro == pool.owner%}
-        <a href="{% url 'core:manual_administracao' %}">
+        {% if pool.user_is_owner%}
+        <!-- <a href="{% url 'core:manual_administracao' %}">
           Manual do administrador
         </a>
-        <a href="{% url 'admin:index' %}">
-          Acessar área de administração
-        </a>
+          <a href="{% url 'admin:index' %}">
+            Acessar área de administração
+          </a> -->
+          <a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>
+          {% endif %}
         <a href="{% url 'core:index' %}">Meus bolões</a>
-        {% endif %}
       </nav>
     {% endif %}
   </main>

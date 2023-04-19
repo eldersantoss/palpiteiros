@@ -4,15 +4,16 @@
 
 {% block content %}
 
-<h1>Meus bolões</h1>
+<h1>Bolões</h1>
 
+<hr class="spacer">
 <nav class="menu vertical">
   {% for pool in pools %}
     <a href={% url 'core:pool_home' pool.slug %}>{{ pool }}</a>
   {% empty %}
     <p>Você ainda não está cadastrado em nenhum bolão. 😕</p>
   {% endfor %}
-  <a href="{% url 'core:index' %}">Novo bolão</a>
+  <a href="{% url 'core:create_pool' %}">Criar bolão</a>
 </nav>
 
 {% endblock content %}

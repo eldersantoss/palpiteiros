@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib import admin
@@ -6,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -326,11 +328,16 @@ class Palpite(models.Model):
 
 
 class GuessPool(TimeStampedModel):
-
     MINUTES_BEFORE_START_MATCH = 30
     HOURS_BEFORE_START_MATCH = 72
 
-    name = models.CharField(max_length=100, unique=True)
+    uuid = models.UUIDField(
+        "identificador público",
+        unique=True,
+        editable=False,
+        default=uuid4,
+    )
+    name = models.CharField("nome", max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     owner = models.ForeignKey(
         Palpiteiro,
@@ -341,10 +348,12 @@ class GuessPool(TimeStampedModel):
         Palpiteiro,
         related_name="pools",
         blank=True,
+        verbose_name="palpiteiros",
     )
     teams = models.ManyToManyField(
         Equipe,
         related_name="pools",
+        verbose_name="times",
     )
     guesses = models.ManyToManyField(
         Palpite,
@@ -364,6 +373,15 @@ class GuessPool(TimeStampedModel):
         if not self.guessers.filter(id=self.owner.id).exists():
             self.guessers.add(self.owner)
 
+    def get_absolute_url(self):
+        return reverse_lazy("core:pool_home", kwargs={"pool_slug": self.slug})
+
+    def get_signin_url(self):
+        return reverse_lazy("core:signin_pool", kwargs={"uuid": self.uuid})
+
+    def signin_new_guesser(self, guesser: Palpiteiro):
+        self.guessers.add(guesser)
+
     @admin.display(description="Equipes")
     def number_of_teams(self):
         return self.teams.count()
@@ -371,6 +389,9 @@ class GuessPool(TimeStampedModel):
     @admin.display(description="Palpiteiros")
     def number_of_guessers(self):
         return self.guessers.count()
+
+    def guesser_is_member(self, guesser: Palpiteiro):
+        return self.guessers.contains(guesser)
 
     def get_visible_rounds(self):
         """Filter queryset to exclude inactive future rounds"""

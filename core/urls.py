@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 app_name = "core"
 
 urlpatterns = [
@@ -12,9 +11,24 @@ urlpatterns = [
         name="index",
     ),
     path(
+        "boloes/criar-bolao/",
+        views.PoolCreateView.as_view(),
+        name="create_pool",
+    ),
+    path(
+        "boloes/<uuid:uuid>/",
+        views.GuessPoolSignInView.as_view(),
+        name="signin_pool",
+    ),
+    path(
         "boloes/<slug:pool_slug>/",
-        views.PoolHome.as_view(),
+        views.PoolHomeView.as_view(),
         name="pool_home",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/gerenciar",
+        views.ManagePoolView.as_view(),
+        name="pool_management",
     ),
     path(
         "boloes/<slug:pool_slug>/palpites/",
