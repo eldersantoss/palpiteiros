@@ -4,24 +4,19 @@
 
 {% block content %}
 
-<h1>Login</h1>
-
 <form action="{% url 'login' %}" method="post" class="login-form">
     {% if not form.errors %}
     <p>Bem-vindo, palpiteiro(a)</p>
     {% endif %}
     {% csrf_token %}
     {{ form.as_div }}
+    <a href="{% url 'password_reset' %}" class="forget-password">Esqueci minha senha</a>
     <div><input type="hidden" name="next" value="{{ next }}"></div>
     <div><input type="submit" value="Entrar"></div>
 </form>
 
 <div class="help-links">
-    <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
-    <a href="mailto:elder_rn@hotmail.com?subject=Teste Palpiteiros&body=Olá! Desejo testar o app Palpiteiros.">
-      Desejo testar o aplicativo
-    </a>
-    {% comment %} <a href="{% url 'register' %}">Criar conta</a> {% endcomment %}
+    <a href="{% url 'register' %}">Criar conta</a>
 </div>
 
 {% endblock content %}

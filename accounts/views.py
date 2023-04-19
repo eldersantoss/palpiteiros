@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
 from core.models import Palpiteiro
 
@@ -12,13 +14,13 @@ def register(request):
             new_user = form.save(commit=False)
             new_user.set_password(form.cleaned_data["password"])
             new_user.save()
-            Palpiteiro.objects.create(usuario=new_user)
-            return render(
+            messages.success(
                 request,
-                "registration/register_done.html",
-                {"new_user_name": new_user.first_name},
+                "Usuário criado ✅",
+                "temp-msg short-time-msg",
             )
-
+            Palpiteiro.objects.create(usuario=new_user)
+            return redirect(reverse_lazy("login"))
     else:
         form = UserRegistrationForm()
 
