@@ -4,16 +4,29 @@
 
 {% block content %}
 
-<h1>Bolões</h1>
+<h2>Bolões cadastrados</h2>
 
-<hr class="spacer">
-<nav class="menu vertical">
-  {% for pool in pools %}
-    <a href={% url 'core:pool_home' pool.slug %}>{{ pool }}</a>
-  {% empty %}
-    <p>Você ainda não está cadastrado em nenhum bolão. 😕</p>
-  {% endfor %}
-  <a href="{% url 'core:create_pool' %}">Criar bolão</a>
-</nav>
+{% if pools %}
+  <nav class="menu vertical">
+    {% for pool in pools %}
+      <a href={% url 'core:pool_home' pool.slug %}>{{ pool }}</a>
+    {% endfor %}
+  </nav>
 
+{% else %}
+  <div class="main-msg home-msg">
+    <p>
+      Olá, Palpiteiro(a)! ⚽</br>
+      Você ainda não está cadastrado em nenhum bolão. Algumas opções:
+    </p>
+    <ol class="recommendations-list">
+      <li>
+        Clicando em <strong>Buscar bolão</strong>, você encontrará uma lista de bolões públicos nos quais pode se cadastrar.
+      </li>
+      <li>
+        Clicando em <strong>Criar bolão</strong>, você pode criar seu próprio bolão com as equipes e competições que desejar. Você pode optar por um bolão público, que poderá ser acessado por todos através do Buscar bolão, ou um privado, que terá um link único disponível apenas para você em <strong>Gerenciar bolão</strong>. Para convidar alguém para participar do seu bolão, basta que você forneça o link e o outro palpiteiro o acesse.
+      </li>
+    </ol>
+  </div>
+{% endif %}
 {% endblock content %}

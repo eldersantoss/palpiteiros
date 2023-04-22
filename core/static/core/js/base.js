@@ -10,16 +10,23 @@ function removeTempMessagesAfterTimeout() {
   const LONG_TIME_MESSAGES = 30;
   setTimeout(
     () =>
-      document.querySelectorAll(".short-time-msg").forEach((e) => e.remove()),
+      document
+        .querySelectorAll(".short-time-msg")
+        .forEach((e) => e.parentElement.remove()),
     SHORT_TIME_MESSAGES * 1000
   );
   setTimeout(
-    () => document.querySelectorAll(".mid-time-msg").forEach((e) => e.remove()),
+    () =>
+      document
+        .querySelectorAll(".mid-time-msg")
+        .forEach((e) => e.parentElement.remove()),
     MID_TIME_MESSAGES * 1000
   );
   setTimeout(
     () =>
-      document.querySelectorAll(".long-time-msg").forEach((e) => e.remove()),
+      document
+        .querySelectorAll(".long-time-msg")
+        .forEach((e) => e.parentElement.remove()),
     LONG_TIME_MESSAGES * 1000
   );
 }
@@ -45,7 +52,7 @@ function expandDetailRow(rowId) {
 function copyUrlToClipboard(element) {
   const value = document.querySelector("#pool-url").innerHTML;
   navigator.clipboard.writeText(value);
-  element.innerHTML = "Copiado ✔";
+  element.value = "Copiado ✔";
 }
 
 // var purecookieTitle = "Cookies.",

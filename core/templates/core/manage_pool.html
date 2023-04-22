@@ -4,13 +4,15 @@
 
 {% block content %}
 
+<h3>Gerenciar bolão</h3>
+
 <div class="signin-pool-url">
   <p>Link para ingresso no bolão:</p>
   <p id="pool-url">{{ request.scheme }}://{{ request.get_host }}{{ pool.get_signin_url }}</p>
-  <button class="copy-btn" onclick="copyUrlToClipboard(this)">Copiar</button>
+  <input type="button" class="copy-btn" value="Copiar" onclick="copyUrlToClipboard(this)">
 </div>
 
-<form method="post" class="guesspool-create-form">
+<form method="post" class="main-form">
   {% csrf_token %}
   {{ form.as_div }}
   <input type="submit" value="Salvar alterações">

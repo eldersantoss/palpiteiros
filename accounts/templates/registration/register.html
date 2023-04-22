@@ -4,15 +4,15 @@
 
 {% block content %}
 
-<form action="{% url 'register' %}" method="post" class="login-form">
+<form action="{% url 'register' %}" method="post" class="main-form">
     {% csrf_token %}
     {{ form.as_div }}
-    <div><input type="hidden" name="next" value="{{ next }}"></div>
-    <div><input type="submit" value="Criar conta"></div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <input type="submit" value="Criar conta">
 </form>
 
-<div class="help-links">
+<nav class="menu vertical">
     <a href="{% url 'login' %}">Voltar para login</a>
-</div>
+</nav>
 
 {% endblock content %}

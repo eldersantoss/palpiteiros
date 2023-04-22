@@ -7,8 +7,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href={% static 'core/css/style.css' %}>
   <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
+  <link rel="stylesheet" href={% static 'core/css/style.css' %}>
 
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
   <script>
@@ -26,16 +26,14 @@
 <body>
 
   <header>
-    <span class="logo">
-      <a href="{% url 'core:index' %}">
-        <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
+    {% if request.user.is_authenticated %}
+      <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+        <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
-    </span>
-    <span>
-      {% if request.user.is_authenticated %}
-      {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
-      {% endif %}
-    </span>
+      <span>
+        {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
+      </span>
+    {% endif %}
   </header>
 
   <main>
@@ -48,37 +46,28 @@
         {% endfor %}
       </ul>
     {% endif %}
+
     {% if pool %}
-      <h1>{{ pool }}</h1>
+      <h2>{{ pool }}</h2>
     {% endif %}
 
     {% block content %}{% endblock content %}
 
-    {% if pool %}
-      <hr class="spacer">
-      <nav class="menu vertical">
-        {% if pool.user_is_guesser%}
-          <a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>
-        {% endif %}
-        <a href="{% url 'core:ranking' pool.slug %}">Classificação</a>
-        {% comment %} # TODO: remover comentários {% endcomment %}
-        <!-- <a href="{% url 'core:round_list' pool.slug %}">Rodadas</a> -->
-        {% if pool.user_is_owner%}
-        <!-- <a href="{% url 'core:manual_administracao' %}">
-          Manual do administrador
-        </a>
-          <a href="{% url 'admin:index' %}">
-            Acessar área de administração
-          </a> -->
-          <a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>
-          {% endif %}
-        <a href="{% url 'core:index' %}">Meus bolões</a>
-      </nav>
-    {% endif %}
   </main>
 
   <footer>
-    {% block footer %}{% endblock footer %}
+    {% if request.user.is_authenticated %}
+      <hr class="spacer">
+      <nav class="menu horizontal">
+        {% if pool %}
+          <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
+        {% endif %}
+        <a href="{% url 'core:index' %}">🍀 Bolões</a>
+        <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+        <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+      </nav>
+    {% endif %}
+
     <address>
       Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
     </address>
