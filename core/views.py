@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import CheckboxSelectMultiple, modelform_factory
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.text import slugify
 from django.views import generic
+
+from core.helpers import redirect_with_msg
 
 from .forms import RankingPeriodForm
 from .models import GuessPool
@@ -26,18 +27,8 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
 
 class PoolCreateView(LoginRequiredMixin, generic.CreateView):
     model = GuessPool
-    fields = ["name", "teams"]
+    fields = ["name", "private", "teams"]
     template_name = "core/create_pool.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user.palpiteiro.own_pools.count() >= 2:
-            messages.error(
-                self.request,
-                f"Limite de bolões atingido. Você pode possuir até 2 bolões ❌",
-                "temp-msg mid-time-msg",
-            )
-            return redirect(reverse_lazy("core:index"))
-        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -54,12 +45,18 @@ class PoolCreateView(LoginRequiredMixin, generic.CreateView):
         return modelform_factory(
             self.model,
             fields=self.fields,
-            widgets={"teams": CheckboxSelectMultiple},
+            widgets={"teams": CheckboxSelectMultiple()},
         )
 
     def form_valid(self, form):
         form.instance.owner = self.request.user.palpiteiro
-        form.instance.slug = slugify(form.instance.name)
+        slug = slugify(form.instance.name)
+        if GuessPool.objects.filter(slug=slug).exists():
+            form.add_error(
+                "name", "Já existe um bolão com esse nome. Por favor, escolha outro."
+            )
+            return self.form_invalid()
+        form.instance.slug = slug
         return super().form_valid(form)
 
 
@@ -72,9 +69,10 @@ class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Updat
     def dispatch(self, request, *args, **kwargs):
         if self.pool.user_is_owner:
             return super().dispatch(request, *args, **kwargs)
-        return self.redirect_to_pool_home_with_error_msg(
+        return redirect_with_msg(
+            self.request,
+            "error",
             "Você não possui autorização pra realizar esta ação ❌",
-            "mid-time-msg",
         )
 
     def post(self, request, *args, **kwargs):
@@ -87,14 +85,19 @@ class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Updat
             )
         return response
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["guessers"].queryset = self.pool.guessers.all()
+        return form
+
     def get_form_class(self):
         super().get_form_class()
         return modelform_factory(
             self.model,
             fields=self.fields,
             widgets={
-                "teams": CheckboxSelectMultiple,
-                "guessers": CheckboxSelectMultiple,
+                "teams": CheckboxSelectMultiple(),
+                "guessers": CheckboxSelectMultiple(),
             },
         )
 
@@ -111,18 +114,31 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
         guesser = self.request.user.palpiteiro
         if not pool.guesser_is_member(guesser):
             pool.signin_new_guesser(guesser)
-            messages.success(
-                self.request,
-                f"Bem-vindo(a) ao bolão 😀",
-                "temp-msg short-time-msg",
-            )
+            msg_type = "success"
+            msg = "Bem-vindo(a) ao bolão 😀"
         else:
-            messages.error(
+            msg_type = "error"
+            msg = "Você já é membro do bolão ❌"
+        return redirect_with_msg(self.request, msg_type, msg, "short", pool)
+
+
+class GuessPoolListView(LoginRequiredMixin, generic.ListView):
+    queryset = GuessPool.objects.filter(private=False)
+    template_name = "core/search_pool.html"
+    context_object_name = "pools"
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_queryset().exists():
+            return redirect_with_msg(
                 self.request,
-                f"Você já é membro do bolão ❌",
-                "temp-msg short-time-msg",
+                "error",
+                "Nenhum bolão público cadastrado..."
+                + " Que tal criar um agora mesmo?"
+                + " Basta clicar em <strong>Criar bolão</strong>"
+                + " e configurar como quiser 😎",
+                "long",
             )
-        return redirect(pool)
+        return super().get(request, *args, **kwargs)
 
 
 class PoolHomeView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
@@ -130,14 +146,44 @@ class PoolHomeView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Templat
 
 
 class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+    def dispatch(self, request, *args, **kwargs):
+        if self.pool.user_is_owner and not self.pool.user_is_guesser:
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Você não está cadastrado como palpiteiro."
+                + " Acesse <strong>Gerenciar bolão</strong>"
+                + " e marque seu usuário como <strong>Palpiteiro</strong>"
+                + " para ter acesso à esta ação.",
+                "long",
+                self.pool,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, *args, **kwargs):
+        return self._get_post_handler(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        return self._get_post_handler(*args, **kwargs)
+
+    def _get_post_handler(self, *args, **kwargs):
         open_matches = self.pool.get_update_or_create_guesses(
             self.guesser,
             self.request.POST,
         )
         if not open_matches.exists():
-            return self.redirect_to_pool_home_with_error_msg(
-                "Não existem partidas abertas nesse momento ❌"
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Não existem partidas abertas neste momento ❌",
+                "short",
+                self.pool,
+            )
+        if self.request.method == "POST":
+            messages.success(
+                self.request,
+                "Palpites salvos! ✅",
+                "temp-msg short-time-msg",
             )
         return render(
             self.request,
@@ -145,36 +191,21 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
             {"pool": self.pool, "open_matches": open_matches},
         )
 
-    def post(self, *args, **kwargs):
-        open_matches = self.pool.get_update_or_create_guesses(
-            self.guesser,
-            self.request.POST,
-        )
-        messages.success(
-            self.request,
-            "Palpites salvos! ✅",
-            "temp-msg short-time-msg",
-        )
-        return render(
-            self.request,
-            "core/guesses.html",
-            {"pool": self.pool, "open_matches": open_matches},
-        )
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.pool.user_is_guesser:
-            return super().dispatch(request, *args, **kwargs)
-        return self.redirect_to_pool_home_with_error_msg(
-            "Você não está cadastrado como palpiteiro."
-            + " Acesse <strong>Gerenciar bolão</strong>"
-            + " e marque seu usuário como <strong>Palpiteiro</strong>"
-            + " para ter acesso à esta ação.",
-            "mid-time-msg",
-        )
-
 
 class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
     template_name = "core/ranking.html"
+
+    def get(self, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if not context["ranking"].exists():
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Nenhum palpiteiro cadastrado no bolão 😕",
+                "short",
+                self.pool,
+            )
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -198,7 +229,9 @@ class RoundsListView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.ListV
 
     def get(self, request, *args, **kwargs):
         if not self.get_queryset().exists():
-            return self.redirect_to_pool_home_with_error_msg(
+            return redirect_with_msg(
+                self.request,
+                "error",
                 "Nenhuma rodada encontrada 😕",
             )
         return super().get(request, *args, **kwargs)

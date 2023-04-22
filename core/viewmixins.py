@@ -1,8 +1,6 @@
-from typing import Literal
+from django.shortcuts import get_object_or_404
 
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from core.helpers import redirect_with_msg
 
 from .models import GuessPool
 
@@ -16,9 +14,7 @@ class GuessPoolMembershipMixin:
         self.guesser = self.get_guesser()
         self.pool = self.get_pool()
         self.pool.user_is_owner = self.pool.owner == self.guesser
-        self.pool.user_is_guesser = self.pool.guessers.filter(
-            id=self.guesser.id
-        ).exists()
+        self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
 
     def get_guesser(self):
         return self.request.user.palpiteiro
@@ -29,12 +25,13 @@ class GuessPoolMembershipMixin:
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
-            messages.error(
+            return redirect_with_msg(
                 self.request,
+                "error",
                 f"Você não está cadastrado no bolão {self.pool} ❌",
-                "temp-msg mid-time-msg",
+                "mid",
+                self.redirect_url,
             )
-            return redirect(reverse_lazy(self.redirect_url))
         return super().dispatch(request, *args, **kwargs)
 
     def has_permission(self):
@@ -45,12 +42,3 @@ class GuessPoolMembershipMixin:
         context["pool"] = self.pool
         context["guesser"] = self.guesser
         return context
-
-    def redirect_to_pool_home_with_error_msg(
-        self,
-        msg: str,
-        msg_duration: Literal["short", "mid", "long"] = "short",
-    ):
-        extra_tags = f"temp-msg {msg_duration}-time-msg"
-        messages.error(self.request, msg, extra_tags)
-        return redirect(self.pool.get_absolute_url())
