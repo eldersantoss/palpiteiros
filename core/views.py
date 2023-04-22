@@ -261,10 +261,6 @@ class RoundDetailView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Deta
         return context
 
 
-class ManualAdminView(LoginRequiredMixin, generic.TemplateView):
-    template_name = "core/manual_administracao.html"
-
-
 def one_signal_worker(request):
     return HttpResponse(
         "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",

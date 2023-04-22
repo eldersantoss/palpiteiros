@@ -56,11 +56,6 @@ urlpatterns = [
         name="round_details",
     ),
     path(
-        "manual_administracao/",
-        views.ManualAdminView.as_view(),
-        name="manual_administracao",
-    ),
-    path(
         "OneSignalSDKWorker.js",
         views.one_signal_worker,
         name="one_signal_worker",
