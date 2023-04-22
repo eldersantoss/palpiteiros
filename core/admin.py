@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from . import models
 
-
 admin.site.site_header = "Administração Palpiteiros"
 admin.site.site_title = "Administração Palpiteiros"
 admin.site.index_title = "Selecione entidade para modificar"
@@ -72,6 +71,8 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "number_of_guessers",
         "number_of_rounds",
         "number_of_matches",
+        "private",
     )
+    list_editable = ("private",)
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ["teams", "guessers", "guesses"]

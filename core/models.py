@@ -344,6 +344,10 @@ class GuessPool(TimeStampedModel):
         related_name="own_pools",
         on_delete=models.PROTECT,
     )
+    private = models.BooleanField(
+        "privado",
+        default=True,
+    )
     guessers = models.ManyToManyField(
         Palpiteiro,
         related_name="pools",
@@ -370,7 +374,7 @@ class GuessPool(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if not self.guessers.filter(id=self.owner.id).exists():
+        if not self.guessers.contains(self.owner):
             self.guessers.add(self.owner)
 
     def get_absolute_url(self):
