@@ -11,7 +11,7 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "boloes/",
+        "boloes/buscar/",
         views.GuessPoolListView.as_view(),
         name="pool_list",
     ),
@@ -31,7 +31,7 @@ urlpatterns = [
         name="pool_home",
     ),
     path(
-        "boloes/<slug:pool_slug>/gerenciar",
+        "boloes/<slug:pool_slug>/gerenciar/",
         views.ManagePoolView.as_view(),
         name="pool_management",
     ),
