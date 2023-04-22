@@ -1,14 +1,14 @@
-from django.views.generic import TemplateView, ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views.generic import ListView, TemplateView
 
-from .models import Rodada, Palpiteiro, Partida
 from .forms import RankingPeriodForm
+from .models import Palpiteiro, Partida, Rodada
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -107,7 +107,13 @@ def ranking(request):
 
 
 def one_signal_worker(request):
-    return HttpResponse(
-        "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",
-        headers={"Content-Type": "application/javascript; charset=utf-8"},
+    response = HttpResponse(
+        "OneSignalSDKWorker.js",
+        content_type="application/javascript; charset=utf-8",
     )
+    response["Content-Disposition"] = 'attachment; filename="OneSignalSDKWorker.js"'
+    return response
+    # return HttpResponse(
+    #     "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",
+    #     headers={"Content-Type": "application/javascript; charset=utf-8"},
+    # )
