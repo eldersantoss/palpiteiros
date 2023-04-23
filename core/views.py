@@ -107,13 +107,13 @@ def ranking(request):
 
 
 def one_signal_worker(request):
-    response = HttpResponse(
-        "OneSignalSDKWorker.js",
-        content_type="application/javascript; charset=utf-8",
-    )
-    response["Content-Disposition"] = 'attachment; filename="OneSignalSDKWorker.js"'
-    return response
-    # return HttpResponse(
-    #     "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",
-    #     headers={"Content-Type": "application/javascript; charset=utf-8"},
+    # response = HttpResponse(
+    #     "OneSignalSDKWorker.js",
+    #     content_type="application/javascript; charset=utf-8",
     # )
+    # response["Content-Disposition"] = 'attachment; filename="OneSignalSDKWorker.js"'
+    # return response
+    return HttpResponse(
+        "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDKWorker.js');",
+        headers={"Content-Type": "application/javascript; charset=utf-8"},
+    )
