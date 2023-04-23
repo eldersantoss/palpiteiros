@@ -7,13 +7,13 @@
 <h1>Login</h1>
 
 <form action="{% url 'login' %}" method="post" class="login-form">
-    {% if not form.errors %}
+  {% if not form.errors %}
     <p>Bem-vindo, palpiteiro(a)</p>
-    {% endif %}
-    {% csrf_token %}
-    {{ form.as_div }}
-    <div><input type="hidden" name="next" value="{{ next }}"></div>
-    <div><input type="submit" value="Entrar"></div>
+  {% endif %}
+  {% csrf_token %}
+  {{ form.as_div }}
+  <div><input type="hidden" name="next" value="{{ next }}"></div>
+  <div><input type="submit" value="Entrar"></div>
 </form>
 
 <div class="help-links">
