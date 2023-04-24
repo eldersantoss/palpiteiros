@@ -72,6 +72,8 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "number_of_rounds",
         "number_of_matches",
         "private",
+        "created",
+        "modified",
     )
     list_editable = ("private",)
     prepopulated_fields = {"slug": ("name",)}
