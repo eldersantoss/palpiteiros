@@ -72,6 +72,8 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "number_of_rounds",
         "number_of_matches",
         "private",
+        "new_matches",
+        "updated_matches",
         "created",
         "modified",
     )
