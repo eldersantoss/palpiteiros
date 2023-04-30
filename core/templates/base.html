@@ -32,6 +32,18 @@
       <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
+      {% if request.user.is_authenticated %}
+        <div class="action-menu top-action-menu">
+          <nav class="menu horizontal">
+            {% if pool %}
+              <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
+            {% endif %}
+            <a href="{% url 'core:index' %}">🍀 Bolões</a>
+            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+            <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+          </nav>
+        </div>
+      {% endif %}
       <span>
         {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
       </span>
@@ -59,15 +71,17 @@
 
   <footer>
     {% if request.user.is_authenticated %}
-      <hr class="spacer">
-      <nav class="menu horizontal">
-        {% if pool %}
-          <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-        {% endif %}
-        <a href="{% url 'core:index' %}">🍀 Bolões</a>
-        <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
-        <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
-      </nav>
+      <div class="action-menu bottom-action-menu">
+        <hr class="spacer">
+        <nav class="menu horizontal">
+          {% if pool %}
+            <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
+          {% endif %}
+          <a href="{% url 'core:index' %}">🍀 Bolões</a>
+          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+          <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+        </nav>
+      </div>
     {% endif %}
 
     <address>

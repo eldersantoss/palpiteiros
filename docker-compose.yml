@@ -1,4 +1,22 @@
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    ports:
+      - 5672:5672
+
   web:
     build:
       context: .
@@ -12,17 +30,45 @@ services:
       - .env
     depends_on:
       - postgres
+      - rabbitmq
 
-  postgres:
-    image: postgres:latest
-    ports:
-      - 5432:5432
+  worker:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: celery -A palpiteiros worker -l info
     volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+
+  beat:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: celery -A palpiteiros beat -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: celery flower
+    ports:
+      - 5555:5555
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - web
+      - worker
 
 volumes:
   db_data:

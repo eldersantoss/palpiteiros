@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Iterable, Literal
 from uuid import uuid4
 
 from django.conf import settings
@@ -161,10 +162,24 @@ class Partida(models.Model):
         return f"{self.mandante.nome} x {self.visitante.nome}"
 
     def save(self, *args, **kwargs):
+        is_update = self.id is not None
         super().save(*args, **kwargs)
+        if is_update:
+            self.evaluate_and_consolidate_guesses()
+            self.set_updated_matches_flag_for_involved_pools()
+        else:
+            self.set_new_macthes_flag_for_involved_pools()
+
+    def evaluate_and_consolidate_guesses(self):
         with transaction.atomic():
             for guess in self.palpites.all():
                 guess.evaluate_and_consolidate()
+
+    def set_updated_matches_flag_for_involved_pools(self):
+        GuessPool.toggle_flag_value("updated_matches", self.get_pools(), True)
+
+    def set_new_macthes_flag_for_involved_pools(self):
+        GuessPool.toggle_flag_value("new_matches", self.get_pools(), True)
 
     @classmethod
     def have_open_matches_for_any_active_round(cls):
@@ -207,6 +222,7 @@ class Partida(models.Model):
         )
 
     def get_pools(self):
+        """Return all pools this instance of Match is involved with"""
         return self.mandante.pools.all().union(self.visitante.pools.all())
 
     def get_guess_by_guesser(self, guesser: "Palpiteiro"):
@@ -214,6 +230,9 @@ class Partida(models.Model):
             return self.palpites.get(palpiteiro=guesser)
         except Palpite.DoesNotExist:
             return None
+
+    def pending_guess(self, guesser: "Palpiteiro"):
+        return not self.palpites.filter(palpiteiro=guesser).exists()
 
 
 class Palpiteiro(models.Model):
@@ -234,6 +253,24 @@ class Palpiteiro(models.Model):
         if last_guess is not None:
             return last_guess.partida.rodada == last_active_round
         return False
+
+    def get_involved_pools(self):
+        return self.own_pools.all().union(self.pools.all()).order_by("name")
+
+    @classmethod
+    def get_who_should_be_notified_by_email(cls):
+        """Returns guessers that should be notified by email"""
+        return cls.objects.exclude(usuario__email="").exclude(pools__isnull=True)
+
+    def get_involved_pools_with_new_matches(self):
+        """Returns pools with new matches that this guesser is involved
+        with"""
+        return self.pools.filter(new_matches=True)
+
+    def get_involved_pools_with_updated_matches(self):
+        """Returns pools with updated matches that this guesser is involved
+        with"""
+        return self.pools.filter(updated_matches=True)
 
     def __str__(self) -> str:
         return f"{self.usuario.get_full_name()} ({self.usuario.username})"
@@ -364,6 +401,14 @@ class GuessPool(TimeStampedModel):
         related_name="pools",
         blank=True,
     )
+    new_matches = models.BooleanField(
+        "novas partidas",
+        default=False,
+    )
+    updated_matches = models.BooleanField(
+        "partidas atualizadas",
+        default=False,
+    )
 
     class Meta:
         verbose_name = "bolão"
@@ -450,13 +495,40 @@ class GuessPool(TimeStampedModel):
         return open_matches
 
     def get_open_matches(self):
-        """Returns all open matches envolving registered teams"""
+        """Returns all open matches involving registered teams"""
         return self.get_matches().filter(
             data_hora__gt=timezone.now()
             + timedelta(minutes=self.MINUTES_BEFORE_START_MATCH),
             data_hora__lte=timezone.now()
             + timedelta(hours=self.HOURS_BEFORE_START_MATCH),
         )
+
+    def has_pending_match(self, guesser: Palpiteiro) -> bool:
+        matches = self.get_open_matches()
+        for match in matches:
+            if match.pending_guess(guesser):
+                return True
+        return False
+
+    @classmethod
+    def toggle_flag_value(
+        cls,
+        flag: Literal["new_matches", "updated_matches"],
+        objs: Iterable | None = None,
+        desired_value: bool = False,
+    ):
+        if flag not in ["new_matches", "updated_matches"]:
+            raise ValueError(f"flag value must be 'new_matches' or 'updated_matches'")
+
+        pools = objs or (
+            cls.objects.filter(new_matches=not desired_value)
+            if flag == "new_matches"
+            else cls.objects.filter(updated_matches=not desired_value)
+        )
+
+        for p in pools:
+            setattr(p, flag, desired_value)
+        cls.objects.bulk_update(pools, [flag])
 
     def _update_or_create_guesses(self, for_all_pools, match, guesser, form):
         if for_all_pools:
@@ -571,5 +643,5 @@ class GuessPool(TimeStampedModel):
         return start, end
 
     def _get_matches_on_period(self, start: datetime, end: datetime):
-        """Returns all open matches envolving registered teams"""
+        """Returns all open matches involving registered teams"""
         return self.get_matches().filter(data_hora__gt=start, data_hora__lte=end)

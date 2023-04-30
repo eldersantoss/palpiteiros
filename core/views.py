@@ -19,9 +19,20 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pools_as_owner = self.request.user.palpiteiro.own_pools.all()
-        pools_as_guesser = self.request.user.palpiteiro.pools.all()
-        context["pools"] = pools_as_owner.union(pools_as_guesser).order_by("name")
+
+        guesser = self.request.user.palpiteiro
+        involved_pools = guesser.get_involved_pools()
+        pools_as_guesser = guesser.pools.all()
+        for pool in involved_pools:
+            pool.is_pending = (
+                pool.has_pending_match(self.request.user.palpiteiro)
+                if pool in pools_as_guesser
+                else False
+            )
+
+        context["display_subtitle"] = any([pool.is_pending for pool in involved_pools])
+        context["pools"] = involved_pools
+
         return context
 
 

@@ -77,6 +77,6 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "created",
         "modified",
     )
-    list_editable = ("private",)
+    list_editable = ("private", "new_matches", "updated_matches")
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ["teams", "guessers", "guesses"]

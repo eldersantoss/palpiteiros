@@ -9,9 +9,16 @@
 {% if pools %}
   <nav class="menu vertical">
     {% for pool in pools %}
-      <a href={% url 'core:pool_home' pool.slug %}>{{ pool }}</a>
+      <a href={% url 'core:pool_home' pool.slug %}>
+        {{ pool }} {% if pool.is_pending %}🔔{% endif %}
+      </a>
     {% endfor %}
   </nav>
+  {% if display_subtitle %}
+    <p class="subtitle-msg">
+      🔔: possui partidas abertas que você ainda não palpitou
+    </p>
+  {% endif %}
 
 {% else %}
   <div class="main-msg home-msg">
