@@ -55,6 +55,14 @@ function copyUrlToClipboard(element) {
   element.value = "Copiado ✔";
 }
 
+function showPoolLeavingConfirmation() {
+  document.querySelector(".exit-confirmation").style.display = "flex";
+}
+
+function hidePoolLeavingConfirmation() {
+  document.querySelector(".exit-confirmation").style.display = "none";
+}
+
 // var purecookieTitle = "Cookies.",
 //   purecookieDesc =
 //     "Ao usar este site, você automaticamente aceita que usemos cookies.",

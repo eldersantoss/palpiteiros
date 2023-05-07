@@ -36,9 +36,9 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
         return context
 
 
-class PoolCreateView(LoginRequiredMixin, generic.CreateView):
+class CreatePoolView(LoginRequiredMixin, generic.CreateView):
     model = GuessPool
-    fields = ["name", "private", "teams"]
+    fields = ["name", "private", "competitions", "teams"]
     template_name = "core/create_pool.html"
 
     def post(self, request, *args, **kwargs):
@@ -56,7 +56,10 @@ class PoolCreateView(LoginRequiredMixin, generic.CreateView):
         return modelform_factory(
             self.model,
             fields=self.fields,
-            widgets={"teams": CheckboxSelectMultiple()},
+            widgets={
+                "competitions": CheckboxSelectMultiple(),
+                "teams": CheckboxSelectMultiple(),
+            },
         )
 
     def form_valid(self, form):
@@ -73,7 +76,7 @@ class PoolCreateView(LoginRequiredMixin, generic.CreateView):
 
 class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.UpdateView):
     model = GuessPool
-    fields = ["name", "teams", "guessers"]
+    fields = ["name", "private", "competitions", "teams", "guessers"]
     template_name = "core/manage_pool.html"
     slug_url_kwarg = "pool_slug"
 
@@ -107,6 +110,7 @@ class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Updat
             self.model,
             fields=self.fields,
             widgets={
+                "competitions": CheckboxSelectMultiple(),
                 "teams": CheckboxSelectMultiple(),
                 "guessers": CheckboxSelectMultiple(),
             },
@@ -126,11 +130,30 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
         if not pool.guesser_is_member(guesser):
             pool.signin_new_guesser(guesser)
             msg_type = "success"
-            msg = "Bem-vindo(a) ao bolão 😀"
+            msg = f"Bem-vindo(a) ao bolão <strong>{pool}</strong>! Boa sorte 😀🍀🔥"
         else:
             msg_type = "error"
             msg = "Você já é membro do bolão ❌"
-        return redirect_with_msg(self.request, msg_type, msg, "short", pool)
+        return redirect_with_msg(self.request, msg_type, msg, "mid", pool)
+
+
+class GuessPoolSignOutView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        if self.pool.user_is_owner:
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Não é possível sair do bolão porque você é o proprietário 🚫",
+                to=self.pool,
+            )
+
+        self.pool.remove_guesser(self.guesser)
+
+        return redirect_with_msg(
+            self.request,
+            "warning",
+            f"Você saiu do bolão <strong>{self.pool}</strong> 👋🏃",
+        )
 
 
 class GuessPoolListView(LoginRequiredMixin, generic.ListView):

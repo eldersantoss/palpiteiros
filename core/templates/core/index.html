@@ -9,9 +9,7 @@
 {% if pools %}
   <nav class="menu vertical">
     {% for pool in pools %}
-      <a href={% url 'core:pool_home' pool.slug %}>
-        {{ pool }} {% if pool.is_pending %}🔔{% endif %}
-      </a>
+    <a href={% url 'core:pool_home' pool.slug %}>{{ pool }} {% if pool.is_pending %}🔔{% endif %}</a>
     {% endfor %}
   </nav>
   {% if display_subtitle %}
@@ -23,8 +21,8 @@
 {% else %}
   <div class="main-msg home-msg">
     <p>
-      Olá, Palpiteiro(a)! ⚽</br>
-      Você ainda não está cadastrado em nenhum bolão. Algumas opções:
+      Faaala, <strong>{{ request.user.first_name }}</strong>! ⚽😎</br>
+      Você ainda não está cadastrado em nenhum bolão. Toma aqui algumas opções pra resolver esse problema:
     </p>
     <ol class="recommendations-list">
       <li>

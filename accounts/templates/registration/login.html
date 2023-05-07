@@ -14,12 +14,10 @@
 
 
 <form action="{% url 'login' %}" method="post" class="main-form">
+  {% csrf_token %}
   <div>
     <p>Bem-vindo, palpiteiro(a)</p>
   </div>
-  {% if not form.errors %}
-  {% endif %}
-  {% csrf_token %}
   {{ form.as_div }}
   <a href="{% url 'password_reset' %}" class="forget-password">Esqueci minha senha</a>
   <input type="hidden" name="next" value="{{ next }}">

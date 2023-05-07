@@ -59,18 +59,26 @@
   {% for match in open_matches %}
     <div class="match-wrapper">
       <p class="match-time">
-        {{ match.data_hora }}
+        {{ match.data_hora }}{% if match.competition %} - {{ match.competition }}{% endif %}
         {% if match.pontuacao_dobrada %}
         <strong>(x2 🔥)</strong>
         {% endif %}
       </p>
       <div class="guess-wrapper">
-        <div class="team home">
-          {{ match.guess_form.gols_mandante.label_tag }} {{ match.guess_form.gols_mandante }}
+        <div class="team">
+          <div>
+            <img src="{{ match.mandante.logo_url}}" class="small-team-logo">
+            {{ match.guess_form.gols_mandante.label_tag }}
+          </div>
+          {{ match.guess_form.gols_mandante }}
         </div>
         <div class="separador-equipes">x</div>
-        <div class="team away">
-          {{ match.guess_form.gols_visitante }} {{ match.guess_form.gols_visitante.label_tag }}
+        <div class="team">
+          {{ match.guess_form.gols_visitante }}
+          <div>
+            <img src="{{ match.visitante.logo_url}}" class="small-team-logo">
+            {{ match.guess_form.gols_visitante.label_tag }}
+          </div>
         </div>
       </div>
     </div>

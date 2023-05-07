@@ -7,15 +7,68 @@
 <h3>Gerenciar bolão</h3>
 
 <div class="signin-pool-url">
-  <p>Link para ingresso no bolão:</p>
+  <p>Link de ingresso no bolão:</p>
   <p id="pool-url">{{ request.scheme }}://{{ request.get_host }}{{ pool.get_signin_url }}</p>
-  <input type="button" class="copy-btn" value="Copiar" onclick="copyUrlToClipboard(this)">
+  {% comment %} <input type="button" class="copy-btn" value="Copiar" onclick="copyUrlToClipboard(this)"> {% endcomment %}
 </div>
 
 <form method="post" class="main-form">
   {% csrf_token %}
-  {{ form.as_div }}
+
+  {{ form.non_field_errors }}
+
+  <div>
+    {{ form.errors }}
+    {{ form.name.label }}
+    {{ form.name }}
+  </div>
+  <div>
+    <div class="private-checkbox">
+      {{ form.private.errors }}
+      <label for={{ form.private.auto_id }}>Privado</label>
+      {{ form.private }}
+    </div>
+    <div class="help-msg">
+      <p>Desmarque para tornar público ou marque para tornar privado</p>
+    </div>
+  </div>
+  <div>
+    <details>
+      {{ form.errors }}
+      <summary>
+        {{ form.guessers.label }}
+        <div class="help-msg">
+          <p>Edite os membros do bolão</p>
+        </div>
+      </summary>
+      {{ form.guessers }}
+    </details>
+  </div>
+  <div>
+    <details>
+      {{ form.errors }}
+      <summary>
+        {{ form.competitions.label }}
+        <div class="help-msg">
+          <p>Edite as competições do bolão</p>
+        </div>
+      </summary>
+      {{ form.competitions }}
+    </details>
+  </div>
+  <div>
+    <details>
+      {{ form.errors }}
+      <summary>
+        Times avulsos
+        <div class="help-msg">
+          <p>Edite as equipes avulsas do bolão</p>
+        </div>
+      </summary>
+      {{ form.teams }}
+    </details>
+  </div>
+
   <input type="submit" value="Salvar alterações">
 </form>
-
 {% endblock content %}

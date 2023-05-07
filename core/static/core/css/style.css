@@ -19,9 +19,61 @@ a {
   color: yellowgreen;
 }
 
+.exit-btn {
+  background-color: transparent;
+  border: none;
+  color: tomato;
+}
+
+.exit-confirmation {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+  text-align: center;
+  margin-top: 1vh;
+}
+
+.exit-confirmation div {
+  display: flex;
+}
+
+.exit-confirmation a {
+  color: white;
+}
+
+.confirmation-btn {
+  color: white;
+  width: 11vh;
+  padding: 1vh 0;
+  margin: 2vh 5vh;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.stay-opt-btn {
+  background-color: green;
+}
+
+.stay-opt-btn:hover {
+  background-color: yellowgreen;
+}
+
+.exit-opt-btn {
+  background-color: red;
+}
+
+.exit-opt-btn:hover {
+  background-color: tomato;
+}
+
 a:hover {
   color: greenyellow;
 }
+
 
 header {
   padding: 2vh 5vw 0 5vw;
@@ -123,6 +175,28 @@ input {
   margin-top: 3vh;
 }
 
+.main-form details {
+  border-bottom: 1px solid rgba(173, 255, 47, 0.2);
+  padding-bottom: 1vh;
+}
+
+.main-form summary {
+  margin: 0.5vh;
+  color: yellowgreen;
+}
+
+.main-form details label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  margin-top: 1.5vh;
+}
+
+.main-form details input {
+  margin: 0 0.75vh 0 0;
+}
+
 .main-form input {
   margin-top: 1vh;
   padding: 1.5vh 1vh;
@@ -189,7 +263,7 @@ input {
 
 .match-time {
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 0.5rem;
   margin: 0 0;
 }
 
@@ -198,34 +272,46 @@ input {
   justify-content: center;
   align-items: center;
   font-size: 0.7rem;
-  margin-top: 0.5vh;
+  margin-top: 2vh;
+}
+
+.small-team-logo {
+  width: 5vh;
+  margin: 0 1vh;
 }
 
 .team {
   display: flex;
   align-items: center;
-  width: 50%;
-  line-height: 2.5vh;
+  justify-content: space-evenly;
+  width: 30vh;
+  line-height: 2vh;
+  text-align: center;
+}
+
+.team div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 7vh;
+}
+
+.team label {
+  margin-top: 0.5vh;
+  font-size: 0.5rem;
+  line-height: 1.5vh;
   text-align: center;
 }
 
 .team input {
   text-align: center;
-  margin: 0 2vw;
-  max-width: 8vw;
+  margin: 0 0;
+  height: 7vh;
+  width: 7vh;
   color: darkgreen;
   font-weight: bold;
   font-size: 0.75rem;
-}
-
-.home {
-  text-align: right;
-  justify-content: flex-end;
-}
-
-.away {
-  text-align: left;
-  justify-content: flex-start;
 }
 
 .gols-palpite-encerrado {
@@ -268,8 +354,8 @@ input {
   text-align: center;
   flex-grow: 1;
   line-height: 2.5vh;
-  font-size: 0.75rem;
-  width: 90%;
+  font-size: 0.7rem;
+  width: 95%;
 }
 
 .subtitle-msg {
@@ -286,6 +372,13 @@ input {
   margin-top: 2vh;
   line-height: 3vh;
   text-align: justify;
+}
+
+.help-msg p {
+  margin: 0;
+  font-size: 0.55rem;
+  text-align: left;
+  color: white;
 }
 
 .help-links {
@@ -308,10 +401,17 @@ input {
 
 .recommendations-list {
   list-style-position: inside;
-  padding: 0 2vh 2vh 2vh;
+  padding: 0 1.5vh 1.5vh 1.5vh;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   line-height: 3vh;
+  text-align: justify;
+  font-size: 0.7rem;
+  margin-top: 0;
+}
+
+.recommendations-list p {
+  text-align: justify;
 }
 
 .recommendations-list li {
@@ -365,7 +465,7 @@ input {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 2vh 0;
+  margin-top: 2vh;
   text-align: center;
   width: 90%;
 }
@@ -375,7 +475,7 @@ input {
 }
 
 #pool-url {
-  margin-top: 2vh;
+  margin-top: 0;
   color: yellowgreen;
   padding: 2vh 3vh;
   border-radius: 3px;

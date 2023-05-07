@@ -28,7 +28,7 @@ class GuessPoolMembershipMixin:
             return redirect_with_msg(
                 self.request,
                 "error",
-                f"Você não está cadastrado no bolão {self.pool} ❌",
+                f"Você não faz parte do bolão {self.pool} 🚫",
                 "mid",
                 self.redirect_url,
             )

@@ -4,34 +4,78 @@
 
 {% block content %}
 
-<h2>Crie seu bolão</h2>
+<h2>Criar bolão</h2>
 
 <form method="post" class="main-form">
   {% csrf_token %}
 
-  {% if form.non_field_errors %}
-    <ul>
-      {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  {{ form.non_field_errors }}
 
-  {% for field in form %}
-    <div>
-      {% if field.widget_type == 'checkbox' %}
-        <div class="private-checkbox">
-          <label for={{ field.auto_id }}>{{ field.label }}</label>
-          {{ field.errors }}
-          {{ field }}
-        </div>
-      {% else %}
-        {{ field.label_tag }}
-        {{ field.errors }}
-        {{ field }}
-      {% endif %}
+  <div>
+    {{ form.errors }}
+    {{ form.name.label }}
+    {{ form.name }}
+  </div>
+  <div>
+    <div class="private-checkbox">
+      {{ form.private.errors }}
+      <label for={{ form.private.auto_id }}>Privado</label>
+      {{ form.private }}
     </div>
-  {% endfor %}
+    <div class="help-msg">
+      <p>Somente palpiteiros com o link de acesso poderão entrar</p>
+    </div>
+  </div>
+
+  {% comment %} <div>
+    <ol class="recommendations-list">
+      <p>Para escolher quais equipes terão suas partidas disponibilizadas no bolão, você pode selecionar as seguintes opções:</p>
+      <li>
+        <strong>Competições:</strong> <em>TODAS</em> as partidas das
+        competições selecionadas serão incluídas no bolão, independentemente das
+        equipes.
+      </li>
+      <li>
+        <strong>Equipes avulsas:</strong> <em>TODAS</em> as partidas das
+        equipes selecionadas serão incluídas no bolão, independentemente das
+        competições.
+      </li>
+      <li>
+        <strong>Competições e equipes avulsas:</strong> você também pode
+        escolher competições e ainda selecionar outras equipes que não disputem
+        as competições escolhidas. Dessa forma, <em>TODAS</em> as partidas das
+        competições selecionadas junto com <em>TODAS</em> as partidas das
+        equipes serão incluídas no bolão.
+      </li>
+      <p>Abaixo, escolha a melhor opção para o seu bolão 👇</p>
+    </ol>
+  </div> {% endcomment %}
+
+  <div>
+    <details open>
+      {{ form.errors }}
+      <summary>
+        Competições
+        <div class="help-msg">
+          <p>TODAS as partidas das competições selecionadas serão incluídas no bolão.</p>
+        </div>
+      </summary>
+      {{ form.competitions }}
+    </details>
+  </div>
+  <div>
+    <details>
+      {{ form.errors }}
+      <summary>
+        Equipes avulsas
+        <div class="help-msg">
+          <p>TODAS as partidas das equipes selecionadas serão incluídas no bolão.</p>
+        </div>
+      </summary>
+      {{ form.teams }}
+    </details>
+  </div>
+
   <input type="submit" value="Criar bolão">
 </form>
 

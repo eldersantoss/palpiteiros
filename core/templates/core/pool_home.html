@@ -10,4 +10,17 @@
   {% if pool.user_is_owner%}<a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>{% endif %}
 </nav>
 
+<button class="exit-btn" onclick="showPoolLeavingConfirmation()">Deixar bolão ❌</button>
+
+<div class="exit-confirmation">
+  <p>
+    Cuidado! Ao confirmar a saída, sua pontuação neste bolão será apagada e, caso entre novamente,
+    começará do zero.
+  </p>
+  <div>
+    <button class="confirmation-btn stay-opt-btn" onclick="hidePoolLeavingConfirmation()">Ficar</button>
+    <a href={% url 'core:signout_pool' pool.slug pool.uuid %}><button class="confirmation-btn exit-opt-btn">Sair</button></a>
+  </div>
+</div>
+
 {% endblock content %}
