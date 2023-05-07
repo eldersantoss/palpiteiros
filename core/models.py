@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Iterable, Literal
 from uuid import uuid4
 
+import requests
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -24,8 +25,9 @@ class TimeStampedModel(models.Model):
 
 
 class Equipe(models.Model):
+    data_source_id = models.PositiveIntegerField(blank=True, null=True)
     nome = models.CharField(max_length=50)
-    abreviacao = models.CharField(max_length=3, default="???")
+    abreviacao = models.CharField(max_length=3, blank=True, null=True)
 
     class Meta:
         verbose_name = "equipe"
@@ -34,6 +36,167 @@ class Equipe(models.Model):
 
     def __str__(self) -> str:
         return self.nome
+
+    def logo_url(self):
+        return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+
+
+class Competition(models.Model):
+    data_source_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=100)
+    season = models.PositiveIntegerField("Temporada")
+    teams = models.ManyToManyField(Equipe, related_name="competitions")
+
+    class Meta:
+        verbose_name = "competição"
+        verbose_name_plural = "competições"
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+    def logo_url(self) -> str:
+        return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
+
+    def get_teams(self):
+        source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        params = {"league": self.data_source_id, "season": self.season}
+
+        # TODO: tratar requests.exceptions.ConnectionError:
+        response = (
+            requests.get(source_url, headers=headers, params=params)
+            .json()
+            .get("response")
+        )
+
+        teams = []
+        for data in response:
+            data_source_id = data["team"]["id"]
+            nome = data["team"]["name"]
+            abreviacao = data["team"]["code"]
+
+            team, _ = Equipe.objects.get_or_create(
+                data_source_id=data_source_id,
+                nome=nome,
+                abreviacao=abreviacao,
+            )
+            teams.append(team)
+
+        self.teams.set(teams)
+
+        return teams
+
+    def get_new_matches(self, days_ahead: int):
+        api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        params = {
+            "timezone": settings.TIME_ZONE,
+            "league": self.data_source_id,
+            "season": self.season,
+            "from": str(timezone.now().date()),
+            "to": str(timezone.now().date() + timezone.timedelta(days=days_ahead)),
+            "status": "NS",
+        }
+
+        # TODO: tratar requests.exceptions.ConnectionError:
+        response = requests.get(api_url, headers=headers, params=params)
+        json_data = response.json()
+        json_data_response = json_data["response"]
+
+        matches = []
+        for data in json_data_response:
+            data_source_id = data["fixture"]["id"]
+            date_time = timezone.datetime.fromisoformat(data["fixture"]["date"])
+            status = data["fixture"]["status"]["short"]
+            home_team_source_id = data["teams"]["home"]["id"]
+            away_team_source_id = data["teams"]["away"]["id"]
+
+            home_team = Equipe.objects.get(data_source_id=home_team_source_id)
+            away_team = Equipe.objects.get(data_source_id=away_team_source_id)
+
+            match, created = Partida.objects.get_or_create(
+                data_source_id=data_source_id,
+                competition=self,
+                status=status,
+                mandante=home_team,
+                visitante=away_team,
+                data_hora=date_time,
+            )
+            if created:
+                matches.append(match)
+
+        return matches
+
+    def update_matches(self):
+        api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        today = timezone.now().date()
+        yesterday = today - timezone.timedelta(days=1)
+        params = {
+            "timezone": settings.TIME_ZONE,
+            "league": self.data_source_id,
+            "season": self.season,
+            "from": str(yesterday),
+            "to": str(today),
+            "status": "-".join(Partida.IN_PROGRESS_AND_FINISHED_STATUS),
+        }
+
+        # TODO: tratar requests.exceptions.ConnectionError:
+        response = requests.get(api_url, headers=headers, params=params)
+        json_data = response.json()
+        json_data_response = json_data["response"]
+
+        matches = []
+        for data in json_data_response:
+            data_source_id = data["fixture"]["id"]
+            status = data["fixture"]["status"]["short"]
+            elapsed = data["fixture"]["status"]["elapsed"]
+            home_goals = data["goals"]["home"]
+            away_goals = data["goals"]["away"]
+
+            try:
+                match = Partida.objects.exclude(status__in=Partida.FINISHED_STATUS).get(
+                    data_source_id=data_source_id
+                )
+            except Partida.DoesNotExist:
+                continue
+
+            match.update_status(status, elapsed)
+            match.gols_mandante = home_goals
+            match.gols_visitante = away_goals
+            match.save()
+            matches.append(match)
+
+        return matches
+
+    def create_public_pool(self):
+        name = f"{self.name} {self.season}"
+        slug = slugify(name)
+        owner = Palpiteiro.objects.get(usuario__username=settings.ADMIN_USERNAME)
+        private = False
+
+        pool, created = GuessPool.objects.get_or_create(
+            name=name,
+            slug=slug,
+            owner=owner,
+            private=private,
+        )
+
+        if created:
+            pool.competitions.add(self)
+            return pool
+
+        return None
 
 
 class Rodada(TimeStampedModel):
@@ -136,7 +299,41 @@ class Rodada(TimeStampedModel):
 
 
 class Partida(models.Model):
-    rodada = models.ManyToManyField(Rodada, related_name="partidas")
+    NOT_STARTED = "NS"
+    FIRST_HALF = "1H"
+    HALFTIME = "HT"
+    SECOND_HALF = "2H"
+    FINSHED = "FT"
+    FINSHED_AFTER_EXTRA_TIME = "AET"
+    FINSHED_AFTER_PENALTYS = "PEN"
+
+    IN_PROGRESS_STATUS = [FIRST_HALF, HALFTIME, SECOND_HALF]
+
+    FINISHED_STATUS = [FINSHED, FINSHED_AFTER_EXTRA_TIME, FINSHED_AFTER_PENALTYS]
+
+    IN_PROGRESS_AND_FINISHED_STATUS = [*IN_PROGRESS_STATUS, *FINISHED_STATUS]
+
+    STATUS_CHOICES = (
+        (NOT_STARTED, "Não iniciada"),
+        (FIRST_HALF, "1º tempo"),
+        (HALFTIME, "Intervalo"),
+        (SECOND_HALF, "2º tempo"),
+        (FINSHED, "Encerrada"),
+        (FINSHED_AFTER_EXTRA_TIME, "Encerrada após prorrogação"),
+        (FINSHED_AFTER_PENALTYS, "Encerrada após penalidades"),
+    )
+
+    HOURS_BEFORE_OPEN_TO_GUESSES = 1000
+
+    data_source_id = models.PositiveIntegerField(blank=True, null=True)
+    competition = models.ForeignKey(
+        Competition,
+        verbose_name="Competição",
+        on_delete=models.PROTECT,
+        related_name="matches",
+    )
+    status = models.CharField(max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED)
+    rodada = models.ManyToManyField(Rodada, related_name="partidas", blank=True)
     mandante = models.ForeignKey(
         Equipe,
         on_delete=models.CASCADE,
@@ -170,6 +367,31 @@ class Partida(models.Model):
         else:
             self.set_new_macthes_flag_for_involved_pools()
 
+    def update_status(
+        self,
+        new_status: str,
+        elapsed_time: int,
+        match_time_limit_minutes=150,
+    ):
+        self.status = new_status
+
+        match_time_limit = self.data_hora + timezone.timedelta(
+            minutes=match_time_limit_minutes
+        )
+        match_broke_limit_time = timezone.now() >= match_time_limit
+
+        REGULAR_MATCH_DURATION = 90
+
+        if (
+            match_broke_limit_time
+            and elapsed_time >= REGULAR_MATCH_DURATION
+            and self.status == Partida.SECOND_HALF
+        ):
+            self.status = Partida.FINISHED_STATUS
+
+    def is_finished(self) -> bool:
+        return self.status in self.FINISHED_STATUS
+
     def evaluate_and_consolidate_guesses(self):
         with transaction.atomic():
             for guess in self.palpites.all():
@@ -185,7 +407,7 @@ class Partida(models.Model):
     def have_open_matches_for_any_active_round(cls):
         return cls.objects.filter(
             rodada__active=True,
-            data_hora__gt=timezone.now() + timedelta(minutes=30),
+            data_hora__gt=timezone.now() + timezone.timedelta(minutes=30),
         ).exists()
 
     @classmethod
@@ -195,7 +417,7 @@ class Partida(models.Model):
 
         closed_matches = cls.objects.filter(
             rodada__active=True,
-            data_hora__lte=timezone.now() + timedelta(minutes=30),
+            data_hora__lte=timezone.now() + timezone.timedelta(minutes=30),
         )
         for cm in closed_matches:
             try:
@@ -217,8 +439,10 @@ class Partida(models.Model):
         description="Aberta para palpites?",
     )
     def open_to_guesses(self):
-        return (self.data_hora > timezone.now() + timedelta(minutes=30)) and (
-            self.data_hora <= timezone.now() + timedelta(hours=72)
+        return (self.data_hora > timezone.now() + timezone.timedelta(minutes=30)) and (
+            self.data_hora
+            <= timezone.now()
+            + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
         )
 
     def get_pools(self):
@@ -311,7 +535,10 @@ class Palpite(models.Model):
     def evaluate_and_consolidate(self):
         if self.partida.result_str is not None:
             self.pontuacao = self._evaluate()
-            self.contabilizado = True
+
+            if self.partida.is_finished():
+                self.contabilizado = True
+
             self.save()
 
     @property
@@ -366,7 +593,6 @@ class Palpite(models.Model):
 
 class GuessPool(TimeStampedModel):
     MINUTES_BEFORE_START_MATCH = 30
-    HOURS_BEFORE_START_MATCH = 72
 
     uuid = models.UUIDField(
         "identificador público",
@@ -391,10 +617,17 @@ class GuessPool(TimeStampedModel):
         blank=True,
         verbose_name="palpiteiros",
     )
+    competitions = models.ManyToManyField(
+        Competition,
+        related_name="pools",
+        verbose_name="competições",
+        blank=True,
+    )
     teams = models.ManyToManyField(
         Equipe,
         related_name="pools",
         verbose_name="times",
+        blank=True,
     )
     guesses = models.ManyToManyField(
         Palpite,
@@ -495,12 +728,13 @@ class GuessPool(TimeStampedModel):
         return open_matches
 
     def get_open_matches(self):
-        """Returns all open matches involving registered teams"""
+        """Returns matches open to guesses"""
+
         return self.get_matches().filter(
             data_hora__gt=timezone.now()
-            + timedelta(minutes=self.MINUTES_BEFORE_START_MATCH),
+            + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH),
             data_hora__lte=timezone.now()
-            + timedelta(hours=self.HOURS_BEFORE_START_MATCH),
+            + timezone.timedelta(hours=Partida.HOURS_BEFORE_OPEN_TO_GUESSES),
         )
 
     def has_pending_match(self, guesser: Palpiteiro) -> bool:
@@ -595,14 +829,17 @@ class GuessPool(TimeStampedModel):
         return self.get_matches().count()
 
     def get_matches(self):
-        """Returns all matches created after this pool involving
-        registered teams"""
-        is_home_or_away_team = Q(mandante__in=self.teams.all()) | Q(
-            visitante__in=self.teams.all()
+        """Returns all matches created after this pool that belongs to
+        any registered competition or involving registered teams"""
+        matches_post_pool_creation = Partida.objects.filter(data_hora__gt=self.created)
+
+        competition_or_team_membership = (
+            Q(competition__in=self.competitions.all())
+            | Q(mandante__in=self.teams.all())
+            | Q(visitante__in=self.teams.all())
         )
-        return Partida.objects.filter(data_hora__gte=self.created).filter(
-            is_home_or_away_team
-        )
+
+        return matches_post_pool_creation.filter(competition_or_team_membership)
 
     def get_ranking(self, month: int, year: int):
         start, end = self._assemble_datetime_period(month, year)
@@ -616,6 +853,11 @@ class GuessPool(TimeStampedModel):
             filter=guesses_of_this_pool_in_the_period,
         )
         return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by("-score")
+
+    def remove_guesser(self, guesser: Palpiteiro):
+        self.guesses.remove(*self.guesses.filter(palpiteiro=guesser))
+        self._delete_orphans_guesses()
+        self.guessers.remove(guesser)
 
     def _assemble_datetime_period(self, month: int, year: int):
         base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
@@ -638,7 +880,7 @@ class GuessPool(TimeStampedModel):
                 base_end.replace(year=year, month=month + 1)
                 if month < 12
                 else base_end.replace(year=year + 1, month=1)
-            ) - timedelta(days=1)
+            ) - timezone.timedelta(days=1)
 
         return start, end
 

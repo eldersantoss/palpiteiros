@@ -13,6 +13,13 @@ class EquipeAdmin(admin.ModelAdmin):
     search_fields = ("nome", "abreviacao")
 
 
+@admin.register(models.Competition)
+class CompetitionAdmin(admin.ModelAdmin):
+    list_display = ("name", "season")
+    search_fields = ("name", "season")
+    filter_horizontal = ["teams"]
+
+
 @admin.register(models.Palpiteiro)
 class PalpiteiroAdmin(admin.ModelAdmin):
     list_display = ("__str__", "usuario", "guessed_on_last_round")
@@ -27,16 +34,14 @@ class PalpiteiroAdmin(admin.ModelAdmin):
 class PartidaAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
+        "competition",
         "data_hora",
+        "status",
         "open_to_guesses",
         "gols_mandante",
         "gols_visitante",
     )
-    list_filter = ["rodada"]
-    list_editable = [
-        "gols_mandante",
-        "gols_visitante",
-    ]
+    list_filter = ["rodada", "competition"]
     filter_horizontal = ["rodada"]
 
 

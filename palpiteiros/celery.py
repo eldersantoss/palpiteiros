@@ -12,13 +12,22 @@ app.autodiscover_tasks()
 
 app.conf.timezone = settings.TIME_ZONE
 app.conf.beat_schedule = {
+    "get_new_matches": {
+        "task": "get_new_matches",
+        "schedule": crontab(minute="0", hour="0", day_of_week="1,4"),
+        "args": (4,),
+    },
+    "update_matches": {
+        "task": "get_weekend_matches",
+        "schedule": crontab(minute="59", hour="0,1,9-23"),
+    },
     "send_email_notification_of_new_matches": {
         "task": "send_email_notification_of_new_matches",
-        "schedule": crontab(minute="0", hour="11"),
+        "schedule": crontab(minute="0", hour="8", day_of_week="1,4"),
     },
     "send_email_notification_of_updated_matches": {
         "task": "send_email_notification_of_updated_matches",
-        "schedule": crontab(minute="0", hour="7,14,16,22"),
+        "schedule": crontab(minute="0", hour="11,15,22"),
     },
 }
 
