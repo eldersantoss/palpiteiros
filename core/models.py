@@ -119,13 +119,13 @@ class Competition(models.Model):
             home_team = Team.objects.get(data_source_id=home_team_source_id)
             away_team = Team.objects.get(data_source_id=away_team_source_id)
 
-            match, created = Partida.objects.get_or_create(
+            match, created = Match.objects.get_or_create(
                 data_source_id=data_source_id,
                 competition=self,
                 status=status,
-                mandante=home_team,
-                visitante=away_team,
-                data_hora=date_time,
+                home_team=home_team,
+                away_team=away_team,
+                date_time=date_time,
             )
             if created:
                 matches.append(match)
@@ -147,7 +147,7 @@ class Competition(models.Model):
             "season": self.season,
             "from": str(from_),
             "to": str(to),
-            "status": "-".join(Partida.IN_PROGRESS_AND_FINISHED_STATUS),
+            "status": "-".join(Match.IN_PROGRESS_AND_FINISHED_STATUS),
         }
 
         # TODO: tratar requests.exceptions.ConnectionError:
@@ -164,15 +164,15 @@ class Competition(models.Model):
             away_goals = data["goals"]["away"]
 
             try:
-                match = Partida.objects.exclude(status__in=Partida.FINISHED_STATUS).get(
+                match = Match.objects.exclude(status__in=Match.FINISHED_STATUS).get(
                     data_source_id=data_source_id
                 )
-            except Partida.DoesNotExist:
+            except Match.DoesNotExist:
                 continue
 
             match.update_status(status, elapsed)
-            match.gols_mandante = home_goals
-            match.gols_visitante = away_goals
+            match.home_goals = home_goals
+            match.away_goals = away_goals
             match.save()
             matches.append(match)
 
@@ -198,7 +198,7 @@ class Competition(models.Model):
         return None
 
 
-class Partida(models.Model):
+class Match(models.Model):
     NOT_STARTED = "NS"
     FIRST_HALF = "1H"
     HALFTIME = "HT"
@@ -235,29 +235,29 @@ class Partida(models.Model):
         related_name="matches",
     )
     status = models.CharField(max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED)
-    mandante = models.ForeignKey(
+    home_team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
-        related_name="partidas_mandante",
+        related_name="matches_as_home_team",
     )
-    visitante = models.ForeignKey(
+    away_team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
-        related_name="partidas_visitante",
+        related_name="matches_as_away_team",
     )
-    data_hora = models.DateTimeField("Data e hora")
-    gols_mandante = models.PositiveIntegerField(blank=True, null=True)
-    gols_visitante = models.PositiveIntegerField(blank=True, null=True)
-    pontuacao_dobrada = models.BooleanField(default=False)
+    date_time = models.DateTimeField("Data e hora")
+    home_goals = models.PositiveIntegerField(blank=True, null=True)
+    away_goals = models.PositiveIntegerField(blank=True, null=True)
+    double_score = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "partida"
         verbose_name_plural = "partidas"
-        ordering = ("data_hora",)
-        unique_together = ["mandante", "visitante", "data_hora"]
+        ordering = ("date_time",)
+        unique_together = ["home_team", "away_team", "date_time"]
 
     def __str__(self):
-        return f"{self.mandante.name} x {self.visitante.name}"
+        return f"{self.home_team.name} x {self.away_team.name}"
 
     def save(self, *args, **kwargs):
         is_update = self.id is not None
@@ -276,7 +276,7 @@ class Partida(models.Model):
     ):
         self.status = new_status
 
-        match_time_limit = self.data_hora + timezone.timedelta(
+        match_time_limit = self.date_time + timezone.timedelta(
             minutes=match_time_limit_minutes
         )
         match_broke_limit_time = timezone.now() >= match_time_limit
@@ -286,9 +286,9 @@ class Partida(models.Model):
         if (
             match_broke_limit_time
             and elapsed_time >= REGULAR_MATCH_DURATION
-            and self.status == Partida.SECOND_HALF
+            and self.status == Match.SECOND_HALF
         ):
-            self.status = Partida.FINISHED_STATUS
+            self.status = Match.FINISHED_STATUS
 
     def is_finished(self) -> bool:
         return self.status in self.FINISHED_STATUS
@@ -307,8 +307,8 @@ class Partida(models.Model):
     @property
     def result_str(self):
         return (
-            f"{self.gols_mandante} x {self.gols_visitante}"
-            if self.gols_mandante is not None and self.gols_visitante is not None
+            f"{self.home_goals} x {self.away_goals}"
+            if self.home_goals is not None and self.away_goals is not None
             else None
         )
 
@@ -318,11 +318,11 @@ class Partida(models.Model):
     )
     def open_to_guesses(self):
         return (
-            self.data_hora
+            self.date_time
             > timezone.now()
             + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH)
         ) and (
-            self.data_hora
+            self.date_time
             <= timezone.now()
             + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
         )
@@ -331,8 +331,8 @@ class Partida(models.Model):
         """Return all pools with this instance of Match is involved"""
 
         pools_with_competition_as_pool_member = self.competition.pools.all()
-        pools_with_home_team_as_pool_member = self.mandante.pools.all()
-        pools_with_away_team_as_pool_member = self.visitante.pools.all()
+        pools_with_home_team_as_pool_member = self.home_team.pools.all()
+        pools_with_away_team_as_pool_member = self.away_team.pools.all()
 
         return pools_with_competition_as_pool_member.union(
             pools_with_home_team_as_pool_member,
@@ -381,7 +381,7 @@ class Palpite(models.Model):
         related_name="palpites",
     )
     partida = models.ForeignKey(
-        Partida,
+        Match,
         on_delete=models.CASCADE,
         related_name="palpites",
     )
@@ -396,9 +396,9 @@ class Palpite(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"{self.partida.mandante.name} {self.gols_mandante}"
+            f"{self.partida.home_team.name} {self.gols_mandante}"
             + " x "
-            + f"{self.gols_visitante} {self.partida.visitante.name}"
+            + f"{self.gols_visitante} {self.partida.away_team.name}"
         )
 
     def get_score(self) -> int:
@@ -420,16 +420,16 @@ class Palpite(models.Model):
         return f"{self.gols_mandante} x {self.gols_visitante}"
 
     def _evaluate(self):
-        ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.gols_mandante
-        ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.gols_visitante
+        ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.home_goals
+        ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.away_goals
         ACERTO_MANDANTE_VENCEDOR = (self.gols_mandante > self.gols_visitante) and (
-            self.partida.gols_mandante > self.partida.gols_visitante
+            self.partida.home_goals > self.partida.away_goals
         )
         ACERTO_VISITANTE_VENCEDOR = (self.gols_mandante < self.gols_visitante) and (
-            self.partida.gols_mandante < self.partida.gols_visitante
+            self.partida.home_goals < self.partida.away_goals
         )
         ACERTO_EMPATE = (self.gols_mandante == self.gols_visitante) and (
-            self.partida.gols_mandante == self.partida.gols_visitante
+            self.partida.home_goals == self.partida.away_goals
         )
         ACERTO_PARCIAL = ACERTO_MANDANTE_VENCEDOR or ACERTO_VISITANTE_VENCEDOR
         ACERTO_PARCIAL_COM_GOLS = ACERTO_PARCIAL and (
@@ -459,7 +459,7 @@ class Palpite(models.Model):
         else:
             score = 0
 
-        if self.partida.pontuacao_dobrada:
+        if self.partida.double_score:
             score *= 2
 
         return score
@@ -553,10 +553,10 @@ class GuessPool(TimeStampedModel):
         """Returns matches open to guesses"""
 
         return self.get_matches().filter(
-            data_hora__gt=timezone.now()
-            + timezone.timedelta(minutes=Partida.MINUTES_BEFORE_START_MATCH),
-            data_hora__lte=timezone.now()
-            + timezone.timedelta(hours=Partida.HOURS_BEFORE_OPEN_TO_GUESSES),
+            date_time__gt=timezone.now()
+            + timezone.timedelta(minutes=Match.MINUTES_BEFORE_START_MATCH),
+            date_time__lte=timezone.now()
+            + timezone.timedelta(hours=Match.HOURS_BEFORE_OPEN_TO_GUESSES),
         )
 
     def has_pending_match(self, guesser: Palpiteiro) -> bool:
@@ -629,14 +629,14 @@ class GuessPool(TimeStampedModel):
         """Returns all matches created after this pool that belongs to
         any registered competition or involving registered teams"""
 
-        matches_post_pool_creation = Partida.objects.filter(
-            data_hora__gt=self.created,
+        matches_post_pool_creation = Match.objects.filter(
+            date_time__gt=self.created,
         )
 
         competition_or_team_membership = (
             Q(competition__in=self.competitions.all())
-            | Q(mandante__in=self.teams.all())
-            | Q(visitante__in=self.teams.all())
+            | Q(home_team__in=self.teams.all())
+            | Q(away_team__in=self.teams.all())
         )
 
         return matches_post_pool_creation.filter(competition_or_team_membership)
@@ -699,16 +699,16 @@ class GuessPool(TimeStampedModel):
         start: datetime,
         end: datetime,
     ):
-        """Returns fininshed or in progress matches with data_hora field
+        """Returns fininshed or in progress matches with date_time field
         between start and end"""
 
         return (
             self.get_matches()
-            .filter(status__in=Partida.IN_PROGRESS_AND_FINISHED_STATUS)
-            .filter(data_hora__gt=start, data_hora__lte=end)
+            .filter(status__in=Match.IN_PROGRESS_AND_FINISHED_STATUS)
+            .filter(date_time__gt=start, date_time__lte=end)
         )
 
-    def get_guessers_with_match_scores(self, matches: Iterable[Partida]):
+    def get_guessers_with_match_scores(self, matches: Iterable[Match]):
         guesses_of_this_pool_in_the_period = Q(palpites__partida__in=matches) & Q(
             palpites__in=self.guesses.all()
         )

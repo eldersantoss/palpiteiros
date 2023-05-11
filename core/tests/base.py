@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import GuessPool, Palpiteiro, Partida, Team
+from core.models import GuessPool, Match, Palpiteiro, Team
 
 
 class PalpiteirosTestCase(TestCase):
@@ -42,15 +42,15 @@ class PalpiteirosTestCase(TestCase):
         for i in range(0, len(cls.teams), 2):
             cls.matches.append(
                 mommy.make(
-                    Partida,
-                    mandante=cls.teams[i],
-                    visitante=cls.teams[i + 1],
-                    gols_mandante=i,
-                    gols_visitante=2 * i,
+                    Match,
+                    home_team=cls.teams[i],
+                    away_team=cls.teams[i + 1],
+                    home_goals=i,
+                    away_goals=2 * i,
                 )
             )
         cls.open_matches = cls.matches[3:5]
         for m in cls.open_matches:
-            m.data_hora = timezone.now() + timedelta(hours=6)
+            m.date_time = timezone.now() + timedelta(hours=6)
             m.save()
         cls.closed_matches = list(set(cls.matches) - set(cls.open_matches))

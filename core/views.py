@@ -214,14 +214,14 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                     palpiteiro=self.guesser,
                 )
                 initial_data = {
-                    f"gols_mandante_{match.id}": guess.gols_mandante,
-                    f"gols_visitante_{match.id}": guess.gols_visitante,
+                    f"home_goals_{match.id}": guess.gols_mandante,
+                    f"away_goals_{match.id}": guess.gols_visitante,
                 }
 
             except Palpite.DoesNotExist:
                 initial_data = None
 
-            guess_forms.append(GuessForm(initial_data, partida=match))
+            guess_forms.append(GuessForm(initial_data, match=match))
 
         return render(
             self.request,
@@ -245,7 +245,7 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
 
         guess_forms = []
         for match in open_matches:
-            guess_form = GuessForm(self.request.POST, partida=match)
+            guess_form = GuessForm(self.request.POST, match=match)
 
             if guess_form.is_valid():
                 """
@@ -263,8 +263,8 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                 guess = Palpite.objects.create(
                     partida=match,
                     palpiteiro=self.guesser,
-                    gols_mandante=guess_form.cleaned_data["gols_mandante"],
-                    gols_visitante=guess_form.cleaned_data["gols_visitante"],
+                    gols_mandante=guess_form.cleaned_data["home_goals"],
+                    gols_visitante=guess_form.cleaned_data["away_goals"],
                 )
                 self.pool.add_guess_to_pools(guess, for_all_pools)
                 self.pool.delete_orphans_guesses()
@@ -278,14 +278,14 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                         palpiteiro=self.guesser,
                     )
                     initial_data = {
-                        f"gols_mandante_{match.id}": guess.gols_mandante,
-                        f"gols_visitante_{match.id}": guess.gols_visitante,
+                        f"home_goals_{match.id}": guess.gols_mandante,
+                        f"away_goals_{match.id}": guess.gols_visitante,
                     }
 
                 except Palpite.DoesNotExist:
                     initial_data = None
 
-                guess_forms.append(GuessForm(initial_data, partida=match))
+                guess_forms.append(GuessForm(initial_data, match=match))
 
         messages.success(
             self.request,

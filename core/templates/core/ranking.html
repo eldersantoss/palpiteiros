@@ -64,14 +64,14 @@
             {% for match_and_guess in guesser.matches_and_guesses %}
               <tr class="detail-table-row-match-time">
                 <td colspan="5">
-                  <p class="match-time">{{ match_and_guess.match.data_hora }}</p>
+                  <p class="match-time">{{ match_and_guess.match.date_time }}</p>
                 </td>
               </tr>
               <tr class="detail-table-row">
                 <td>
-                    <p>{{ match_and_guess.match.mandante }}</p>
+                    <p>{{ match_and_guess.match.home_team }}</p>
                     <p>x</p>
-                    <p>{{ match_and_guess.match.visitante }}</p>
+                    <p>{{ match_and_guess.match.away_team }}</p>
                 </td>
                 <td>{{ match_and_guess.match.result_str|default:"-" }}</td>
                 {% if match_and_guess.guess %}
@@ -86,7 +86,7 @@
                   <td>-</td>
                 {% endif %}
                 <td>
-                  {% if match_and_guess.match.pontuacao_dobrada %}
+                  {% if match_and_guess.match.double_score %}
                   🔥
                   {% endif %}
                 </td>

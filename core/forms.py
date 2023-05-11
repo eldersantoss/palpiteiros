@@ -6,17 +6,17 @@ from core.models import GuessPool
 
 
 class GuessForm(forms.Form):
-    gols_mandante = forms.IntegerField(min_value=0)
-    gols_visitante = forms.IntegerField(min_value=0)
+    home_goals = forms.IntegerField(min_value=0)
+    away_goals = forms.IntegerField(min_value=0)
 
     def __init__(self, *args, **kwargs):
-        self.partida = kwargs.pop("partida")
+        self.match = kwargs.pop("match")
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
-        self["gols_mandante"].label = self.partida.mandante.name
-        self["gols_mandante"].html_name += f"_{self.partida.id}"
-        self["gols_visitante"].label = self.partida.visitante.name
-        self["gols_visitante"].html_name += f"_{self.partida.id}"
+        self["home_goals"].label = self.match.home_team.name
+        self["home_goals"].html_name += f"_{self.match.id}"
+        self["away_goals"].label = self.match.away_team.name
+        self["away_goals"].html_name += f"_{self.match.id}"
 
 
 class RankingPeriodForm(forms.Form):

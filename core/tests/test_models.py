@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Palpite, Palpiteiro, Partida, Rodada
+from core.models import Match, Palpite, Palpiteiro, Rodada
 
 from .base import PalpiteirosTestCase
 
@@ -16,12 +16,12 @@ class MatchModelTests(TestCase):
         hour before current time and False otherwise"""
 
         open_match = mommy.make(
-            Partida,
-            data_hora=timezone.now() + timedelta(minutes=31),
+            Match,
+            date_time=timezone.now() + timedelta(minutes=31),
         )
         on_limit_closed_match = mommy.make(
-            Partida,
-            data_hora=timezone.now() + timedelta(minutes=30),
+            Match,
+            date_time=timezone.now() + timedelta(minutes=30),
         )
         self.assertTrue(open_match.open_to_guesses())
         self.assertFalse(on_limit_closed_match.open_to_guesses())
@@ -32,8 +32,8 @@ class MatchModelTests(TestCase):
 
         # Given a match and your guesses
         match = mommy.make(
-            Partida,
-            data_hora=timezone.now() - timedelta(hours=6),
+            Match,
+            date_time=timezone.now() - timedelta(hours=6),
         )
         spiked_guess = mommy.make(
             Palpite,
@@ -53,8 +53,8 @@ class MatchModelTests(TestCase):
         self.assertEqual(partially_correct_guess.get_score(), 0)
 
         # When the match is updated
-        match.gols_mandante = 2
-        match.gols_visitante = 0
+        match.home_goals = 2
+        match.away_goals = 0
         match.save()
 
         # Then the guesses must have been evaluated and consolidated
@@ -169,9 +169,7 @@ class GuessPoolModelTests(PalpiteirosTestCase):
         self.assertEqual(self.pool01.guesses.count(), 1)
 
         post_data = self._generate_post_data(self.pool02)
-        self.pool02.get_update_or_create_guesses(
-            self.pool02.owner, post_data
-        )
+        self.pool02.get_update_or_create_guesses(self.pool02.owner, post_data)
         self.assertEqual(self.pool02.guesses.count(), 1)
 
         post_data = self._generate_post_data(self.pool03)
@@ -180,7 +178,6 @@ class GuessPoolModelTests(PalpiteirosTestCase):
 
         self.assertNotIn(self.pool01.guesses.get(), self.pool03.guesses.all())
         self.assertNotIn(self.pool02.guesses.get(), self.pool03.guesses.all())
-
 
     def test_creating_for_all_pools_guesses(self):
         post_data = self._generate_post_data(self.pool01, True)
@@ -223,8 +220,8 @@ class GuessPoolModelTests(PalpiteirosTestCase):
     def _generate_post_data(self, pool, for_all_pools=False, goals=0):
         post_data = {"for_all_pools": True} if for_all_pools else {}
         for m in pool.get_open_matches():
-            post_data[f"gols_mandante_{m.id}"] = goals
-            post_data[f"gols_visitante_{m.id}"] = goals
+            post_data[f"home_goals_{m.id}"] = goals
+            post_data[f"away_goals_{m.id}"] = goals
         return post_data
 
     def test_get_open_matches(self):
@@ -242,14 +239,14 @@ class GuessPoolModelTests(PalpiteirosTestCase):
 
     def test_get_matches(self):
         self.assertTrue(
-            all([m.data_hora > self.pool01.created for m in self.pool01.get_matches()])
+            all([m.date_time > self.pool01.created for m in self.pool01.get_matches()])
         )
         self.assertTrue(
             all(
                 [
                     (
-                        m.mandante in self.pool01.teams.all()
-                        or m.visitante in self.pool01.teams.all()
+                        m.home_team in self.pool01.teams.all()
+                        or m.away_team in self.pool01.teams.all()
                     )
                     for m in self.pool01.get_matches()
                 ]
@@ -257,14 +254,14 @@ class GuessPoolModelTests(PalpiteirosTestCase):
         )
 
         self.assertTrue(
-            all([m.data_hora > self.pool02.created for m in self.pool02.get_matches()])
+            all([m.date_time > self.pool02.created for m in self.pool02.get_matches()])
         )
         self.assertTrue(
             all(
                 [
                     (
-                        m.mandante in self.pool02.teams.all()
-                        or m.visitante in self.pool02.teams.all()
+                        m.home_team in self.pool02.teams.all()
+                        or m.away_team in self.pool02.teams.all()
                     )
                     for m in self.pool02.get_matches()
                 ]
@@ -272,14 +269,14 @@ class GuessPoolModelTests(PalpiteirosTestCase):
         )
 
         self.assertTrue(
-            all([m.data_hora > self.pool03.created for m in self.pool03.get_matches()])
+            all([m.date_time > self.pool03.created for m in self.pool03.get_matches()])
         )
         self.assertTrue(
             all(
                 [
                     (
-                        m.mandante in self.pool03.teams.all()
-                        or m.visitante in self.pool03.teams.all()
+                        m.home_team in self.pool03.teams.all()
+                        or m.away_team in self.pool03.teams.all()
                     )
                     for m in self.pool03.get_matches()
                 ]
@@ -313,7 +310,6 @@ class GuessPoolModelTests(PalpiteirosTestCase):
             all([g.score == 0 for g in self.pool03.get_ranking(month, year)])
         )
 
-
     def test_get_ranking_with_exclusive_guesses(self):
         """
         equipes:
@@ -344,56 +340,71 @@ class GuessPoolModelTests(PalpiteirosTestCase):
         12 24
         14 28
         """
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser01,
-            partida=self.matches[0],
-            gols_mandante=1,
-            gols_visitante=1,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser01,
-            partida=self.matches[1],
-            gols_mandante=2,
-            gols_visitante=4,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser01,
-            partida=self.matches[2],
-            gols_mandante=0,
-            gols_visitante=8,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser01,
-            partida=self.matches[3],
-            gols_mandante=0,
-            gols_visitante=1,
-        ))
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser01,
+                partida=self.matches[0],
+                gols_mandante=1,
+                gols_visitante=1,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser01,
+                partida=self.matches[1],
+                gols_mandante=2,
+                gols_visitante=4,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser01,
+                partida=self.matches[2],
+                gols_mandante=0,
+                gols_visitante=8,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser01,
+                partida=self.matches[3],
+                gols_mandante=0,
+                gols_visitante=1,
+            )
+        )
 
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser03,
-            partida=self.matches[0],
-            gols_mandante=0,
-            gols_visitante=0,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser03,
-            partida=self.matches[1],
-            gols_mandante=2,
-            gols_visitante=3,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser03,
-            partida=self.matches[2],
-            gols_mandante=4,
-            gols_visitante=0,
-        ))
-        self.pool01.guesses.add(Palpite.objects.create(
-            palpiteiro=self.guesser03,
-            partida=self.matches[3],
-            gols_mandante=2,
-            gols_visitante=1,
-        ))
-
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser03,
+                partida=self.matches[0],
+                gols_mandante=0,
+                gols_visitante=0,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser03,
+                partida=self.matches[1],
+                gols_mandante=2,
+                gols_visitante=3,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser03,
+                partida=self.matches[2],
+                gols_mandante=4,
+                gols_visitante=0,
+            )
+        )
+        self.pool01.guesses.add(
+            Palpite.objects.create(
+                palpiteiro=self.guesser03,
+                partida=self.matches[3],
+                gols_mandante=2,
+                gols_visitante=1,
+            )
+        )
 
         for g in self.pool01.guesses.all():
             g.evaluate_and_consolidate()
@@ -404,13 +415,12 @@ class GuessPoolModelTests(PalpiteirosTestCase):
         self.assertEqual(ranking.get(id=self.guesser02.id).score, 0)
         self.assertEqual(ranking.get(id=self.guesser03.id).score, 16)
 
-
         open_match_without_result = mommy.make(
-            Partida,
+            Match,
             rodada=[self.active_round],
-            mandante=self.teams[0],
-            visitante=self.teams[3],
-            data_hora=timezone.now() + timedelta(hours=6),
+            home_team=self.teams[0],
+            away_team=self.teams[3],
+            date_time=timezone.now() + timedelta(hours=6),
         )
         self.assertIsNone(open_match_without_result.result_str)
         self.pool01.guesses.add(

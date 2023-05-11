@@ -30,18 +30,18 @@ class PalpiteiroAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(models.Partida)
-class PartidaAdmin(admin.ModelAdmin):
+@admin.register(models.Match)
+class MatchAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
         "competition",
-        "data_hora",
+        "date_time",
         "status",
         "open_to_guesses",
-        "gols_mandante",
-        "gols_visitante",
+        "home_goals",
+        "away_goals",
     )
-    list_filter = ["competition"]
+    list_filter = ["competition", "status"]
 
 
 @admin.register(models.Palpite)

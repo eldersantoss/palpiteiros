@@ -12,36 +12,36 @@
   {% for match in closed_matches %}
   <div class="match-wrapper">
     <p class="match-time">
-      {{ guess_form.partida.data_hora }}
-      {% if guess_form.partida.pontuacao_dobrada %}
+      {{ guess_form.match.date_time }}
+      {% if guess_form.match.double_score %}
       <strong>(x2 🔥)</strong>
       {% endif %}
     </p>
     <div class="guess-wrapper">
       <div class="team home">
-        {{ guess_form.partida.mandante }}
+        {{ guess_form.match.home_team }}
       </div>
       <div>
         <span class="gols-palpite-encerrado">
-          {% if guess_form.partida.guess %}
-          {{ guess_form.partida.guess.gols_mandante }}
+          {% if guess_form.match.guess %}
+            {{ guess_form.match.guess.gols_mandante }}
           {% else %}
-          -
+            -
           {% endif %}
         </span>
       </div>
       <div class="separador-equipes">x</div>
       <div>
         <span class="gols-palpite-encerrado">
-          {% if guess_form.partida.guess %}
-          {{ guess_form.partida.guess.gols_visitante }}
+          {% if guess_form.match.guess %}
+            {{ guess_form.match.guess.gols_visitante }}
           {% else %}
-          -
+            -
           {% endif %}
         </span>
       </div>
       <div class="team away">
-        {{ guess_form.partida.visitante }}
+        {{ guess_form.match.away_team }}
       </div>
     </div>
   </div>
@@ -59,25 +59,25 @@
   {% for guess_form in guess_forms %}
     <div class="match-wrapper">
       <p class="match-time">
-        {{ guess_form.partida.data_hora }}{% if guess_form.partida.competition %} - {{ guess_form.partida.competition }}{% endif %}
-        {% if guess_form.partida.pontuacao_dobrada %}
+        {{ guess_form.match.date_time }}{% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
+        {% if guess_form.match.double_score %}
         <strong>(x2 🔥)</strong>
         {% endif %}
       </p>
       <div class="guess-wrapper">
         <div class="team">
           <div>
-            <img src="{{ guess_form.partida.mandante.logo_url}}" class="small-team-logo">
-            {{ guess_form.gols_mandante.label_tag }}
+            <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
+            {{ guess_form.home_goals.label_tag }}
           </div>
-          {{ guess_form.gols_mandante }}
+          {{ guess_form.home_goals }}
         </div>
         <div class="separador-equipes">x</div>
         <div class="team">
-          {{ guess_form.gols_visitante }}
+          {{ guess_form.away_goals }}
           <div>
-            <img src="{{ guess_form.partida.visitante.logo_url}}" class="small-team-logo">
-            {{ guess_form.gols_visitante.label_tag }}
+            <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
+            {{ guess_form.away_goals.label_tag }}
           </div>
         </div>
       </div>

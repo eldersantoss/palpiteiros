@@ -1,14 +1,13 @@
 from datetime import timedelta
 from http import HTTPStatus
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.utils import timezone
+from django.test import TestCase
 from django.urls import reverse_lazy
-
+from django.utils import timezone
 from model_mommy import mommy
 
-from ..models import Palpiteiro, Partida, Rodada, Palpite, GuessPool
+from ..models import GuessPool, Match, Palpite, Palpiteiro, Rodada
 
 
 class GuessesViewTests(TestCase):
@@ -52,10 +51,10 @@ class GuessesViewTests(TestCase):
         number of open matches"""
         rodada = mommy.make(Rodada, active=True)
         open_matches = mommy.make(
-            Partida,
+            Match,
             _quantity=5,
             rodada=rodada,
-            data_hora=timezone.now() + timedelta(minutes=60),
+            date_time=timezone.now() + timedelta(minutes=60),
         )
 
         response = self.client.get(reverse_lazy("core:guesses"))
@@ -73,9 +72,9 @@ class GuessesViewTests(TestCase):
 
         rodada = mommy.make(Rodada, active=True)
         open_match = mommy.make(
-            Partida,
+            Match,
             rodada=rodada,
-            data_hora=timezone.now() + timedelta(minutes=60),
+            date_time=timezone.now() + timedelta(minutes=60),
         )
 
         guess = mommy.make(
@@ -97,34 +96,34 @@ class GuessesViewTests(TestCase):
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertEquals(
-            palpite_form.data[f"gols_mandante_{open_match.id}"],
+            palpite_form.data[f"home_goals_{open_match.id}"],
             guess.gols_mandante,
         )
         self.assertEquals(
-            palpite_form.data[f"gols_visitante_{open_match.id}"],
+            palpite_form.data[f"away_goals_{open_match.id}"],
             guess.gols_visitante,
         )
 
     def test_match_closed_for_guesses_half_hour_before(self):
         """Predictions must be unavailable half an hour before the
-        match data_hora, so one form referent to open match and two
+        match date_time, so one form referent to open match and two
         dicts referent to closed matches should be in context of the
         get request response"""
 
         rodada = mommy.make(Rodada, active=True)
 
         open_match = mommy.make(
-            Partida, rodada=rodada, data_hora=timezone.now() + timedelta(minutes=31)
+            Match, rodada=rodada, date_time=timezone.now() + timedelta(minutes=31)
         )
         mommy.make(
-            Partida,
+            Match,
             rodada=rodada,
-            data_hora=timezone.now() + timedelta(minutes=30),
+            date_time=timezone.now() + timedelta(minutes=30),
         )
         mommy.make(
-            Partida,
+            Match,
             rodada=rodada,
-            data_hora=timezone.now() - timedelta(minutes=30),
+            date_time=timezone.now() - timedelta(minutes=30),
         )
 
         response = self.client.get(reverse_lazy("core:guesses"))
@@ -134,10 +133,10 @@ class GuessesViewTests(TestCase):
         ]
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertEquals(Partida.objects.count(), 3)
+        self.assertEquals(Match.objects.count(), 3)
         self.assertEquals(len(closed_matches), 2)
         self.assertEquals(len(open_matches_guess_forms), 1)
-        self.assertEquals(open_matches_guess_forms[0].partida, open_match)
+        self.assertEquals(open_matches_guess_forms[0].match, open_match)
 
     def test_send_a_guess(self):
         """When send a guess for a open match via post request, a
@@ -145,17 +144,17 @@ class GuessesViewTests(TestCase):
 
         rodada = mommy.make(Rodada, active=True)
         open_match = mommy.make(
-            Partida,
+            Match,
             rodada=rodada,
-            data_hora=timezone.now() + timedelta(minutes=60),
+            date_time=timezone.now() + timedelta(minutes=60),
         )
         number_of_guesses_before = Palpite.objects.count()
 
         self.client.post(
             reverse_lazy("core:guesses"),
             data={
-                f"gols_mandante_{open_match.id}": 2,
-                f"gols_visitante_{open_match.id}": 1,
+                f"home_goals_{open_match.id}": 2,
+                f"away_goals_{open_match.id}": 1,
             },
         )
         created_guess = Palpite.objects.last()
@@ -210,12 +209,12 @@ class RoundDetailViewTests(TestCase):
         excluding inactive future rounds"""
         pool = mommy.make(GuessPool, owner=self.guesser)
         visible_rounds = mommy.make(Rodada, pool=pool, _quantity=5)
-        [mommy.make(Partida, rodada=[vr]) for vr in visible_rounds[1:]]
+        [mommy.make(Match, rodada=[vr]) for vr in visible_rounds[1:]]
         visible_rounds.pop(0)
         invisible_round = mommy.make(Rodada, pool=pool)
         mommy.make(
-            Partida,
-            data_hora=timezone.now() + timedelta(days=1),
+            Match,
+            date_time=timezone.now() + timedelta(days=1),
             rodada=[invisible_round],
         )
 
