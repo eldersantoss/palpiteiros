@@ -50,19 +50,4 @@ urlpatterns = [
         views.RankingView.as_view(),
         name="ranking",
     ),
-    path(
-        "boloes/<slug:pool_slug>/rodadas/",
-        views.RoundsListView.as_view(),
-        name="round_list",
-    ),
-    path(
-        "boloes/<slug:pool_slug>/rodadas/<slug:round_slug>/",
-        views.RoundDetailView.as_view(),
-        name="round_details",
-    ),
-    path(
-        "OneSignalSDKWorker.js",
-        views.one_signal_worker,
-        name="one_signal_worker",
-    ),
 ]

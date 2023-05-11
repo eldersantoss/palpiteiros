@@ -22,7 +22,7 @@ class CompetitionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Palpiteiro)
 class PalpiteiroAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "usuario", "guessed_on_last_round")
+    list_display = ("__str__", "usuario")
     search_fields = [
         "usuario__username",
         "usuario__first_name",
@@ -41,31 +41,13 @@ class PartidaAdmin(admin.ModelAdmin):
         "gols_mandante",
         "gols_visitante",
     )
-    list_filter = ["rodada", "competition"]
-    filter_horizontal = ["rodada"]
-
-
-@admin.register(models.Rodada)
-class RodadaAdmin(admin.ModelAdmin):
-    fields = ["pool", "active"]
-    list_display = (
-        "__str__",
-        "pool",
-        "created",
-        "modified",
-        "number_of_matches",
-        "active",
-    )
-    list_filter = ["pool"]
+    list_filter = ["competition"]
 
 
 @admin.register(models.Palpite)
 class PalpitesAdmin(admin.ModelAdmin):
     list_display = ("__str__", "palpiteiro")
-    list_filter = [
-        "palpiteiro",
-        "partida__rodada",
-    ]
+    list_filter = ["palpiteiro"]
 
 
 @admin.register(models.GuessPool)
@@ -74,7 +56,6 @@ class GuessPoolAdmin(admin.ModelAdmin):
         "__str__",
         "number_of_teams",
         "number_of_guessers",
-        "number_of_rounds",
         "number_of_matches",
         "private",
         "new_matches",

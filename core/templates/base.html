@@ -10,18 +10,6 @@
   <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
   <link rel="stylesheet" href={% static 'core/css/style.css' %}>
 
-  {% comment %} # TODO: corrigir isso {% endcomment %}
-  {% comment %} <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script> {% endcomment %}
-
-  <script>
-    window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function() {
-        OneSignal.init({
-        appId: "eb1979ac-e89d-4e32-b059-9e1ecd5471c5",
-        });
-    });
-  </script>
-
   <title>{% block title %}{% endblock title %}</title>
 </head>
 

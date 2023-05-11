@@ -199,108 +199,6 @@ class Competition(models.Model):
         return None
 
 
-class Rodada(TimeStampedModel):
-    label = models.CharField(max_length=100)
-    slug = models.SlugField()
-    active = models.BooleanField("Ativa", default=False)
-    pool = models.ForeignKey(
-        "GuessPool",
-        verbose_name="Bolão",
-        on_delete=models.CASCADE,
-        related_name="rounds",
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        ordering = ("-created",)
-        verbose_name = "Rodada"
-        verbose_name_plural = "Rodadas"
-        unique_together = ["slug", "pool"]
-
-    def __str__(self) -> str:
-        return self.label
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        self.label = self._generate_label()
-        self.slug = slugify(self.label)
-        super().save(*args, **kwargs)
-
-    def clean(self) -> None:
-        super().clean()
-        self._validate_active_round()
-
-    @admin.display(description="Número de partidas")
-    def number_of_matches(self) -> int:
-        return self.partidas.count()
-
-    def get_details(
-        self,
-        pool: "GuessPool",
-        logged_guesser: "Palpiteiro",
-    ) -> list[dict[str, any]]:
-        round_details = []
-        for guesser in pool.guessers.all():
-            detail = {
-                "guesser": guesser,
-                "round_score": guesser.get_round_score(self, pool),
-                "matches_and_guesses": [],
-            }
-            for match in self.partidas.all():
-                if logged_guesser == guesser or not match.open_to_guesses():
-                    try:
-                        guess = pool.guesses.get(partida=match, palpiteiro=guesser)
-                    except Palpite.DoesNotExist:
-                        guess = None
-                else:
-                    guess = None
-                detail["matches_and_guesses"].append({"match": match, "guess": guess})
-            round_details.append(detail)
-        round_details.sort(key=lambda e: e["round_score"], reverse=True)
-        return round_details
-
-    def _generate_label(self):
-        nome_meses = [
-            "janeiro",
-            "fevereiro",
-            "março",
-            "abril",
-            "maio",
-            "junho",
-            "julho",
-            "agosto",
-            "setembro",
-            "outubro",
-            "novembro",
-            "dezembro",
-        ]
-        mes_atual = timezone.now().month
-        ano_atual = timezone.now().year
-        numero_rodada = (
-            Rodada.objects.filter(created__month=mes_atual, pool=self.pool).count() + 1
-        )
-        return f"{numero_rodada}ª rodada de {nome_meses[mes_atual - 1]} de {ano_atual}"
-
-    def _validate_active_round(self):
-        if (
-            self.active
-            and Rodada.objects.filter(active=True, pool=self.pool)
-            .exclude(id=self.id)
-            .exists()
-        ):
-            raise ValidationError(
-                {
-                    "active": [
-                        "Já existe uma rodada ativa. Desative-a para poder ativar esta."
-                    ]
-                }
-            )
-
-    def __str__(self) -> str:
-        return f"{self.label} do bolão {self.pool}"
-
-
 class Partida(models.Model):
     NOT_STARTED = "NS"
     FIRST_HALF = "1H"
@@ -338,7 +236,6 @@ class Partida(models.Model):
         related_name="matches",
     )
     status = models.CharField(max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED)
-    rodada = models.ManyToManyField(Rodada, related_name="partidas", blank=True)
     mandante = models.ForeignKey(
         Equipe,
         on_delete=models.CASCADE,
@@ -408,29 +305,6 @@ class Partida(models.Model):
     def set_new_macthes_flag_for_involved_pools(self):
         GuessPool.toggle_flag_value("new_matches", self.get_pools(), True)
 
-    @classmethod
-    def have_open_matches_for_any_active_round(cls):
-        return cls.objects.filter(
-            rodada__active=True,
-            data_hora__gt=timezone.now() + timezone.timedelta(minutes=30),
-        ).exists()
-
-    @classmethod
-    def get_closed_matches_with_guesses(cls, guesser: "Palpiteiro"):
-        """For each closed match of the the active rounds, it searches
-        and appends the guess of the provided guesser, if exists."""
-
-        closed_matches = cls.objects.filter(
-            rodada__active=True,
-            data_hora__lte=timezone.now() + timezone.timedelta(minutes=30),
-        )
-        for cm in closed_matches:
-            try:
-                cm.guess = cm.palpites.get(palpiteiro=guesser)
-            except Palpite.DoesNotExist:
-                cm.guess = None
-        return closed_matches
-
     @property
     def result_str(self):
         return (
@@ -478,22 +352,6 @@ class Partida(models.Model):
 
 class Palpiteiro(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    def get_round_score(self, round_: "Rodada", pool: "GuessPool") -> int:
-        return sum(
-            guess.get_score() for guess in (pool.guesses.filter(partida__rodada=round_))
-        )
-
-    @admin.display(
-        boolean=True,
-        description="Palpitou na última rodada",
-    )
-    def guessed_on_last_round(self):
-        last_guess = self.palpites.last()
-        last_active_round = Rodada.objects.filter(active=True).first()
-        if last_guess is not None:
-            return last_guess.partida.rodada == last_active_round
-        return False
 
     def get_involved_pools(self):
         return self.own_pools.all().union(self.pools.all()).order_by("name")
@@ -691,30 +549,6 @@ class GuessPool(TimeStampedModel):
 
     def guesser_is_member(self, guesser: Palpiteiro):
         return self.guessers.contains(guesser)
-
-    def get_visible_rounds(self):
-        """Filter queryset to exclude inactive future rounds"""
-        rounds_with_matches = (
-            self.get_rounds()
-            .annotate(match_count=models.Count("partidas"))
-            .filter(match_count__gt=0)
-        )
-        inactive_future_rounds = Q(active=False) & Q(opening__gt=timezone.now())
-        visible_rounds = (
-            rounds_with_matches.annotate(
-                opening=models.Min("partidas__data_hora"),
-            )
-            .exclude(inactive_future_rounds)
-            .order_by("-created")
-        )
-        return visible_rounds
-
-    def get_rounds(self):
-        return self.rounds.all()
-
-    @admin.display(description="Rodadas")
-    def number_of_rounds(self):
-        return self.rounds.count()
 
     def get_open_matches(self):
         """Returns matches open to guesses"""

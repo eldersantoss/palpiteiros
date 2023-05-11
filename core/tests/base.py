@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Equipe, GuessPool, Palpiteiro, Partida, Rodada
+from core.models import Equipe, GuessPool, Palpiteiro, Partida
 
 
 class PalpiteirosTestCase(TestCase):
@@ -38,13 +38,11 @@ class PalpiteirosTestCase(TestCase):
         )
 
         # Partidas
-        cls.active_round = mommy.make(Rodada, active=True)
         cls.matches = []
         for i in range(0, len(cls.teams), 2):
             cls.matches.append(
                 mommy.make(
                     Partida,
-                    rodada=[cls.active_round],
                     mandante=cls.teams[i],
                     visitante=cls.teams[i + 1],
                     gols_mandante=i,
