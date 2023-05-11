@@ -224,6 +224,8 @@ input {
   width: 100%;
 }
 
+
+
 .forget-password {
   font-size: 0.75rem;
   align-self: flex-end;
@@ -499,6 +501,12 @@ input {
   border: none;
   background-color: transparent;
   color: yellowgreen;
+}
+
+.manage-pool-form input[type="text"] {
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: darkgreen;
 }
 
 .main-table {
