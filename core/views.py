@@ -20,12 +20,12 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        guesser = self.request.user.palpiteiro
+        guesser = self.request.user.guesser
         involved_pools = guesser.get_involved_pools()
         pools_as_guesser = guesser.pools.all()
         for pool in involved_pools:
             pool.is_pending = (
-                pool.has_pending_match(self.request.user.palpiteiro)
+                pool.has_pending_match(self.request.user.guesser)
                 if pool in pools_as_guesser
                 else False
             )
@@ -63,7 +63,7 @@ class CreatePoolView(LoginRequiredMixin, generic.CreateView):
         )
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.palpiteiro
+        form.instance.owner = self.request.user.guesser
         slug = slugify(form.instance.name)
         if GuessPool.objects.filter(slug=slug).exists():
             form.add_error(
@@ -117,7 +117,7 @@ class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Updat
         )
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.palpiteiro
+        form.instance.owner = self.request.user.guesser
         form.instance.slug = slugify(form.instance.name)
         return super().form_valid(form)
 
@@ -126,7 +126,7 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
     def get(self, *args, **kwargs):
         uuid = kwargs.get("uuid")
         pool = get_object_or_404(GuessPool, uuid=uuid)
-        guesser = self.request.user.palpiteiro
+        guesser = self.request.user.guesser
         if not pool.guesser_is_member(guesser):
             pool.signin_new_guesser(guesser)
             msg_type = "success"

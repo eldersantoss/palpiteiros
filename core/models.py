@@ -181,7 +181,7 @@ class Competition(models.Model):
     def create_public_pool(self):
         name = f"{self.name} {self.season}"
         slug = slugify(name)
-        owner = Palpiteiro.objects.get(usuario__username=settings.ADMIN_USERNAME)
+        owner = Guesser.objects.get(user__username=settings.ADMIN_USERNAME)
         private = False
 
         pool, created = GuessPool.objects.get_or_create(
@@ -339,44 +339,50 @@ class Match(models.Model):
             pools_with_away_team_as_pool_member,
         )
 
-    def get_guess_by_guesser(self, guesser: "Palpiteiro"):
+    def get_guess_by_guesser(self, guesser: "Guesser"):
         try:
             return self.palpites.get(palpiteiro=guesser)
         except Palpite.DoesNotExist:
             return None
 
-    def pending_guess(self, guesser: "Palpiteiro"):
+    def pending_guess(self, guesser: "Guesser"):
         return not self.palpites.filter(palpiteiro=guesser).exists()
 
 
-class Palpiteiro(models.Model):
-    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+class Guesser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def get_involved_pools(self):
+        """Returns all pools that guesser is involved with as owner, as
+        guesser or both"""
+
         return self.own_pools.all().union(self.pools.all()).order_by("name")
 
     @classmethod
     def get_who_should_be_notified_by_email(cls):
         """Returns guessers that should be notified by email"""
-        return cls.objects.exclude(usuario__email="").exclude(pools__isnull=True)
+
+        return cls.objects.exclude(user__email="").exclude(pools__isnull=True)
 
     def get_involved_pools_with_new_matches(self):
         """Returns pools with new matches that this guesser is involved
         with"""
+
         return self.pools.filter(new_matches=True)
 
     def get_involved_pools_with_updated_matches(self):
         """Returns pools with updated matches that this guesser is involved
         with"""
+
         return self.pools.filter(updated_matches=True)
 
     def __str__(self) -> str:
-        return f"{self.usuario.get_full_name()} ({self.usuario.username})"
+        return f"{self.user.get_full_name()} ({self.user.username})"
 
 
 class Palpite(models.Model):
     palpiteiro = models.ForeignKey(
-        Palpiteiro,
+        Guesser,
         on_delete=models.CASCADE,
         related_name="palpites",
     )
@@ -477,7 +483,7 @@ class GuessPool(TimeStampedModel):
     name = models.CharField("nome", max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     owner = models.ForeignKey(
-        Palpiteiro,
+        Guesser,
         related_name="own_pools",
         on_delete=models.PROTECT,
     )
@@ -486,7 +492,7 @@ class GuessPool(TimeStampedModel):
         default=True,
     )
     guessers = models.ManyToManyField(
-        Palpiteiro,
+        Guesser,
         related_name="pools",
         blank=True,
         verbose_name="palpiteiros",
@@ -535,7 +541,7 @@ class GuessPool(TimeStampedModel):
     def get_signin_url(self):
         return reverse_lazy("core:signin_pool", kwargs={"uuid": self.uuid})
 
-    def signin_new_guesser(self, guesser: Palpiteiro):
+    def signin_new_guesser(self, guesser: Guesser):
         self.guessers.add(guesser)
 
     @admin.display(description="Equipes")
@@ -546,7 +552,7 @@ class GuessPool(TimeStampedModel):
     def number_of_guessers(self):
         return self.guessers.count()
 
-    def guesser_is_member(self, guesser: Palpiteiro):
+    def guesser_is_member(self, guesser: Guesser):
         return self.guessers.contains(guesser)
 
     def get_open_matches(self):
@@ -559,7 +565,7 @@ class GuessPool(TimeStampedModel):
             + timezone.timedelta(hours=Match.HOURS_BEFORE_OPEN_TO_GUESSES),
         )
 
-    def has_pending_match(self, guesser: Palpiteiro) -> bool:
+    def has_pending_match(self, guesser: Guesser) -> bool:
         matches = self.get_open_matches()
         for match in matches:
             if match.pending_guess(guesser):
@@ -732,7 +738,7 @@ class GuessPool(TimeStampedModel):
 
         return matches_and_guesses
 
-    def remove_guesser(self, guesser: Palpiteiro):
+    def remove_guesser(self, guesser: Guesser):
         self.guesses.remove(*self.guesses.filter(palpiteiro=guesser))
         self.delete_orphans_guesses()
         self.guessers.remove(guesser)

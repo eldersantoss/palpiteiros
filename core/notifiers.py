@@ -2,9 +2,9 @@ from typing import Iterable, Literal
 
 from django.core.mail import EmailMultiAlternatives, get_connection
 
-from core.models import Palpiteiro
+from core.models import Guesser
 
-from .models import GuessPool, Palpiteiro
+from .models import Guesser, GuessPool
 
 
 class EmailNotifier:
@@ -26,7 +26,7 @@ class EmailNotifier:
     def __init__(
         self,
         notification_type: Literal["new_matches", "updated_matches"],
-        guessers: Iterable[Palpiteiro],
+        guessers: Iterable[Guesser],
     ) -> None:
         if notification_type not in ["new_matches", "updated_matches"]:
             raise ValueError("msg_type value must be 'created' or 'updated'")
@@ -55,7 +55,7 @@ class EmailNotifier:
         with get_connection() as conn:
             conn.send_messages(self.email_msgs)
 
-    def _get_notifiable_pools(self, guesser: Palpiteiro):
+    def _get_notifiable_pools(self, guesser: Guesser):
         return (
             guesser.get_involved_pools_with_new_matches()
             if self.notification_type == "new_matches"
@@ -64,16 +64,16 @@ class EmailNotifier:
 
     def _assemble_email(
         self,
-        guesser: Palpiteiro,
+        guesser: Guesser,
         notifiable_pools: Iterable[GuessPool],
     ) -> EmailMultiAlternatives:
-        guesser_name = guesser.usuario.first_name
+        guesser_name = guesser.user.first_name
         text_content, html_content = (
             self._get_plural_content(guesser_name, notifiable_pools)
             if notifiable_pools.count() > 1
             else self._get_singular_content(guesser_name, notifiable_pools)
         )
-        recipients = [guesser.usuario.email]
+        recipients = [guesser.user.email]
         email = EmailMultiAlternatives(self.subject, text_content, to=recipients)
         email.attach_alternative(html_content, "text/html")
         return email
@@ -139,7 +139,7 @@ class NewMatchesEmailNotifier(EmailNotifier):
         "Novas partidas disponíveis nos bolões {}. Acesse o app agora mesmo e deixe seus palpites! 🍀⚽",
     )
 
-    def __init__(self, guessers: Iterable[Palpiteiro]) -> None:
+    def __init__(self, guessers: Iterable[Guesser]) -> None:
         super().__init__("new_matches", guessers)
 
 
@@ -158,5 +158,5 @@ class UpdatedMatchesEmailNotifier(EmailNotifier):
         "Os bolões {} foram atualizados. Acesse o app agora mesmo e confira seus resultados! 📊🏆",
     )
 
-    def __init__(self, guessers: Iterable[Palpiteiro]) -> None:
+    def __init__(self, guessers: Iterable[Guesser]) -> None:
         super().__init__("updated_matches", guessers)

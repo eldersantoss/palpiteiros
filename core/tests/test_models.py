@@ -5,9 +5,9 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Match, Palpite, Palpiteiro, Rodada
+from core.models import Guesser, Match, Palpite, Rodada
 
-from .base import PalpiteirosTestCase
+from .base import GuessersTestCase
 
 
 class MatchModelTests(TestCase):
@@ -64,7 +64,7 @@ class MatchModelTests(TestCase):
         self.assertTrue(partially_correct_guess.contabilizado)
 
 
-class RoundModelTests(PalpiteirosTestCase):
+class RoundModelTests(GuessersTestCase):
     def test_only_one_active_round_is_allowed(self):
         with self.assertRaises(ValidationError):
             mommy.make(Rodada, active=True)
@@ -75,7 +75,7 @@ class RoundModelTests(PalpiteirosTestCase):
         round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
-        round_detail = round_.get_details(self.guesser01.usuario)
+        round_detail = round_.get_details(self.guesser01.user)
         guessers = [detail["guesser"] for detail in round_detail]
         self.assertCountEqual(guessers, self.guessers)
 
@@ -85,7 +85,7 @@ class RoundModelTests(PalpiteirosTestCase):
         round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
-        round_detail = round_.get_details(self.guesser01.usuario)
+        round_detail = round_.get_details(self.guesser01.user)
         matches = [
             [
                 detail_round_matches["match"]
@@ -100,7 +100,7 @@ class RoundModelTests(PalpiteirosTestCase):
         round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
-        round_detail = round_.get_details(self.guesser01.usuario)
+        round_detail = round_.get_details(self.guesser01.user)
         for i in range(len(round_detail) - 1):
             self.assertGreaterEqual(
                 round_detail[i]["round_score"],
@@ -113,7 +113,7 @@ class RoundModelTests(PalpiteirosTestCase):
         for guess in Palpite.objects.all():
             guess.get_score()
 
-        round_detail = round_.get_details(self.guesser01.usuario)
+        round_detail = round_.get_details(self.guesser01.user)
         self.assertEqual(round_detail[0]["round_score"], 34)
         self.assertEqual(round_detail[1]["round_score"], 22)
         self.assertEqual(round_detail[2]["round_score"], 0)
@@ -122,7 +122,7 @@ class RoundModelTests(PalpiteirosTestCase):
         round_ = Rodada.objects.filter(active=True).last()
         self.assertIsNotNone(round_)
 
-        round_detail = round_.get_details(self.guesser01.usuario)
+        round_detail = round_.get_details(self.guesser01.user)
 
         for detail in round_detail:
             guesses = [
@@ -136,7 +136,7 @@ class RoundModelTests(PalpiteirosTestCase):
                 self.assertLessEqual(len(guesses), len(self.closed_matches))
 
 
-class GuessPoolModelTests(PalpiteirosTestCase):
+class GuessPoolModelTests(GuessersTestCase):
     def test_number_of_teams(self):
         """pool01, pool02 and pool03 should have 8 teams each"""
         self.assertEqual(self.pool01.number_of_teams(), 8)
@@ -449,6 +449,6 @@ class GuessPoolModelTests(PalpiteirosTestCase):
 
         ranking = self.pool03.get_ranking(0, 0)
         self.assertEqual(ranking.get(id=self.guesser01.id).score, 0)
-        with self.assertRaises(Palpiteiro.DoesNotExist):
+        with self.assertRaises(Guesser.DoesNotExist):
             ranking.get(id=self.guesser02.id)
         self.assertEqual(ranking.get(id=self.guesser03.id).score, 0)

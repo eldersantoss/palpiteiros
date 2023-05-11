@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from core.models import Palpiteiro
+from core.models import Guesser
 
 
 class Command(BaseCommand):
@@ -30,6 +30,6 @@ class Command(BaseCommand):
             password=password,
             email=email,
         )
-        Palpiteiro.objects.create(usuario=user)
+        Guesser.objects.create(user=user)
 
         self.stdout.write(f'Superuser "{username}" was created')

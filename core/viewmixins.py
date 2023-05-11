@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 
 from core.helpers import redirect_with_msg
 
-from .models import GuessPool, Palpiteiro
+from .models import Guesser, GuessPool
 
 
 class GuessPoolMembershipMixin:
@@ -16,8 +16,8 @@ class GuessPoolMembershipMixin:
         self.pool.user_is_owner = self.pool.owner == self.guesser
         self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
 
-    def get_guesser(self) -> Palpiteiro:
-        return self.request.user.palpiteiro
+    def get_guesser(self) -> Guesser:
+        return self.request.user.guesser
 
     def get_pool(self) -> GuessPool:
         pool_slug = self.kwargs.get(self.pool_slug_url_kwarg)

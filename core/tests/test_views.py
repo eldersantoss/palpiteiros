@@ -7,14 +7,14 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from model_mommy import mommy
 
-from ..models import GuessPool, Match, Palpite, Palpiteiro, Rodada
+from ..models import Guesser, GuessPool, Match, Palpite, Rodada
 
 
 class GuessesViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = get_user_model().objects.create(username="testuser")
-        cls.palpiteiro = Palpiteiro.objects.create(usuario=cls.user)
+        cls.guesser = Guesser.objects.create(user=cls.user)
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
@@ -23,7 +23,7 @@ class GuessesViewTests(TestCase):
         """When no guesser is found the response should be a redirect
         to index view"""
 
-        self.palpiteiro.delete()
+        self.guesser.delete()
 
         response = self.client.get(reverse_lazy("core:guesses"))
 
@@ -79,7 +79,7 @@ class GuessesViewTests(TestCase):
 
         guess = mommy.make(
             Palpite,
-            palpiteiro=self.palpiteiro,
+            palpiteiro=self.guesser,
             partida=open_match,
             gols_mandante=1,
             gols_visitante=0,
@@ -160,7 +160,7 @@ class GuessesViewTests(TestCase):
         created_guess = Palpite.objects.last()
 
         self.assertEquals(Palpite.objects.count(), number_of_guesses_before + 1)
-        self.assertEquals(created_guess.palpiteiro, self.palpiteiro)
+        self.assertEquals(created_guess.palpiteiro, self.guesser)
         self.assertEquals(created_guess.partida, open_match)
         self.assertEquals(created_guess.gols_mandante, 2)
         self.assertEquals(created_guess.gols_visitante, 1)
@@ -170,7 +170,7 @@ class ClassificacaoViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = get_user_model().objects.create(username="testuser")
-        cls.palpiteiro = Palpiteiro.objects.create(usuario=cls.user)
+        cls.guesser = Guesser.objects.create(user=cls.user)
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
@@ -199,10 +199,10 @@ class ClassificacaoViewTests(TestCase):
 class RoundDetailViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.guesser = mommy.make(Palpiteiro)
+        cls.guesser = mommy.make(Guesser)
 
     def setUp(self) -> None:
-        self.client.force_login(self.guesser.usuario)
+        self.client.force_login(self.guesser.user)
 
     def test_round_list(self):
         """Should have correct rounds in context, this is, all rounds
@@ -230,7 +230,7 @@ class RoundDetailViewTests(TestCase):
 
     def test_round_detail_has_correct_context_data(self):
         """Should have corrects round and round_detail in context"""
-        guessers = mommy.make(Palpiteiro, _quantity=3) + [self.guesser]
+        guessers = mommy.make(Guesser, _quantity=3) + [self.guesser]
         pool = mommy.make(GuessPool, owner=self.guesser, guessers=guessers)
         round_ = mommy.make(Rodada, pool=pool)
 

@@ -20,13 +20,13 @@ class CompetitionAdmin(admin.ModelAdmin):
     filter_horizontal = ["teams"]
 
 
-@admin.register(models.Palpiteiro)
-class PalpiteiroAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "usuario")
+@admin.register(models.Guesser)
+class GuesserAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "user")
     search_fields = [
-        "usuario__username",
-        "usuario__first_name",
-        "usuario__last_name",
+        "user__username",
+        "user__first_name",
+        "user__last_name",
     ]
 
 

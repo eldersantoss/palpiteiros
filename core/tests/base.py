@@ -4,16 +4,16 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import GuessPool, Match, Palpiteiro, Team
+from core.models import Guesser, GuessPool, Match, Team
 
 
-class PalpiteirosTestCase(TestCase):
+class GuessersTestCase(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        # Palpiteiros
-        cls.guesser01 = mommy.make(Palpiteiro)
-        cls.guesser02 = mommy.make(Palpiteiro)
-        cls.guesser03 = mommy.make(Palpiteiro)
+        # Guessers
+        cls.guesser01 = mommy.make(Guesser)
+        cls.guesser02 = mommy.make(Guesser)
+        cls.guesser03 = mommy.make(Guesser)
         cls.guessers = [
             cls.guesser01,
             cls.guesser02,

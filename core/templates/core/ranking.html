@@ -24,8 +24,8 @@
   {% for guesser in guessers %}
     <tr
       class="clickable-row"
-      name="clickable-row{{ guesser.usuario.id }}"
-      onclick="expandDetailRow('{{ guesser.usuario.id }}')"
+      name="clickable-row{{ guesser.user.id }}"
+      onclick="expandDetailRow('{{ guesser.user.id }}')"
     >
       <td>
         {% if forloop.counter == 1 %}
@@ -46,7 +46,7 @@
 
     <tr
       class="detail-row"
-      name="detail-row{{ guesser.usuario.id }}"
+      name="detail-row{{ guesser.user.id }}"
       style="display: none"
     >
       <td colspan="5" class="detail-table-container">
