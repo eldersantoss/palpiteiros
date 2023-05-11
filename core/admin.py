@@ -44,10 +44,10 @@ class MatchAdmin(admin.ModelAdmin):
     list_filter = ["competition", "status"]
 
 
-@admin.register(models.Palpite)
-class PalpitesAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "palpiteiro")
-    list_filter = ["palpiteiro"]
+@admin.register(models.Guess)
+class GuessesAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "guesser")
+    list_filter = ["guesser"]
 
 
 @admin.register(models.GuessPool)

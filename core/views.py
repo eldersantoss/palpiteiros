@@ -10,7 +10,7 @@ from django.views import generic
 from core.helpers import redirect_with_msg
 
 from .forms import GuessForm, RankingPeriodForm
-from .models import GuessPool, Palpite
+from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
 
 
@@ -210,15 +210,15 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
         for match in open_matches:
             try:
                 guess = self.pool.guesses.get(
-                    partida=match,
-                    palpiteiro=self.guesser,
+                    match=match,
+                    guesser=self.guesser,
                 )
                 initial_data = {
-                    f"home_goals_{match.id}": guess.gols_mandante,
-                    f"away_goals_{match.id}": guess.gols_visitante,
+                    f"home_goals_{match.id}": guess.home_goals,
+                    f"away_goals_{match.id}": guess.away_goals,
                 }
 
-            except Palpite.DoesNotExist:
+            except Guess.DoesNotExist:
                 initial_data = None
 
             guess_forms.append(GuessForm(initial_data, match=match))
@@ -260,11 +260,11 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                 novo na relação guesses.
                 """
 
-                guess = Palpite.objects.create(
-                    partida=match,
-                    palpiteiro=self.guesser,
-                    gols_mandante=guess_form.cleaned_data["home_goals"],
-                    gols_visitante=guess_form.cleaned_data["away_goals"],
+                guess = Guess.objects.create(
+                    match=match,
+                    guesser=self.guesser,
+                    home_goals=guess_form.cleaned_data["home_goals"],
+                    away_goals=guess_form.cleaned_data["away_goals"],
                 )
                 self.pool.add_guess_to_pools(guess, for_all_pools)
                 self.pool.delete_orphans_guesses()
@@ -274,15 +274,15 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
             else:
                 try:
                     guess = self.pool.guesses.get(
-                        partida=match,
-                        palpiteiro=self.guesser,
+                        match=match,
+                        guesser=self.guesser,
                     )
                     initial_data = {
-                        f"home_goals_{match.id}": guess.gols_mandante,
-                        f"away_goals_{match.id}": guess.gols_visitante,
+                        f"home_goals_{match.id}": guess.home_goals,
+                        f"away_goals_{match.id}": guess.away_goals,
                     }
 
-                except Palpite.DoesNotExist:
+                except Guess.DoesNotExist:
                     initial_data = None
 
                 guess_forms.append(GuessForm(initial_data, match=match))

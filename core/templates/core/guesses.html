@@ -24,7 +24,7 @@
       <div>
         <span class="gols-palpite-encerrado">
           {% if guess_form.match.guess %}
-            {{ guess_form.match.guess.gols_mandante }}
+            {{ guess_form.match.guess.home_goals }}
           {% else %}
             -
           {% endif %}
@@ -34,7 +34,7 @@
       <div>
         <span class="gols-palpite-encerrado">
           {% if guess_form.match.guess %}
-            {{ guess_form.match.guess.gols_visitante }}
+            {{ guess_form.match.guess.away_goals }}
           {% else %}
             -
           {% endif %}

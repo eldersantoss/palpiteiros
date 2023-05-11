@@ -295,7 +295,7 @@ class Match(models.Model):
 
     def evaluate_and_consolidate_guesses(self):
         with transaction.atomic():
-            for guess in self.palpites.all():
+            for guess in self.guesses.all():
                 guess.evaluate_and_consolidate()
 
     def set_updated_matches_flag_for_involved_pools(self):
@@ -341,12 +341,12 @@ class Match(models.Model):
 
     def get_guess_by_guesser(self, guesser: "Guesser"):
         try:
-            return self.palpites.get(palpiteiro=guesser)
-        except Palpite.DoesNotExist:
+            return self.guesses.get(guesser=guesser)
+        except Guess.DoesNotExist:
             return None
 
     def pending_guess(self, guesser: "Guesser"):
-        return not self.palpites.filter(palpiteiro=guesser).exists()
+        return not self.guesses.filter(guesser=guesser).exists()
 
 
 class Guesser(models.Model):
@@ -380,21 +380,21 @@ class Guesser(models.Model):
         return f"{self.user.get_full_name()} ({self.user.username})"
 
 
-class Palpite(models.Model):
-    palpiteiro = models.ForeignKey(
+class Guess(models.Model):
+    guesser = models.ForeignKey(
         Guesser,
         on_delete=models.CASCADE,
-        related_name="palpites",
+        related_name="guesses",
     )
-    partida = models.ForeignKey(
+    match = models.ForeignKey(
         Match,
         on_delete=models.CASCADE,
-        related_name="palpites",
+        related_name="guesses",
     )
-    gols_mandante = models.PositiveIntegerField()
-    gols_visitante = models.PositiveIntegerField()
-    pontuacao = models.PositiveIntegerField(default=0)
-    contabilizado = models.BooleanField(default=False)
+    home_goals = models.PositiveIntegerField()
+    away_goals = models.PositiveIntegerField()
+    score = models.PositiveIntegerField(default=0)
+    consolidated = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "palpite"
@@ -402,40 +402,42 @@ class Palpite(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"{self.partida.home_team.name} {self.gols_mandante}"
+            f"{self.match.home_team.name} {self.home_goals}"
             + " x "
-            + f"{self.gols_visitante} {self.partida.away_team.name}"
+            + f"{self.away_goals} {self.match.away_team.name}"
         )
 
     def get_score(self) -> int:
-        if not self.contabilizado:
+        if not self.consolidated:
             self.evaluate_and_consolidate()
-        return self.pontuacao
+        return self.score
 
     def evaluate_and_consolidate(self):
-        if self.partida.result_str is not None:
-            self.pontuacao = self._evaluate()
+        if self.match.result_str is not None:
+            self.score = self._evaluate()
 
-            if self.partida.is_finished():
-                self.contabilizado = True
+            if self.match.is_finished():
+                self.consolidated = True
 
             self.save()
 
     @property
     def result_str(self) -> str:
-        return f"{self.gols_mandante} x {self.gols_visitante}"
+        return f"{self.home_goals} x {self.away_goals}"
 
     def _evaluate(self):
-        ACERTO_DE_GOLS_MANDANTE = self.gols_mandante == self.partida.home_goals
-        ACERTO_DE_GOLS_VISITANTE = self.gols_visitante == self.partida.away_goals
-        ACERTO_MANDANTE_VENCEDOR = (self.gols_mandante > self.gols_visitante) and (
-            self.partida.home_goals > self.partida.away_goals
+        """Compares match result with your guess and returns the score"""
+
+        ACERTO_DE_GOLS_MANDANTE = self.home_goals == self.match.home_goals
+        ACERTO_DE_GOLS_VISITANTE = self.away_goals == self.match.away_goals
+        ACERTO_MANDANTE_VENCEDOR = (self.home_goals > self.away_goals) and (
+            self.match.home_goals > self.match.away_goals
         )
-        ACERTO_VISITANTE_VENCEDOR = (self.gols_mandante < self.gols_visitante) and (
-            self.partida.home_goals < self.partida.away_goals
+        ACERTO_VISITANTE_VENCEDOR = (self.home_goals < self.away_goals) and (
+            self.match.home_goals < self.match.away_goals
         )
-        ACERTO_EMPATE = (self.gols_mandante == self.gols_visitante) and (
-            self.partida.home_goals == self.partida.away_goals
+        ACERTO_EMPATE = (self.home_goals == self.away_goals) and (
+            self.match.home_goals == self.match.away_goals
         )
         ACERTO_PARCIAL = ACERTO_MANDANTE_VENCEDOR or ACERTO_VISITANTE_VENCEDOR
         ACERTO_PARCIAL_COM_GOLS = ACERTO_PARCIAL and (
@@ -465,7 +467,7 @@ class Palpite(models.Model):
         else:
             score = 0
 
-        if self.partida.double_score:
+        if self.match.double_score:
             score *= 2
 
         return score
@@ -510,7 +512,7 @@ class GuessPool(TimeStampedModel):
         blank=True,
     )
     guesses = models.ManyToManyField(
-        Palpite,
+        Guess,
         related_name="pools",
         blank=True,
     )
@@ -592,9 +594,9 @@ class GuessPool(TimeStampedModel):
             setattr(p, flag, desired_value)
         cls.objects.bulk_update(pools, [flag])
 
-    def add_guess_to_pools(self, guess: Palpite, for_all_pools: bool):
-        match = guess.partida
-        guesser = guess.palpiteiro
+    def add_guess_to_pools(self, guess: Guess, for_all_pools: bool):
+        match = guess.match
+        guesser = guess.guesser
 
         if for_all_pools:
             pools_with_the_match = match.get_pools()
@@ -615,12 +617,12 @@ class GuessPool(TimeStampedModel):
         with transaction.atomic():
             try:
                 old_guess = target_pool.guesses.get(
-                    partida=guess.partida,
-                    palpiteiro=guess.palpiteiro,
+                    match=guess.match,
+                    guesser=guess.guesser,
                 )
                 target_pool.guesses.remove(old_guess)
 
-            except Palpite.DoesNotExist:
+            except Guess.DoesNotExist:
                 pass
 
             target_pool.guesses.add(guess)
@@ -629,7 +631,7 @@ class GuessPool(TimeStampedModel):
     def delete_orphans_guesses(cls):
         """Deletes Palpite instances that are not related with a Pool"""
 
-        return Palpite.objects.exclude(pools__in=cls.objects.all()).delete()
+        return Guess.objects.exclude(pools__in=cls.objects.all()).delete()
 
     def get_matches(self):
         """Returns all matches created after this pool that belongs to
@@ -715,11 +717,11 @@ class GuessPool(TimeStampedModel):
         )
 
     def get_guessers_with_match_scores(self, matches: Iterable[Match]):
-        guesses_of_this_pool_in_the_period = Q(palpites__partida__in=matches) & Q(
-            palpites__in=self.guesses.all()
+        guesses_of_this_pool_in_the_period = Q(guesses__match__in=matches) & Q(
+            guesses__in=self.guesses.all()
         )
         sum_expr = Sum(
-            "palpites__pontuacao",
+            "guesses__score",
             filter=guesses_of_this_pool_in_the_period,
         )
         return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by("-score")
@@ -729,9 +731,9 @@ class GuessPool(TimeStampedModel):
 
         for match in matches[: self.MAX_MATCHES_TO_SHOW_INTO_RANKING]:
             try:
-                guess = self.guesses.get(partida=match, palpiteiro=guesser)
+                guess = self.guesses.get(match=match, guesser=guesser)
 
-            except Palpite.DoesNotExist:
+            except Guess.DoesNotExist:
                 guess = None
 
             matches_and_guesses.append({"match": match, "guess": guess})
@@ -739,7 +741,7 @@ class GuessPool(TimeStampedModel):
         return matches_and_guesses
 
     def remove_guesser(self, guesser: Guesser):
-        self.guesses.remove(*self.guesses.filter(palpiteiro=guesser))
+        self.guesses.remove(*self.guesses.filter(guesser=guesser))
         self.delete_orphans_guesses()
         self.guessers.remove(guesser)
 

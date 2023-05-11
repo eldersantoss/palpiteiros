@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from model_mommy import mommy
 
-from ..models import Guesser, GuessPool, Match, Palpite, Rodada
+from ..models import Guess, Guesser, GuessPool, Match, Rodada
 
 
 class GuessesViewTests(TestCase):
@@ -78,11 +78,11 @@ class GuessesViewTests(TestCase):
         )
 
         guess = mommy.make(
-            Palpite,
-            palpiteiro=self.guesser,
-            partida=open_match,
-            gols_mandante=1,
-            gols_visitante=0,
+            Guess,
+            guesser=self.guesser,
+            match=open_match,
+            home_goals=1,
+            away_goals=0,
         )
 
         response = self.client.get(reverse_lazy("core:guesses"))
@@ -97,11 +97,11 @@ class GuessesViewTests(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertEquals(
             palpite_form.data[f"home_goals_{open_match.id}"],
-            guess.gols_mandante,
+            guess.home_goals,
         )
         self.assertEquals(
             palpite_form.data[f"away_goals_{open_match.id}"],
-            guess.gols_visitante,
+            guess.away_goals,
         )
 
     def test_match_closed_for_guesses_half_hour_before(self):
@@ -148,7 +148,7 @@ class GuessesViewTests(TestCase):
             rodada=rodada,
             date_time=timezone.now() + timedelta(minutes=60),
         )
-        number_of_guesses_before = Palpite.objects.count()
+        number_of_guesses_before = Guess.objects.count()
 
         self.client.post(
             reverse_lazy("core:guesses"),
@@ -157,13 +157,13 @@ class GuessesViewTests(TestCase):
                 f"away_goals_{open_match.id}": 1,
             },
         )
-        created_guess = Palpite.objects.last()
+        created_guess = Guess.objects.last()
 
-        self.assertEquals(Palpite.objects.count(), number_of_guesses_before + 1)
-        self.assertEquals(created_guess.palpiteiro, self.guesser)
-        self.assertEquals(created_guess.partida, open_match)
-        self.assertEquals(created_guess.gols_mandante, 2)
-        self.assertEquals(created_guess.gols_visitante, 1)
+        self.assertEquals(Guess.objects.count(), number_of_guesses_before + 1)
+        self.assertEquals(created_guess.guesser, self.guesser)
+        self.assertEquals(created_guess.match, open_match)
+        self.assertEquals(created_guess.home_goals, 2)
+        self.assertEquals(created_guess.away_goals, 1)
 
 
 class ClassificacaoViewTests(TestCase):
