@@ -6,19 +6,27 @@
 
 <h3>Classificação</h3>
 
-<form action="{% url 'core:ranking' pool.slug %}" method="GET" class="menu horizontal period-form">
-  {{ period_form.as_div }}
-</form>
+<div class="period-form-container">
+  <p>Escolha o período que deseja ver a classificação:</p>
+  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form">
+    {{ period_form.as_div }}
+  </form>
+</div>
 
-<table class="main-table">
+<table class="main-table ranking-table">
   <tr>
-    <th style="width:2.5%"></th>
-    <th style="width:2.5%"></th>
-    <th style="width:80%"></th>
-    <th style="width:15%">Pontos</th>
+    <th></th>
+    <th></th>
+    <th style="width:60%"></th>
+    <th>Pontos</th>
+    <th style="width:20%"></th>
   </tr>
-  {% for guesser in ranking %}
-    <tr>
+  {% for guesser in guessers %}
+    <tr
+      class="clickable-row"
+      name="clickable-row{{ guesser.usuario.id }}"
+      onclick="expandDetailRow('{{ guesser.usuario.id }}')"
+    >
       <td>
         {% if forloop.counter == 1 %}
         🥇
@@ -31,10 +39,64 @@
         {% endif %}
       </td>
       <td>{{ forloop.counter }}º</td>
-      {% comment %} <td>{{ guesser }}</td> {% endcomment %}
       <td style="text-align:left">{{ guesser }}</td>
       <td>{{ guesser.score }}</td>
+      <td class="expand-icon">Palpites 🔽</td>
     </tr>
+
+    <tr
+      class="detail-row"
+      name="detail-row{{ guesser.usuario.id }}"
+      style="display: none"
+    >
+      <td colspan="5" class="detail-table-container">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th style="width:50%">Partida</th>
+              <th style="width:15%">Resultado</th>
+              <th style="width:15%">Palpite</th>
+              <th style="width:15%">Pontuação</th>
+              <th style="width:5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for match_and_guess in guesser.matches_and_guesses %}
+              <tr class="detail-table-row-match-time">
+                <td colspan="5">
+                  <p class="match-time">{{ match_and_guess.match.data_hora }}</p>
+                </td>
+              </tr>
+              <tr class="detail-table-row">
+                <td>
+                    <p>{{ match_and_guess.match.mandante }}</p>
+                    <p>x</p>
+                    <p>{{ match_and_guess.match.visitante }}</p>
+                </td>
+                <td>{{ match_and_guess.match.result_str|default:"-" }}</td>
+                {% if match_and_guess.guess %}
+                  <td>{{ match_and_guess.guess.result_str }}</td>
+                  {% if match_and_guess.match.result_str %}
+                    <td>{{ match_and_guess.guess.get_score }}</td>
+                  {% else %}
+                    <td>-</td>
+                  {% endif %}
+                {% else %}
+                  <td>-</td>
+                  <td>-</td>
+                {% endif %}
+                <td>
+                  {% if match_and_guess.match.pontuacao_dobrada %}
+                  🔥
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+
   {% endfor %}
 </table>
 

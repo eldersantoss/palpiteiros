@@ -9,8 +9,8 @@ from django.views import generic
 
 from core.helpers import redirect_with_msg
 
-from .forms import RankingPeriodForm
-from .models import GuessPool
+from .forms import GuessForm, RankingPeriodForm
+from .models import GuessPool, Palpite
 from .viewmixins import GuessPoolMembershipMixin
 
 
@@ -195,16 +195,8 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
-        return self._get_post_handler(*args, **kwargs)
+        open_matches = self.pool.get_open_matches()
 
-    def post(self, *args, **kwargs):
-        return self._get_post_handler(*args, **kwargs)
-
-    def _get_post_handler(self, *args, **kwargs):
-        open_matches = self.pool.get_update_or_create_guesses(
-            self.guesser,
-            self.request.POST,
-        )
         if not open_matches.exists():
             return redirect_with_msg(
                 self.request,
@@ -213,16 +205,98 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                 "short",
                 self.pool,
             )
-        if self.request.method == "POST":
-            messages.success(
-                self.request,
-                "Palpites salvos! ✅",
-                "temp-msg short-time-msg",
-            )
+
+        guess_forms = []
+        for match in open_matches:
+            try:
+                guess = self.pool.guesses.get(
+                    partida=match,
+                    palpiteiro=self.guesser,
+                )
+                initial_data = {
+                    f"gols_mandante_{match.id}": guess.gols_mandante,
+                    f"gols_visitante_{match.id}": guess.gols_visitante,
+                }
+
+            except Palpite.DoesNotExist:
+                initial_data = None
+
+            guess_forms.append(GuessForm(initial_data, partida=match))
+
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": self.pool, "open_matches": open_matches},
+            {"pool": self.pool, "guess_forms": guess_forms},
+        )
+
+    def post(self, *args, **kwargs):
+        for_all_pools = bool(self.request.POST.get("for_all_pools"))
+
+        open_matches = self.pool.get_open_matches()
+
+        if not open_matches.exists():
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Não existem partidas abertas neste momento ❌",
+                "short",
+                self.pool,
+            )
+
+        guess_forms = []
+        for match in open_matches:
+            guess_form = GuessForm(self.request.POST, partida=match)
+
+            if guess_form.is_valid():
+                """
+                Quando o palpite é aproveitado em todos os bolões, a mesma
+                instância de palpite é adicionada no relacionamento guesses
+                de todos os bolões nos quais ele é aproveitado. Então, quando
+                essa instância for modificada, todos os bolões terão seus
+                palpites afetados. Por isso, só se deve ATUALIZAR um palpite
+                se ele for aproveitado em todos os bolões (for_all_pools). Caso
+                contrário, quando o palpite for exclusivo de um único bolão,
+                deve-se sempre criar um novo palpite e substituir o antigo pelo
+                novo na relação guesses.
+                """
+
+                guess = Palpite.objects.create(
+                    partida=match,
+                    palpiteiro=self.guesser,
+                    gols_mandante=guess_form.cleaned_data["gols_mandante"],
+                    gols_visitante=guess_form.cleaned_data["gols_visitante"],
+                )
+                self.pool.add_guess_to_pools(guess, for_all_pools)
+                self.pool.delete_orphans_guesses()
+
+                guess_forms.append(guess_form)
+
+            else:
+                try:
+                    guess = self.pool.guesses.get(
+                        partida=match,
+                        palpiteiro=self.guesser,
+                    )
+                    initial_data = {
+                        f"gols_mandante_{match.id}": guess.gols_mandante,
+                        f"gols_visitante_{match.id}": guess.gols_visitante,
+                    }
+
+                except Palpite.DoesNotExist:
+                    initial_data = None
+
+                guess_forms.append(GuessForm(initial_data, partida=match))
+
+        messages.success(
+            self.request,
+            "Palpites salvos ✅",
+            "temp-msg short-time-msg",
+        )
+
+        return render(
+            self.request,
+            "core/guesses.html",
+            {"pool": self.pool, "guess_forms": guess_forms},
         )
 
 
@@ -231,7 +305,7 @@ class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Template
 
     def get(self, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        if not context["ranking"].exists():
+        if not context["guessers"].exists():
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -243,16 +317,24 @@ class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Template
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = RankingPeriodForm(self.request.GET)
-        if form.is_valid():
-            month = int(form.cleaned_data["mes"])
-            year = int(form.cleaned_data["ano"])
-        else:
-            month = timezone.now().month
-            year = timezone.now().year
-        form = RankingPeriodForm({"mes": month, "ano": year})
+
+        current_period = {
+            "mes": timezone.now().month,
+            "ano": timezone.now().year,
+            "rodada": timezone.now().isocalendar().week,
+        }
+        form = RankingPeriodForm(self.request.GET or current_period)
+        form.is_valid()
+
+        month = int(form.cleaned_data["mes"])
+        year = int(form.cleaned_data["ano"])
+        round_ = int(form.cleaned_data["rodada"])
+
         context["period_form"] = form
-        context["ranking"] = self.pool.get_ranking(month, year)
+        context["guessers"] = self.pool.get_guessers_with_score_and_guesses(
+            month, year, round_
+        )
+
         return context
 
 
