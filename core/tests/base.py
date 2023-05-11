@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
-from core.models import Equipe, GuessPool, Palpiteiro, Partida
+from core.models import GuessPool, Palpiteiro, Partida, Team
 
 
 class PalpiteirosTestCase(TestCase):
@@ -21,7 +21,7 @@ class PalpiteirosTestCase(TestCase):
         ]
 
         # Equipes
-        cls.teams = mommy.make(Equipe, _quantity=16)
+        cls.teams = mommy.make(Team, _quantity=16)
 
         # Bolões
         cls.pool01 = mommy.make(

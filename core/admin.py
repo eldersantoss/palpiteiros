@@ -7,10 +7,10 @@ admin.site.site_title = "Administração Palpiteiros"
 admin.site.index_title = "Selecione entidade para modificar"
 
 
-@admin.register(models.Equipe)
-class EquipeAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "abreviacao")
-    search_fields = ("nome", "abreviacao")
+@admin.register(models.Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "code")
+    search_fields = ("name", "code")
 
 
 @admin.register(models.Competition)

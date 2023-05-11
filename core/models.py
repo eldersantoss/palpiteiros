@@ -5,7 +5,6 @@ from uuid import uuid4
 import requests
 from django.conf import settings
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
@@ -23,18 +22,18 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class Equipe(models.Model):
+class Team(models.Model):
     data_source_id = models.PositiveIntegerField(blank=True, null=True)
-    nome = models.CharField(max_length=50)
-    abreviacao = models.CharField(max_length=3, blank=True, null=True)
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=3, blank=True, null=True)
 
     class Meta:
         verbose_name = "equipe"
         verbose_name_plural = "equipes"
-        ordering = ("nome",)
+        ordering = ("name",)
 
     def __str__(self) -> str:
-        return self.nome
+        return self.name
 
     def logo_url(self):
         return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
@@ -44,7 +43,7 @@ class Competition(models.Model):
     data_source_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
     season = models.PositiveIntegerField("Temporada")
-    teams = models.ManyToManyField(Equipe, related_name="competitions")
+    teams = models.ManyToManyField(Team, related_name="competitions")
 
     class Meta:
         verbose_name = "competição"
@@ -75,13 +74,13 @@ class Competition(models.Model):
         teams = []
         for data in response:
             data_source_id = data["team"]["id"]
-            nome = data["team"]["name"]
-            abreviacao = data["team"]["code"]
+            name = data["team"]["name"]
+            code = data["team"]["code"]
 
-            team, _ = Equipe.objects.get_or_create(
+            team, _ = Team.objects.get_or_create(
                 data_source_id=data_source_id,
-                nome=nome,
-                abreviacao=abreviacao,
+                name=name,
+                code=code,
             )
             teams.append(team)
 
@@ -117,8 +116,8 @@ class Competition(models.Model):
             home_team_source_id = data["teams"]["home"]["id"]
             away_team_source_id = data["teams"]["away"]["id"]
 
-            home_team = Equipe.objects.get(data_source_id=home_team_source_id)
-            away_team = Equipe.objects.get(data_source_id=away_team_source_id)
+            home_team = Team.objects.get(data_source_id=home_team_source_id)
+            away_team = Team.objects.get(data_source_id=away_team_source_id)
 
             match, created = Partida.objects.get_or_create(
                 data_source_id=data_source_id,
@@ -237,12 +236,12 @@ class Partida(models.Model):
     )
     status = models.CharField(max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED)
     mandante = models.ForeignKey(
-        Equipe,
+        Team,
         on_delete=models.CASCADE,
         related_name="partidas_mandante",
     )
     visitante = models.ForeignKey(
-        Equipe,
+        Team,
         on_delete=models.CASCADE,
         related_name="partidas_visitante",
     )
@@ -258,7 +257,7 @@ class Partida(models.Model):
         unique_together = ["mandante", "visitante", "data_hora"]
 
     def __str__(self):
-        return f"{self.mandante.nome} x {self.visitante.nome}"
+        return f"{self.mandante.name} x {self.visitante.name}"
 
     def save(self, *args, **kwargs):
         is_update = self.id is not None
@@ -397,9 +396,9 @@ class Palpite(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"{self.partida.mandante.nome} {self.gols_mandante}"
+            f"{self.partida.mandante.name} {self.gols_mandante}"
             + " x "
-            + f"{self.gols_visitante} {self.partida.visitante.nome}"
+            + f"{self.gols_visitante} {self.partida.visitante.name}"
         )
 
     def get_score(self) -> int:
@@ -499,7 +498,7 @@ class GuessPool(TimeStampedModel):
         blank=True,
     )
     teams = models.ManyToManyField(
-        Equipe,
+        Team,
         related_name="pools",
         verbose_name="times",
         blank=True,
