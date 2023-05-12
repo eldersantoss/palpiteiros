@@ -11,6 +11,11 @@ urlpatterns = [
         name="index",
     ),
     path(
+        "perfil/",
+        views.ProfileView.as_view(),
+        name="profile",
+    ),
+    path(
         "boloes/buscar/",
         views.GuessPoolListView.as_view(),
         name="pool_list",

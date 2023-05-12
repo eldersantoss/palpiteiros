@@ -5,10 +5,10 @@
 body {
   margin: 0;
   padding: 0;
+  height: 95vh;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background-color: #202124;
   color: white;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -132,6 +132,88 @@ input {
   background-image: linear-gradient(to right, transparent, #9acd32, transparent);
 }
 
+.action-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.top-action-menu {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.bottom-action-menu {
+  width: 100%;
+}
+
+.bottom-action-menu nav {
+  font-size: 0.6rem;
+}
+
+.profile summary::marker {
+  color:#9acd32;
+}
+
+.profile {
+  display: flex;
+  font-size: 0.85rem;
+  text-align: right;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.profile nav {
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+}
+
+.profile a {
+  margin-top: 1.5vh;
+}
+
+.mobile {
+  width: 100%;
+  text-align: right;
+}
+
+@media screen and (max-width: 480px) {
+
+  body {
+    height: 85vh;
+  }
+
+  .top-action-menu {
+    display: none;
+  }
+
+  .bottom-action-menu {
+    display: flex;
+  }
+
+  .profile .mobile {
+    display: flex;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .top-action-menu {
+    display: flex;
+  }
+
+  .bottom-action-menu {
+    display: none;
+  }
+
+  .mobile {
+    display: none;
+  }
+}
+
 .menu {
   display: flex;
   align-items: center;
@@ -180,11 +262,6 @@ input {
   padding-bottom: 1vh;
 }
 
-.main-form summary {
-  margin: 0.5vh;
-  color: yellowgreen;
-}
-
 .main-form details label {
   display: flex;
   justify-content: flex-start;
@@ -193,15 +270,34 @@ input {
   margin-top: 1.5vh;
 }
 
+.main-form summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.main-form summary div {
+  font-weight: normal;
+}
+
+.main-form summary::marker {
+  color: yellowgreen;
+}
+
 .main-form details input {
   margin: 0 0.75vh 0 0;
 }
 
-.main-form input {
+.main-form label {
+  font-size: 0.75rem;
+}
+
+.main-form input, .main-form select {
   margin-top: 1vh;
   padding: 1.5vh 1vh;
   border: none;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  color: darkgreen;
+  font-weight: 600;
 }
 
 .main-form input[type="submit"] {
@@ -404,13 +500,18 @@ input {
 }
 
 .helptext ul {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   list-style-position: inside;
   padding: 0;
+  color: #9acd32;
 }
 
 .helptext li {
   margin: 0;
+}
+
+.helptext li::marker {
+  color: white;
 }
 
 .recommendations-list {
@@ -529,6 +630,10 @@ input {
   margin-top: 5vh;
 }
 
+.open-pools-table tr:nth-of-type(even) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .clickable-row:nth-child(3n + 2) {
   background-color: rgba(255, 255, 255, 0.1);
 }
@@ -586,46 +691,6 @@ footer {
 footer address {
   font-size: 0.55rem;
   margin-top: 3vh;
-}
-
-.action-menu {
-  padding: 1vh 2vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.top-action-menu {
-  width: 60%;
-}
-
-.bottom-action-menu {
-  width: 100%;
-}
-
-.bottom-action-menu nav {
-  font-size: 0.6rem;
-}
-
-@media screen and (max-width: 480px) {
-  .top-action-menu {
-    display: none;
-  }
-
-  .bottom-action-menu {
-    display: flex;
-  }
-}
-
-@media screen and (min-width: 480px) {
-  .top-action-menu {
-    display: flex;
-  }
-
-  .bottom-action-menu {
-    display: none;
-  }
 }
 
 /* .cookieConsentContainer {

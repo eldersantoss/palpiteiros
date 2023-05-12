@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import CheckboxSelectMultiple, modelform_factory
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.text import slugify
@@ -9,7 +8,7 @@ from django.views import generic
 
 from core.helpers import redirect_with_msg
 
-from .forms import GuessForm, RankingPeriodForm
+from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
 
@@ -34,6 +33,53 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
         context["pools"] = involved_pools
 
         return context
+
+
+class ProfileView(LoginRequiredMixin, generic.View):
+    template_name = "core/profile.html"
+
+    def get(self, *args, **kwargs):
+        user_edit_form = UserEditForm(instance=self.request.user)
+        guesser_edit_form = GuesserEditForm(instance=self.request.user.guesser)
+
+        return render(
+            self.request,
+            self.template_name,
+            {"user_edit_form": user_edit_form, "guesser_edit_form": guesser_edit_form},
+        )
+
+    def post(self, *args, **kwargs):
+        user_edit_form = UserEditForm(
+            instance=self.request.user,
+            data=self.request.POST,
+        )
+        guesser_edit_form = GuesserEditForm(
+            instance=self.request.user.guesser,
+            data=self.request.POST,
+        )
+
+        if user_edit_form.is_valid() and guesser_edit_form.is_valid():
+            user_edit_form.save()
+            guesser_edit_form.save()
+
+            messages.success(
+                self.request,
+                "Perfil atualizado ✅",
+                "temp-msg short-time-msg",
+            )
+
+        else:
+            messages.error(
+                self.request,
+                "Corrija os erros abaixo ❌",
+                "temp-msg short-time-msg",
+            )
+
+        return render(
+            self.request,
+            self.template_name,
+            {"user_edit_form": user_edit_form, "guesser_edit_form": guesser_edit_form},
+        )
 
 
 class CreatePoolView(LoginRequiredMixin, generic.CreateView):

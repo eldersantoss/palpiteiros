@@ -1,8 +1,21 @@
 from django import forms
+from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from core.models import GuessPool
+from core.models import Guesser, GuessPool
+
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email")
+
+
+class GuesserEditForm(forms.ModelForm):
+    class Meta:
+        model = Guesser
+        fields = ("supported_team", "receive_notifications")
 
 
 class GuessForm(forms.Form):

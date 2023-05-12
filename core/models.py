@@ -350,7 +350,21 @@ class Match(models.Model):
 
 
 class Guesser(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    supported_team = models.ForeignKey(
+        Team,
+        verbose_name="Time do coração",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    receive_notifications = models.BooleanField(
+        "Receber notificações",
+        default=True,
+    )
 
     def get_involved_pools(self):
         """Returns all pools that guesser is involved with as owner, as
@@ -362,7 +376,11 @@ class Guesser(models.Model):
     def get_who_should_be_notified_by_email(cls):
         """Returns guessers that should be notified by email"""
 
-        return cls.objects.exclude(user__email="").exclude(pools__isnull=True)
+        return (
+            cls.objects.exclude(user__email="")
+            .exclude(pools__isnull=True)
+            .exclude(receive_notifications=False)
+        )
 
     def get_involved_pools_with_new_matches(self):
         """Returns pools with new matches that this guesser is involved
@@ -477,7 +495,7 @@ class GuessPool(TimeStampedModel):
     MAX_MATCHES_TO_SHOW_INTO_RANKING = 50
 
     uuid = models.UUIDField(
-        "identificador público",
+        "Identificador público",
         unique=True,
         editable=False,
         default=uuid4,
