@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Bolão | Palpiteiros{% endblock title %}
+
+{% block content %}
+
+<h2>Criar bolão</h2>
+
+<form method="post" class="main-form">
+  {% csrf_token %}
+
+  {{ form.non_field_errors }}
+
+  <div>
+    {{ form.errors }}
+    {{ form.name.label }}
+    {{ form.name }}
+  </div>
+  <div>
+    <div class="private-checkbox">
+      {{ form.private.errors }}
+      <label for={{ form.private.auto_id }}>Privado</label>
+      {{ form.private }}
+    </div>
+    <div class="help-msg">
+      <p>Somente palpiteiros com o link de acesso poderão entrar</p>
+    </div>
+  </div>
+
+  <div>
+    <details open>
+      {{ form.errors }}
+      <summary>
+        Competições
+        <div class="help-msg">
+          <p>TODAS as partidas das competições selecionadas serão incluídas no bolão.</p>
+        </div>
+      </summary>
+      {{ form.competitions }}
+    </details>
+  </div>
+  <div>
+    <details>
+      {{ form.errors }}
+      <summary>
+        Equipes avulsas
+        <div class="help-msg">
+          <p>TODAS as partidas das equipes selecionadas serão incluídas no bolão.</p>
+        </div>
+      </summary>
+      {{ form.teams }}
+    </details>
+  </div>
+
+  <input type="submit" value="Criar bolão">
+</form>
+
+{% endblock content %}

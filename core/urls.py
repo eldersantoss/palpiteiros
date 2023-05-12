@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 app_name = "core"
 
 urlpatterns = [
@@ -12,33 +11,48 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "palpites/",
-        views.guesses,
+        "perfil/",
+        views.ProfileView.as_view(),
+        name="profile",
+    ),
+    path(
+        "boloes/buscar/",
+        views.GuessPoolListView.as_view(),
+        name="pool_list",
+    ),
+    path(
+        "boloes/criar-bolao/",
+        views.CreatePoolView.as_view(),
+        name="create_pool",
+    ),
+    path(
+        "boloes/<uuid:uuid>/",
+        views.GuessPoolSignInView.as_view(),
+        name="signin_pool",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/sair/<uuid:uuid>/",
+        views.GuessPoolSignOutView.as_view(),
+        name="signout_pool",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/",
+        views.PoolHomeView.as_view(),
+        name="pool_home",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/gerenciar/",
+        views.ManagePoolView.as_view(),
+        name="pool_management",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/palpites/",
+        views.GuessesView.as_view(),
         name="guesses",
     ),
     path(
-        "manual_administracao/",
-        views.ManualAdminView.as_view(),
-        name="manual_administracao",
-    ),
-    path(
-        "classificacao/",
-        views.ranking,
+        "boloes/<slug:pool_slug>/classificacao/",
+        views.RankingView.as_view(),
         name="ranking",
-    ),
-    path(
-        "rodadas/",
-        views.RoundsListView.as_view(),
-        name="lista_rodadas",
-    ),
-    path(
-        "rodadas/<slug:slug>/",
-        views.round_details,
-        name="round_details",
-    ),
-    path(
-        "OneSignalSDKWorker.js",
-        views.one_signal_worker,
-        name="one_signal_worker",
     ),
 ]

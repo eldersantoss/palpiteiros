@@ -1,73 +1,90 @@
 {% extends 'base.html' %}
 
-{% block title %}Palpiteiros | Palpitar{% endblock title %}
+{% block title %} Palpites | Palpiteiros{% endblock title %}
 
 {% block content %}
 
-<h1>Palpitar</h1>
+<h3>Palpites abertos</h3>
 
-<form action="{% url 'core:guesses' %}" method="post" class="guess-form">
-    {% csrf_token %}
-    {% if closed_matches %}<h3>Palpites encerrados</h3>{% endif %}
-    {% for match in closed_matches %}
-        <div class="match-wrapper">
-            <p class="match-time">
-                {{ match.data_hora }}
-                {% if match.pontuacao_dobrada %}
-                  <strong>(x2 🔥)</strong>
-                {% endif %}
-            </p>
-            <div class="guess-wrapper">
-              <div class="team home">
-                {{ match.mandante }}
-              </div>
-              <div>
-                <span class="gols-palpite-encerrado">
-                  {% if match.guess %}
-                    {{ match.guess.gols_mandante }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </span>
-              </div>
-              <div class="separador-equipes">x</div>
-              <div>
-                <span class="gols-palpite-encerrado">
-                  {% if match.guess %}
-                    {{ match.guess.gols_visitante }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </span>
-              </div>
-              <div class="team away">
-                {{ match.visitante }}
-              </div>
-            </div>
-        </div>
-    {% endfor %}
-
-    <h3>Palpites abertos</h3>
-    {% for match in open_matches %}
-      <div class="match-wrapper">
-        <p class="match-time">
-          {{ match.data_hora }}
-          {% if match.pontuacao_dobrada %}
-            <strong>(x2 🔥)</strong>
+<form action="{% url 'core:guesses' pool.slug %}" method="post" class="main-form">
+  {% csrf_token %}
+  {% if closed_matches %}<h3>Palpites encerrados</h3>{% endif %}
+  {% for match in closed_matches %}
+  <div class="match-wrapper">
+    <p class="match-time">
+      {{ guess_form.match.date_time }}
+      {% if guess_form.match.double_score %}
+      <strong>(x2 🔥)</strong>
+      {% endif %}
+    </p>
+    <div class="guess-wrapper">
+      <div class="team home">
+        {{ guess_form.match.home_team }}
+      </div>
+      <div>
+        <span class="gols-palpite-encerrado">
+          {% if guess_form.match.guess %}
+            {{ guess_form.match.guess.home_goals }}
+          {% else %}
+            -
           {% endif %}
-        </p>
-        <div class="guess-wrapper">
-          <div class="team home">
-            {{ match.guess_form.gols_mandante.label_tag }} {{ match.guess_form.gols_mandante }}
+        </span>
+      </div>
+      <div class="separador-equipes">x</div>
+      <div>
+        <span class="gols-palpite-encerrado">
+          {% if guess_form.match.guess %}
+            {{ guess_form.match.guess.away_goals }}
+          {% else %}
+            -
+          {% endif %}
+        </span>
+      </div>
+      <div class="team away">
+        {{ guess_form.match.away_team }}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div>
+    <div class="guesses-checkbox">
+      <label for="id_for_all_pools">
+        Aproveitar palpites em todos os bolões
+      </label>
+      <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
+    </div>
+  </div>
+
+  {% for guess_form in guess_forms %}
+    <div class="match-wrapper">
+      <p class="match-time">
+        {{ guess_form.match.date_time }}{% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
+        {% if guess_form.match.double_score %}
+        <strong>(x2 🔥)</strong>
+        {% endif %}
+      </p>
+      <div class="guess-wrapper">
+        <div class="team">
+          <div>
+            <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
+            {{ guess_form.home_goals.label_tag }}
           </div>
-          <div class="separador-equipes">x</div>
-          <div class="team away">
-            {{ match.guess_form.gols_visitante }} {{ match.guess_form.gols_visitante.label_tag }}
+          {{ guess_form.home_goals }}
+        </div>
+        <div class="separador-equipes">x</div>
+        <div class="team">
+          {{ guess_form.away_goals }}
+          <div>
+            <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
+            {{ guess_form.away_goals.label_tag }}
           </div>
         </div>
       </div>
-    {% endfor %}
-    <input type="submit" value="Salvar palpites">
+    </div>
+  {% endfor %}
+
+  <input type="submit" value="Salvar palpites">
 </form>
 
 {% endblock content %}

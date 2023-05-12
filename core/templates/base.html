@@ -4,75 +4,100 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href={% static 'core/css/style.css' %}>
-    <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
+  <link rel="stylesheet" href={% static 'core/css/style.css' %}>
 
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-        window.OneSignal = window.OneSignal || [];
-        OneSignal.push(function() {
-            OneSignal.init({
-            appId: "eb1979ac-e89d-4e32-b059-9e1ecd5471c5",
-            });
-        });
-    </script>
-
-    <title>{% block title %}{% endblock title %}</title>
+  <title>{% block title %}{% endblock title %}</title>
 </head>
 
 <body>
 
-    <header>
-        <span class="logo">
-            <a href="{% url 'core:index' %}">
-              <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros">
-            </a>
-        </span>
-        <span>
-            {% if request.user.is_authenticated %}
-            {{ request.user.first_name }} | <a href="{% url 'logout' %}">Sair</a>
+  <header>
+    {% if request.user.is_authenticated %}
+      <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+        <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
+      </a>
+
+      {% if request.user.is_authenticated %}
+        <div class="action-menu top-action-menu">
+          <nav class="menu horizontal">
+            {% if pool %}
+              <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
             {% endif %}
-        </span>
-    </header>
+            <a href="{% url 'core:index' %}">🍀 Bolões</a>
+            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+            <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+            <details class="profile">
+              <summary>
+                {{ request.user.first_name|default:request.user.username }}
+              </summary>
+              <nav>
+                <a href="{% url 'core:profile' %}">Perfil</a>
+                <a href="{% url 'password_change' %}">Alterar senha</a>
+                <a href="{% url 'logout' %}">Sair</a>
+              </nav>
+            </details>
+          </nav>
+        </div>
+        <details class="profile mobile">
+          <summary>
+            {{ request.user.first_name|default:request.user.username }}
+          </summary>
+          <nav>
+            <a href="{% url 'core:profile' %}">Perfil</a>
+            <a href="{% url 'password_change' %}">Alterar senha</a>
+            <a href="{% url 'logout' %}">Sair</a>
+          </nav>
+        </details>
+      {% endif %}
 
-    <main>
-        {% if messages %}
-          <ul class="messages">
-              {% for message in messages %}
-                  <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
-                      {{ message|safe }}
-                  </li>
-              {% endfor %}
-          </ul>
-        {% endif %}
 
-        {% block content %}{% endblock content %}
+    {% endif %}
+  </header>
 
-        {% if request.user.is_authenticated %}
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+            {{ message|safe }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if pool %}
+      <h2>{{ pool }}</h2>
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+
+  </main>
+
+  <footer>
+    {% if request.user.is_authenticated %}
+      <div class="action-menu bottom-action-menu">
         <hr class="spacer">
-        <nav class="menu vertical">
-            <a href="{% url 'core:guesses' %}">Palpitar</a>
-            <a href="{% url 'core:ranking' %}">Classificação</a>
-            <a href="{% url 'core:lista_rodadas' %}">Rodadas</a>
-            {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'core:manual_administracao' %}">Manual do administrador</a>
-            <a href="{% url 'admin:index' %}">Acessar área de administração</a>
-            {% endif %}
+        <nav class="menu horizontal">
+          {% if pool %}
+            <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
+          {% endif %}
+          <a href="{% url 'core:index' %}">🍀 Bolões</a>
+          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+          <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
         </nav>
-        {% endif %}
-    </main>
+      </div>
+    {% endif %}
 
-    <footer>
+    <address>
+      Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
+    </address>
+  </footer>
 
-        {% block footer %}{% endblock footer %}
-
-        <address>Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a></address>
-    </footer>
-
-    <script src={% static 'core/js/base.js' %}></script>
+  <script src={% static 'core/js/base.js' %}></script>
 </body>
 
 </html>

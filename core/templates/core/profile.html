@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Editar perfil</h2>
+
+<form method="post" class="main-form">
+
+  {% csrf_token %}
+
+  {{ user_edit_form.as_div }}
+
+  {{ guesser_edit_form.non_field_errors }}
+
+  <div>
+    {{ guesser_edit_form.errors }}
+    {{ guesser_edit_form.supported_team.label_tag }}
+    {{ guesser_edit_form.supported_team }}
+  </div>
+
+  <div>
+    <div class="private-checkbox">
+      {{ guesser_edit_form.receive_notifications.errors }}
+      <label for={{ guesser_edit_form.receive_notifications.auto_id }}>
+        Receber notificações
+      </label>
+      {{ guesser_edit_form.receive_notifications }}
+    </div>
+    <div class="help-msg">
+      <p>Você será notificado por e-mail quando houverem novas partidas disponíveis para palpite e quando os resultados das partidas forem atualizados.</p>
+    </div>
+  </div>
+
+  <div><input type="submit" value="Salvar alterações"></div>
+
+</form>
+
+{% endblock content %}

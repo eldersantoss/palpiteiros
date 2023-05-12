@@ -1,40 +1,103 @@
 {% extends 'base.html' %}
 
-{% block title %}Palpiteiros | Classificação{% endblock title %}
+{% block title %}Classificação | Palpiteiros{% endblock title %}
 
 {% block content %}
 
-<h1>Classificação</h1>
+<h3>Classificação</h3>
 
-<form action="{% url 'core:ranking' %}" method="GET" class="menu horizontal period-form">
-  {{ period_form.as_div }}
-</form>
+<div class="period-form-container">
+  <p>Escolha o período que deseja ver a classificação:</p>
+  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form">
+    {{ period_form.as_div }}
+  </form>
+</div>
 
-<table>
-    <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th>Pontos</th>
+<table class="main-table ranking-table">
+  <tr>
+    <th></th>
+    <th></th>
+    <th style="width:60%"></th>
+    <th>Pontos</th>
+    <th style="width:20%"></th>
+  </tr>
+  {% for guesser in guessers %}
+    <tr
+      class="clickable-row"
+      name="clickable-row{{ guesser.user.id }}"
+      onclick="expandDetailRow('{{ guesser.user.id }}')"
+    >
+      <td>
+        {% if forloop.counter == 1 %}
+        🥇
+        {% elif forloop.counter == 2 %}
+        🥈
+        {% elif forloop.counter == 3 %}
+        🥉
+        {% elif forloop.last %}
+        🔦
+        {% endif %}
+      </td>
+      <td>{{ forloop.counter }}º</td>
+      <td style="text-align:left">{{ guesser }}</td>
+      <td>{{ guesser.score }}</td>
+      <td class="expand-icon">Palpites 🔽</td>
     </tr>
-    {% for guesser in ranking %}
-    <tr>
-        <td>
-            {% if forloop.counter == 1 %}
-            🥇
-            {% elif forloop.counter == 2 %}
-            🥈
-            {% elif forloop.counter == 3 %}
-            🥉
-            {% elif forloop.last %}
-            🔦
-            {% endif %}
-        </td>
-        <td>{{ forloop.counter }}º</td>
-        <td>{{ guesser }}</td>
-        <td>{{ guesser.score }}</td>
+
+    <tr
+      class="detail-row"
+      name="detail-row{{ guesser.user.id }}"
+      style="display: none"
+    >
+      <td colspan="5" class="detail-table-container">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th style="width:50%">Partida</th>
+              <th style="width:15%">Resultado</th>
+              <th style="width:15%">Palpite</th>
+              <th style="width:15%">Pontuação</th>
+              <th style="width:5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for match_and_guess in guesser.matches_and_guesses %}
+              <tr class="detail-table-row-match-time">
+                <td colspan="5">
+                  <p class="match-time">{{ match_and_guess.match.date_time }}</p>
+                </td>
+              </tr>
+              <tr class="detail-table-row">
+                <td>
+                    <p>{{ match_and_guess.match.home_team }}</p>
+                    <p>x</p>
+                    <p>{{ match_and_guess.match.away_team }}</p>
+                </td>
+                <td>{{ match_and_guess.match.result_str|default:"-" }}</td>
+                {% if match_and_guess.guess %}
+                  <td>{{ match_and_guess.guess.result_str }}</td>
+                  {% if match_and_guess.match.result_str %}
+                    <td>{{ match_and_guess.guess.get_score }}</td>
+                  {% else %}
+                    <td>-</td>
+                  {% endif %}
+                {% else %}
+                  <td>-</td>
+                  <td>-</td>
+                {% endif %}
+                <td>
+                  {% if match_and_guess.match.double_score %}
+                  🔥
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
     </tr>
-    {% endfor %}
+
+  {% endfor %}
 </table>
 
 {% endblock content %}

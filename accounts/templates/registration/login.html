@@ -1,27 +1,31 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Palpiteiros | Entrar{% endblock title %}
 
 {% block content %}
 
-<h1>Login</h1>
+<div class="logo large">
+  <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+    <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros"
+    class="large-logo">
+  </a>
+</div>
 
-<form action="{% url 'login' %}" method="post" class="login-form">
-    {% if not form.errors %}
+
+<form action="{% url 'login' %}" method="post" class="main-form">
+  {% csrf_token %}
+  <div>
     <p>Bem-vindo, palpiteiro(a)</p>
-    {% endif %}
-    {% csrf_token %}
-    {{ form.as_div }}
-    <div><input type="hidden" name="next" value="{{ next }}"></div>
-    <div><input type="submit" value="Entrar"></div>
+  </div>
+  {{ form.as_div }}
+  <a href="{% url 'password_reset' %}" class="forget-password">Esqueci minha senha</a>
+  <input type="hidden" name="next" value="{{ next }}">
+  <input type="submit" value="Entrar">
 </form>
 
-<div class="help-links">
-    <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
-    <a href="mailto:elder_rn@hotmail.com?subject=Teste Palpiteiros&body=Olá! Desejo testar o app Palpiteiros.">
-      Desejo testar o aplicativo
-    </a>
-    {% comment %} <a href="{% url 'register' %}">Criar conta</a> {% endcomment %}
-</div>
+<nav class="menu vertical">
+  <a href="{% url 'register' %}">Criar conta</a>
+</nav>
 
 {% endblock content %}
