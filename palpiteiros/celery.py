@@ -18,8 +18,8 @@ app.conf.beat_schedule = {
         "args": (4,),
     },
     "update_matches": {
-        "task": "get_weekend_matches",
-        "schedule": crontab(minute="59", hour="0,1,9-23"),
+        "task": "update_matches",
+        "schedule": crontab(minute="0", hour="0,1,14-23"),
     },
     "send_email_notification_of_new_matches": {
         "task": "send_email_notification_of_new_matches",
@@ -27,7 +27,7 @@ app.conf.beat_schedule = {
     },
     "send_email_notification_of_updated_matches": {
         "task": "send_email_notification_of_updated_matches",
-        "schedule": crontab(minute="0", hour="11,15,22"),
+        "schedule": crontab(minute="0", hour="15,22"),
     },
 }
 
