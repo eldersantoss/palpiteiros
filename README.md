@@ -1,11 +1,11 @@
 <div align="center">
-<img src="core\static\core\img\palpiteiros.png" width="100px">
-<h2>Palpiteiros</h2>
-<p>Seu app de palpites em partidas de futebol 🍀</p>
+  <img src="core\static\core\img\palpiteiros.png" width="100px">
+  <h2>Palpiteiros</h2>
+  <p>Seu app de palpites em partidas de futebol 🍀</p>
 
-[![License](https://img.shields.io/github/license/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/blob/main/LICENSE)
-[![Issues](https://img.shields.io/github/issues/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/issues)
-[![Last commit](https://img.shields.io/github/last-commit/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/commits/main)
+  [![License](https://img.shields.io/github/license/eldersantoss/palpiteiros)](https://creativecommons.org/licenses/by-nc/4.0/legalcode)
+  [![Issues](https://img.shields.io/github/issues/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/issues)
+  [![Last commit](https://img.shields.io/github/last-commit/eldersantoss/palpiteiros)](https://github.com/eldersantoss/palpiteiros/commits/main)
 </div>
 
 - [🚀 **Funcionalidades**](#-funcionalidades)
@@ -18,7 +18,7 @@
 
 ## 🚀 **Funcionalidades**
 
-* `Sistema de autenticação completo`: o usuário pode se cadastrar, fazer login e recuperar sua senha através do email.
+* `Autenticação`: o usuário pode se cadastrar, fazer login e recuperar sua senha através do email.
 
 * `Edição de perfil`: o usuário poderá visualizar e editar suas informações pessoais e algumas preferências como, por exemplo, se deseja receber *notificações por email*.
 
@@ -43,9 +43,9 @@
 ## 🛠 **Tecnologias utilizadas**
 
 * [Django](https://www.djangoproject.com/): framework para desenvolvimento web em Python que facilita a criação de aplicativos web robustos e escaláveis.
-* [PostgreSQL](https://www.postgresql.org/):banco de dados relacional de código aberto, robusto e altamente escalável, que suporta recursos avançados como consultas complexas, índices, transações ACID e replicação.
+* [PostgreSQL](https://www.postgresql.org/): banco de dados relacional de código aberto, robusto e altamente escalável, que suporta recursos avançados como consultas complexas, índices, transações ACID e replicação.
 * [Docker](https://www.docker.com/): plataforma para criação e execução de aplicativos em contêineres, proporcionando isolamento, portabilidade e facilidade na implantação.
-* [Celery](https://docs.celeryq.dev/en/stable/): biblioteca em Python para execução de tarefas assíncronas e distribuídas. Ele permite que você agende e processe tarefas em segundo plano, gerenciando filas de trabalho e garantindo a escalabilidade e o desempenho em aplicativos web.
+* [Celery](https://docs.celeryq.dev/en/stable/): biblioteca Python para execução de tarefas assíncronas e distribuídas. Permite que você agende e processe tarefas em segundo plano, gerenciando filas de trabalho e garantindo a escalabilidade e o desempenho em aplicativos web.
 
 ## 🤗 **Contribuindo**
 
