@@ -125,8 +125,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "pt-br"
 USE_I18N = True
 
-TIME_ZONE = config("TIME_ZONE", default="America/Sao_Paulo")
-USE_TZ = config("USE_TZ", default=False, cast=bool)
+TIME_ZONE = config("TIME_ZONE")
+USE_TZ = config("USE_TZ", cast=bool)
 
 
 # Static files (CSS, JavaScript, Images)
