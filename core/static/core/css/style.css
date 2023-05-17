@@ -484,6 +484,10 @@ input {
   text-align: justify;
 }
 
+.home-msg h2 {
+  margin: 0;
+}
+
 .help-msg p {
   margin: 0;
   font-size: 0.55rem;

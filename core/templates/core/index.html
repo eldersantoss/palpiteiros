@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<h2>Bolões cadastrados</h2>
-
 {% if pools %}
+  <h2>Bolões cadastrados</h2>
+
   <nav class="menu vertical">
     {% for pool in pools %}
     <a href={% url 'core:pool_home' pool.slug %}>{{ pool }} {% if pool.is_pending %}🔔{% endif %}</a>
@@ -19,17 +19,20 @@
   {% endif %}
 
 {% else %}
+
+
   <div class="main-msg home-msg">
+    <h2>Faaala, <strong>{{ request.user.first_name }}</strong>! ⚽😎</br></h2>
+
     <p>
-      Faaala, <strong>{{ request.user.first_name }}</strong>! ⚽😎</br>
       Você ainda não está cadastrado em nenhum bolão. Toma aqui algumas opções pra resolver esse problema:
     </p>
     <ol class="recommendations-list">
       <li>
-        Clicando em <strong>Buscar bolão</strong>, você encontrará uma lista de bolões públicos nos quais pode se cadastrar.
+        Clicando em <strong>Buscar bolão</strong>, você encontrará uma lista de bolões públicos em que pode se cadastrar.
       </li>
       <li>
-        Clicando em <strong>Criar bolão</strong>, você pode criar seu próprio bolão com as equipes e competições que desejar. Você pode optar por um bolão público, que poderá ser acessado por todos através do Buscar bolão, ou um privado, que terá um link único disponível apenas para você em <strong>Gerenciar bolão</strong>. Para convidar alguém para participar do seu bolão, basta que você forneça o link e o outro palpiteiro o acesse.
+        Clicando em <strong>Criar bolão</strong>, você pode criar seu próprio bolão com as equipes e competições que quiser palpitar. Você pode escolher criar um bolão público, que será acessível a todos através do <strong>Buscar bolão</strong>, ou um bolão privado, que terá um link de acesso exclusivo disponível apenas para você, dono da parada, em <strong>Gerenciar bolão</strong>. Para convidar alguém pra participar do seu bolão, basta fornecer o link de acesso. Quando o outro palpiteiro entrar no link, automaticamente estará fazendo parte do bolão.
       </li>
     </ol>
   </div>
