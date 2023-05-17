@@ -694,7 +694,7 @@ footer {
 
 footer address {
   font-size: 0.55rem;
-  margin-top: 3vh;
+  margin: 3vh 0;
 }
 
 /* .cookieConsentContainer {
