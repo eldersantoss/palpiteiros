@@ -223,7 +223,7 @@ class Match(models.Model):
         (FINSHED_AFTER_PENALTYS, "Encerrada após penalidades"),
     )
 
-    MINUTES_BEFORE_START_MATCH = 30
+    MINUTES_BEFORE_START_MATCH = 5
 
     HOURS_BEFORE_OPEN_TO_GUESSES = 48
 
