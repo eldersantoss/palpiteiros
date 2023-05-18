@@ -1,5 +1,6 @@
 from typing import Iterable, Literal
 
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, get_connection
 
 from core.models import Guesser
@@ -10,7 +11,7 @@ from .models import Guesser, GuessPool
 class EmailNotifier:
     html_structure = """
     <div style='display:flex; justify-content:center; width:100%; margin: 50px 0'>
-        <img src='https://palpiteiros.up.railway.app/static/core/img/palpiteiros.png' alt='Logo Palpiteiros' width='100'>
+        <img src='https://palpiteiros-v2.up.railway.app/static/core/img/palpiteiros.png' alt='Logo Palpiteiros' width='100'>
     </div>
     <p style='text-align: center'>
         {}
@@ -19,7 +20,7 @@ class EmailNotifier:
         {}
     <p>
     <p style='margin: 50px 0; text-align: center'>
-        <a href='https://palpiteiros.up.railway.app/' style='text-decoration:none; color: #9acd32; font-weight: bold'>Acessar Palpiteiros</a>
+        <a href='https://palpiteiros-v2.up.railway.app/' style='text-decoration:none; color: #9acd32; font-weight: bold'>Acessar Palpiteiros</a>
     <p>
     """
 
@@ -74,7 +75,12 @@ class EmailNotifier:
             else self._get_singular_content(guesser_name, notifiable_pools)
         )
         recipients = [guesser.user.email]
-        email = EmailMultiAlternatives(self.subject, text_content, to=recipients)
+        email = EmailMultiAlternatives(
+            self.subject,
+            text_content,
+            f"Palpiteiros <{settings.DEFAULT_FROM_EMAIL}>",
+            to=recipients,
+        )
         email.attach_alternative(html_content, "text/html")
         return email
 
@@ -125,7 +131,7 @@ class EmailNotifier:
 
 
 class NewMatchesEmailNotifier(EmailNotifier):
-    subject = "Palpiteiros - Novas Partidas Disponíveis"
+    subject = "Novas Partidas Disponíveis"
 
     text_template_singular = "Olá, {}\nNovas partidas disponíveis no bolão {}. Acesse o app agora mesmo e deixe seus palpites!"
     text_template_plural = "Olá, {}\nNovas partidas disponíveis nos bolões {}. Acesse o app agora mesmo e deixe seus palpites!"
@@ -144,7 +150,7 @@ class NewMatchesEmailNotifier(EmailNotifier):
 
 
 class UpdatedMatchesEmailNotifier(EmailNotifier):
-    subject = "Palpiteiros - Bolões Atualizados"
+    subject = "Bolões Atualizados"
 
     text_template_singular = "Olá, {}\nO bolão {} foi atualizado. Acesse o app agora mesmo e confira seus resultados!"
     text_template_plural = "Olá, {}\nOs bolões {} foram atualizados. Acesse o app agora mesmo e confira seus resultados!"
