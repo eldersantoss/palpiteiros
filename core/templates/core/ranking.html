@@ -62,13 +62,9 @@
           </thead>
           <tbody>
             {% for match_and_guess in guesser.matches_and_guesses %}
-              {% comment %} <tr class="detail-table-row-match-time">
-                <td colspan="5">
-                </td>
-              </tr> {% endcomment %}
               <tr class="detail-table-row">
                 <td>
-                    <p class="match-time">{{ match_and_guess.match.date_time|date:"l d/m - H:i" }}</p>
+                    <p class="match-time">{{ match_and_guess.match.date_time|date:"l d/m H:i" }}</p>
                     <p>{{ match_and_guess.match.home_team }}</p>
                     <p>x</p>
                     <p>{{ match_and_guess.match.away_team }}</p>

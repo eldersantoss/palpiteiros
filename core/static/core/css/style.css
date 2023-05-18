@@ -362,7 +362,6 @@ input {
 .match-time {
   text-align: center;
   font-size: 0.5rem;
-  padding-bottom: 1vh;
 }
 
 .guess-wrapper {
@@ -673,9 +672,8 @@ input {
   padding: 0.5vh 0 1vh;
 }
 
-.detail-table-row-match-time td{
-  padding: 1vh 0 0 0;
-  border-top: 1px solid rgba(173, 255, 47, 0.2);
+.detail-table tr {
+  border-bottom: 1px solid rgba(173, 255, 47, 0.2);
 }
 
 .detail-table p {

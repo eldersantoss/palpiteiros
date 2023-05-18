@@ -8,44 +8,6 @@
 
 <form action="{% url 'core:guesses' pool.slug %}" method="post" class="main-form">
   {% csrf_token %}
-  {% if closed_matches %}<h3>Palpites encerrados</h3>{% endif %}
-  {% for match in closed_matches %}
-  <div class="match-wrapper">
-    <p class="match-time">
-      {{ guess_form.match.date_time }}
-      {% if guess_form.match.double_score %}
-      <strong>(x2 🔥)</strong>
-      {% endif %}
-    </p>
-    <div class="guess-wrapper">
-      <div class="team home">
-        {{ guess_form.match.home_team }}
-      </div>
-      <div>
-        <span class="gols-palpite-encerrado">
-          {% if guess_form.match.guess %}
-            {{ guess_form.match.guess.home_goals }}
-          {% else %}
-            -
-          {% endif %}
-        </span>
-      </div>
-      <div class="separador-equipes">x</div>
-      <div>
-        <span class="gols-palpite-encerrado">
-          {% if guess_form.match.guess %}
-            {{ guess_form.match.guess.away_goals }}
-          {% else %}
-            -
-          {% endif %}
-        </span>
-      </div>
-      <div class="team away">
-        {{ guess_form.match.away_team }}
-      </div>
-    </div>
-  </div>
-  {% endfor %}
 
   <div>
     <div class="guesses-checkbox">
@@ -59,7 +21,8 @@
   {% for guess_form in guess_forms %}
     <div class="match-wrapper">
       <p class="match-time">
-        {{ guess_form.match.date_time }}{% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
+        {{ guess_form.match.date_time|date:"l d/m H:i" }}
+        {% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
         {% if guess_form.match.double_score %}
         <strong>(x2 🔥)</strong>
         {% endif %}
