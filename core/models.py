@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from time import sleep
 from typing import Iterable, Literal
 from uuid import uuid4
 
@@ -70,6 +71,7 @@ class Competition(models.Model):
             .json()
             .get("response")
         )
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
 
         teams = []
         for data in response:
@@ -105,6 +107,8 @@ class Competition(models.Model):
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
         json_data = response.json()
         json_data_response = json_data["response"]
 
@@ -152,6 +156,8 @@ class Competition(models.Model):
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
         json_data = response.json()
         json_data_response = json_data["response"]
 

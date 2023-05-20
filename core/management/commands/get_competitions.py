@@ -1,3 +1,5 @@
+from time import sleep
+
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
@@ -37,6 +39,8 @@ class Command(BaseCommand):
 
             # TODO: tratar possíveis exceções
             response = requests.get(api_url, headers=headers, params=params)
+            sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
             json_data = response.json()
             json_data_response = json_data["response"][0]
 

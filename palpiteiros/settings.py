@@ -190,3 +190,4 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 FOOTBALL_API_KEY = config("FOOTBALL_API_KEY")
 FOOTBALL_API_HOST = "v3.football.api-sports.io"
+FOOTBALL_API_RATE_LIMIT_TIME = 7
