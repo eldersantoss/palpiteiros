@@ -28,3 +28,8 @@ def send_email_notification_of_new_matches():
 @shared_task(name="send_email_notification_of_updated_matches")
 def send_email_notification_of_updated_matches():
     call_command("send_email_notification_of_updated_matches")
+
+
+@shared_task(name="send_email_notification_of_pending_matches")
+def send_email_notification_of_pending_matches():
+    call_command("send_email_notification_of_pending_matches")

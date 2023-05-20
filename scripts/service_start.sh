@@ -10,7 +10,6 @@ if [ "$PROCESS_TYPE" = "web" ]; then
     --username=$ADMIN_USERNAME \
     --password=$ADMIN_PASSWORD \
     --email=$ADMIN_EMAIL
-  python manage.py loaddata core/fixtures/initial_data_2023.json
 
   if [ "$DEBUG" = "True" ]; then
     python manage.py runserver 0.0.0.0:$PORT

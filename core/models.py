@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Iterable, Literal
 from uuid import uuid4
 
@@ -178,6 +178,17 @@ class Competition(models.Model):
 
         return matches
 
+    @classmethod
+    def get_with_matches_on_period(cls, from_: date, to: date):
+        """Returns competitions which that have matches on period"""
+
+        matches_on_period = Match.get_happen_on_period(from_, to)
+        competitions_with_matches_on_period = matches_on_period.values(
+            "competition"
+        ).distinct()
+
+        return cls.objects.filter(id__in=competitions_with_matches_on_period)
+
     def create_public_pool(self):
         name = f"{self.name} {self.season}"
         slug = slugify(name)
@@ -192,6 +203,7 @@ class Competition(models.Model):
         )
 
         if created:
+            pool.guessers.remove(pool.owner)
             pool.competitions.add(self)
             return pool
 
@@ -348,6 +360,10 @@ class Match(models.Model):
     def pending_guess(self, guesser: "Guesser"):
         return not self.guesses.filter(guesser=guesser).exists()
 
+    @classmethod
+    def get_happen_on_period(cls, from_: date, to: date):
+        return cls.objects.filter(date_time__date__gte=from_, date_time__date__lte=to)
+
 
 class Guesser(models.Model):
     user = models.OneToOneField(
@@ -393,6 +409,12 @@ class Guesser(models.Model):
         with"""
 
         return self.pools.filter(updated_matches=True)
+
+    def get_involved_pools_with_pending_matches(self):
+        """Returns pools with pending matches that this guesser is involved
+        with"""
+
+        return [pool for pool in self.pools.all() if pool.has_pending_match(self)]
 
     def __str__(self) -> str:
         return f"{self.user.get_full_name()} ({self.user.username})"
@@ -575,6 +597,14 @@ class GuessPool(TimeStampedModel):
     def guesser_is_member(self, guesser: Guesser):
         return self.guessers.contains(guesser)
 
+    def has_pending_match(self, guesser: Guesser) -> bool:
+        """Returns True if pool has pending matches open to guesses"""
+
+        for match in self.get_open_matches():
+            if match.pending_guess(guesser):
+                return True
+        return False
+
     def get_open_matches(self):
         """Returns matches open to guesses"""
 
@@ -584,13 +614,6 @@ class GuessPool(TimeStampedModel):
             date_time__lte=timezone.now()
             + timezone.timedelta(hours=Match.HOURS_BEFORE_OPEN_TO_GUESSES),
         )
-
-    def has_pending_match(self, guesser: Guesser) -> bool:
-        matches = self.get_open_matches()
-        for match in matches:
-            if match.pending_guess(guesser):
-                return True
-        return False
 
     @classmethod
     def toggle_flag_value(

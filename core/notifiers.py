@@ -1,3 +1,4 @@
+import abc
 from typing import Iterable, Literal
 
 from django.conf import settings
@@ -8,7 +9,7 @@ from core.models import Guesser
 from .models import Guesser, GuessPool
 
 
-class EmailNotifier:
+class EmailNotifier(abc.ABC):
     html_structure = """
     <div style='display:flex; justify-content:center; width:100%; margin: 50px 0'>
         <img src='https://palpiteiros-v2.up.railway.app/static/core/img/palpiteiros.png' alt='Logo Palpiteiros' width='100'>
@@ -24,14 +25,7 @@ class EmailNotifier:
     <p>
     """
 
-    def __init__(
-        self,
-        notification_type: Literal["new_matches", "updated_matches"],
-        guessers: Iterable[Guesser],
-    ) -> None:
-        if notification_type not in ["new_matches", "updated_matches"]:
-            raise ValueError("msg_type value must be 'created' or 'updated'")
-        self.notification_type = notification_type
+    def __init__(self, guessers: Iterable[Guesser]) -> None:
         self.guessers = guessers
         self.email_msgs: list[EmailMultiAlternatives] = []
 
@@ -45,7 +39,7 @@ class EmailNotifier:
     def prepare_notifications(self) -> str:
         for guesser in self.guessers:
             notifiable_pools = self._get_notifiable_pools(guesser)
-            if notifiable_pools.exists():
+            if notifiable_pools:
                 email_msg = self._assemble_email(guesser, notifiable_pools)
                 self.email_msgs.append(email_msg)
 
@@ -56,22 +50,19 @@ class EmailNotifier:
         with get_connection() as conn:
             conn.send_messages(self.email_msgs)
 
-    def _get_notifiable_pools(self, guesser: Guesser):
-        return (
-            guesser.get_involved_pools_with_new_matches()
-            if self.notification_type == "new_matches"
-            else guesser.get_involved_pools_with_updated_matches()
-        )
+    @abc.abstractmethod
+    def _get_notifiable_pools(self, guesser: Guesser) -> list[GuessPool]:
+        raise NotImplementedError()
 
     def _assemble_email(
         self,
         guesser: Guesser,
-        notifiable_pools: Iterable[GuessPool],
+        notifiable_pools: list[GuessPool],
     ) -> EmailMultiAlternatives:
         guesser_name = guesser.user.first_name
         text_content, html_content = (
             self._get_plural_content(guesser_name, notifiable_pools)
-            if notifiable_pools.count() > 1
+            if len(notifiable_pools) > 1
             else self._get_singular_content(guesser_name, notifiable_pools)
         )
         recipients = [guesser.user.email]
@@ -116,13 +107,13 @@ class EmailNotifier:
         guesser_name: str,
         notifiable_pools: Iterable[GuessPool],
     ):
-        pool_name = str(notifiable_pools.first())
+        pool_name = str(notifiable_pools[0])
         text_content = self.text_template_singular.format(
             guesser_name,
             pool_name,
         )
 
-        pool_name_strong = f"<strong>{str(notifiable_pools.first())}</strong>"
+        pool_name_strong = f"<strong>{str(notifiable_pools[0])}</strong>"
         html_content = self.html_template_singular.format(
             guesser_name,
             pool_name_strong,
@@ -146,7 +137,10 @@ class NewMatchesEmailNotifier(EmailNotifier):
     )
 
     def __init__(self, guessers: Iterable[Guesser]) -> None:
-        super().__init__("new_matches", guessers)
+        super().__init__(guessers)
+
+    def _get_notifiable_pools(self, guesser: Guesser):
+        return list(guesser.get_involved_pools_with_new_matches())
 
 
 class UpdatedMatchesEmailNotifier(EmailNotifier):
@@ -165,4 +159,29 @@ class UpdatedMatchesEmailNotifier(EmailNotifier):
     )
 
     def __init__(self, guessers: Iterable[Guesser]) -> None:
-        super().__init__("updated_matches", guessers)
+        super().__init__(guessers)
+
+    def _get_notifiable_pools(self, guesser: Guesser):
+        return list(guesser.get_involved_pools_with_updated_matches())
+
+
+class PendingMatchesEmailNotifier(EmailNotifier):
+    subject = "Palpites Pendentes"
+
+    text_template_singular = "Olá, {}\nO bolão {} possui partidas que você ainda não palpitou. Acesse o app e deixe seus palpites."
+    text_template_plural = "Olá, {}\nOs bolões {} possuem partidas que você ainda não palpitou. Acesse o app e deixe seus palpites."
+
+    html_template_singular = EmailNotifier.html_structure.format(
+        "Olá, {} 😎",
+        "O bolão {} possui partidas que você ainda não palpitou. Acesse o app e deixe seus palpites. 🍀🏆",
+    )
+    html_template_plural = EmailNotifier.html_structure.format(
+        "Olá, {} 😎",
+        "Os bolões {} possuem partidas que você ainda não palpitou. Acesse o app e deixe seus palpites. 🍀🏆",
+    )
+
+    def __init__(self, guessers: Iterable[Guesser]) -> None:
+        super().__init__(guessers)
+
+    def _get_notifiable_pools(self, guesser: Guesser):
+        return list(guesser.get_involved_pools_with_pending_matches())

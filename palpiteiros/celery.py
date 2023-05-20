@@ -21,13 +21,13 @@ app.conf.beat_schedule = {
         "task": "update_matches",
         "schedule": crontab(minute="0", hour="0,1,14-23"),
     },
-    "send_email_notification_of_new_matches": {
-        "task": "send_email_notification_of_new_matches",
-        "schedule": crontab(minute="0", hour="8", day_of_week="1,4"),
-    },
     "send_email_notification_of_updated_matches": {
         "task": "send_email_notification_of_updated_matches",
-        "schedule": crontab(minute="0", hour="15,22"),
+        "schedule": crontab(minute="59", hour="18,23"),
+    },
+    "send_email_notification_of_pending_matches": {
+        "task": "send_email_notification_of_pending_matches",
+        "schedule": crontab(minute="0", hour="7"),
     },
 }
 
