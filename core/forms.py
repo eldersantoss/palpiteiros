@@ -125,7 +125,7 @@ class RankingPeriodForm(forms.Form):
         self.fields["ano"].choices = self.YEAR_CHOICE
 
         self.MONTH_CHOICES = [(self.ALL_TIMES, "Anual")] + [
-            (str(m), _(timezone.now().replace(month=m).strftime("%B")))
+            (str(m), _(timezone.now().replace(day=1, month=m).strftime("%B")))
             for m in range(1, 13)
         ]
         self.fields["mes"].choices = self.MONTH_CHOICES
