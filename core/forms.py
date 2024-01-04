@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -118,6 +120,7 @@ class RankingPeriodForm(forms.Form):
                 year["created__year"]
                 for year in GuessPool.objects.values("created__year")
             ]
+            + [date.today().year]
         )
         self.YEAR_CHOICE = [(self.ALL_TIMES, "Geral")] + [
             (str(year), str(year)) for year in years
