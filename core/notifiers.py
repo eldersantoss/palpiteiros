@@ -1,10 +1,8 @@
 import abc
-from typing import Iterable, Literal
+from typing import Iterable
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, get_connection
-
-from core.models import Guesser
 
 from .models import Guesser, GuessPool
 
@@ -82,8 +80,7 @@ class EmailNotifier(abc.ABC):
     ):
         notifiable_pool_names = [str(np) for np in notifiable_pools]
         pool_names = (
-            ", ".join(notifiable_pool_names[:-1])
-            + f" e {notifiable_pool_names[-1]}"
+            ", ".join(notifiable_pool_names[:-1]) + f" e {notifiable_pool_names[-1]}"
         )
         text_content = self.text_template_plural.format(
             guesser_name,

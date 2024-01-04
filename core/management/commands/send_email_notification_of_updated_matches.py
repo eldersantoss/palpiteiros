@@ -19,9 +19,7 @@ class Command(BaseCommand):
                 )
 
             else:
-                self.stdout.write(
-                    "No pools with updated matches to notificate."
-                )
+                self.stdout.write("No pools with updated matches to notificate.")
 
         else:
             self.stdout.write("No guessers to notificate.")

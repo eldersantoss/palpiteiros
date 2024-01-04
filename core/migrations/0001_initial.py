@@ -202,15 +202,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "created",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name="Criação"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Criação"),
                 ),
                 (
                     "modified",
-                    models.DateTimeField(
-                        auto_now=True, verbose_name="Atualização"
-                    ),
+                    models.DateTimeField(auto_now=True, verbose_name="Atualização"),
                 ),
                 (
                     "uuid",
@@ -223,9 +219,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(
-                        max_length=100, unique=True, verbose_name="nome"
-                    ),
+                    models.CharField(max_length=100, unique=True, verbose_name="nome"),
                 ),
                 ("slug", models.SlugField(unique=True)),
                 (
@@ -234,9 +228,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "new_matches",
-                    models.BooleanField(
-                        default=False, verbose_name="novas partidas"
-                    ),
+                    models.BooleanField(default=False, verbose_name="novas partidas"),
                 ),
                 (
                     "updated_matches",
@@ -331,8 +323,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="competition",
             name="teams",
-            field=models.ManyToManyField(
-                related_name="competitions", to="core.team"
-            ),
+            field=models.ManyToManyField(related_name="competitions", to="core.team"),
         ),
     ]

@@ -104,9 +104,7 @@ class RankingPeriodForm(forms.Form):
                         == int(month)
                     ]
 
-                    week_choices = [
-                        (week, f"Rodada #{week}") for week in weeks
-                    ]
+                    week_choices = [(week, f"Rodada #{week}") for week in weeks]
                     self.fields["rodada"].choices = [
                         (self.ALL_TIMES, "Mensal")
                     ] + week_choices
@@ -145,15 +143,11 @@ class RankingPeriodForm(forms.Form):
         return month != timezone.datetime.fromisocalendar(year, week, 1).month
 
     def _get_week_for_selected_month(self, year: int, month: int) -> str:
-        return str(
-            timezone.now().replace(year=year, month=month).isocalendar().week
-        )
+        return str(timezone.now().replace(year=year, month=month).isocalendar().week)
 
     def _get_month_for_selected_week(
         self, selected_year: int, selected_week: int
     ) -> str:
         return str(
-            timezone.datetime.fromisocalendar(
-                selected_year, selected_week, 1
-            ).month
+            timezone.datetime.fromisocalendar(selected_year, selected_week, 1).month
         )

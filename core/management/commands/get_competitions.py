@@ -46,9 +46,7 @@ class Command(BaseCommand):
 
             seasons = [d["year"] for d in json_data_response["seasons"]]
             if season not in seasons:
-                self.stderr.write(
-                    f"Season {season} not found for league {league_id}."
-                )
+                self.stderr.write(f"Season {season} not found for league {league_id}.")
                 continue
 
             competition, created = Competition.objects.get_or_create(

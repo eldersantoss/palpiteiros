@@ -29,9 +29,7 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
                 else False
             )
 
-        context["display_subtitle"] = any(
-            [pool.is_pending for pool in involved_pools]
-        )
+        context["display_subtitle"] = any([pool.is_pending for pool in involved_pools])
         context["pools"] = involved_pools
 
         return context
@@ -129,9 +127,7 @@ class CreatePoolView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
-class ManagePoolView(
-    GuessPoolMembershipMixin, LoginRequiredMixin, generic.UpdateView
-):
+class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.UpdateView):
     model = GuessPool
     fields = ["name", "private", "competitions", "teams", "guessers"]
     template_name = "core/manage_pool.html"
@@ -187,18 +183,14 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
         if not pool.guesser_is_member(guesser):
             pool.signin_new_guesser(guesser)
             msg_type = "success"
-            msg = (
-                f"Bem-vindo(a) ao bolão <strong>{pool}</strong>! Boa sorte 😀🍀🔥"
-            )
+            msg = f"Bem-vindo(a) ao bolão <strong>{pool}</strong>! Boa sorte 😀🍀🔥"
         else:
             msg_type = "error"
             msg = "Você já é membro do bolão ❌"
         return redirect_with_msg(self.request, msg_type, msg, "mid", pool)
 
 
-class GuessPoolSignOutView(
-    GuessPoolMembershipMixin, LoginRequiredMixin, generic.View
-):
+class GuessPoolSignOutView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         if self.pool.user_is_owner:
             return redirect_with_msg(
@@ -236,9 +228,7 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
         return super().get(request, *args, **kwargs)
 
 
-class PoolHomeView(
-    GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView
-):
+class PoolHomeView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
     template_name = "core/pool_home.html"
 
 
@@ -363,9 +353,7 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
         )
 
 
-class RankingView(
-    GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView
-):
+class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
     template_name = "core/ranking.html"
 
     def get(self, *args, **kwargs):

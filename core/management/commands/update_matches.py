@@ -31,9 +31,7 @@ class Command(BaseCommand):
         )
         competitions = Competition.get_with_matches_on_period(from_, to)
         if not competitions.exists():
-            self.stdout.write(
-                f"No competitions with matches between {from_} and {to}."
-            )
+            self.stdout.write(f"No competitions with matches between {from_} and {to}.")
 
         for competition in competitions:
             updated_matches = competition.update_matches(days_from, days_ahead)

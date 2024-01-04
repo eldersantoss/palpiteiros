@@ -100,9 +100,7 @@ class Competition(models.Model):
             "league": self.data_source_id,
             "season": self.season,
             "from": str(timezone.now().date()),
-            "to": str(
-                timezone.now().date() + timezone.timedelta(days=days_ahead)
-            ),
+            "to": str(timezone.now().date() + timezone.timedelta(days=days_ahead)),
             "status": "NS",
         }
 
@@ -116,9 +114,7 @@ class Competition(models.Model):
         matches = []
         for data in json_data_response:
             data_source_id = data["fixture"]["id"]
-            date_time = timezone.datetime.fromisoformat(
-                data["fixture"]["date"]
-            )
+            date_time = timezone.datetime.fromisoformat(data["fixture"]["date"])
             status = data["fixture"]["status"]["short"]
             home_team_source_id = data["teams"]["home"]["id"]
             away_team_source_id = data["teams"]["away"]["id"]
@@ -173,9 +169,9 @@ class Competition(models.Model):
             away_goals = data["goals"]["away"]
 
             try:
-                match = Match.objects.exclude(
-                    status__in=Match.FINISHED_STATUS
-                ).get(data_source_id=data_source_id)
+                match = Match.objects.exclude(status__in=Match.FINISHED_STATUS).get(
+                    data_source_id=data_source_id
+                )
             except Match.DoesNotExist:
                 continue
 
@@ -259,9 +255,7 @@ class Match(models.Model):
         on_delete=models.PROTECT,
         related_name="matches",
     )
-    status = models.CharField(
-        max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED
-    )
+    status = models.CharField(max_length=4, choices=STATUS_CHOICES, default=NOT_STARTED)
     home_team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
@@ -377,9 +371,7 @@ class Match(models.Model):
 
     @classmethod
     def get_happen_on_period(cls, from_: date, to: date):
-        return cls.objects.filter(
-            date_time__date__gte=from_, date_time__date__lte=to
-        )
+        return cls.objects.filter(date_time__date__gte=from_, date_time__date__lte=to)
 
 
 class Guesser(models.Model):
@@ -431,9 +423,7 @@ class Guesser(models.Model):
         """Returns pools with pending matches that this guesser is involved
         with"""
 
-        return [
-            pool for pool in self.pools.all() if pool.has_pending_match(self)
-        ]
+        return [pool for pool in self.pools.all() if pool.has_pending_match(self)]
 
     def __str__(self) -> str:
         return f"{self.user.get_full_name()} ({self.user.username})"
@@ -642,9 +632,7 @@ class GuessPool(TimeStampedModel):
         desired_value: bool = False,
     ):
         if flag not in ["new_matches", "updated_matches"]:
-            raise ValueError(
-                f"flag value must be 'new_matches' or 'updated_matches'"
-            )
+            raise ValueError("flag value must be 'new_matches' or 'updated_matches'")
 
         pools = objs or (
             cls.objects.filter(new_matches=not desired_value)
@@ -709,9 +697,7 @@ class GuessPool(TimeStampedModel):
             | Q(away_team__in=self.teams.all())
         )
 
-        return matches_post_pool_creation.filter(
-            competition_or_team_membership
-        )
+        return matches_post_pool_creation.filter(competition_or_team_membership)
 
     def get_guessers_with_score_and_guesses(
         self,
@@ -720,9 +706,7 @@ class GuessPool(TimeStampedModel):
         round_: int,
     ):
         start, end = self._assemble_datetime_period(month, year, round_)
-        matches = self.get_finished_or_in_progress_matches_on_period(
-            start, end
-        )
+        matches = self.get_finished_or_in_progress_matches_on_period(start, end)
         guessers = self.get_guessers_with_match_scores(matches)
 
         for guesser in guessers:
@@ -790,9 +774,7 @@ class GuessPool(TimeStampedModel):
             "guesses__score",
             filter=guesses_of_this_pool_in_the_period,
         )
-        return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by(
-            "-score"
-        )
+        return self.guessers.annotate(score=Coalesce(sum_expr, 0)).order_by("-score")
 
     def _get_guesses_per_matches(self, guesser, matches):
         matches_and_guesses = []

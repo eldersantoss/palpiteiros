@@ -14,9 +14,7 @@ class Command(BaseCommand):
             notifier = NewMatchesEmailNotifier(guessers)
             if notifier.prepare_and_send_notifications():
                 GuessPool.toggle_flag_value("new_matches")
-                self.stdout.write(
-                    "Email notifications of new matches have been sent."
-                )
+                self.stdout.write("Email notifications of new matches have been sent.")
 
             else:
                 self.stdout.write("No pools with new matches to notificate.")
