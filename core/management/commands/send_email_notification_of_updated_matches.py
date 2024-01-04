@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from core.models import Guesser, GuessPool
 from core.notifiers import UpdatedMatchesEmailNotifier
@@ -19,7 +19,9 @@ class Command(BaseCommand):
                 )
 
             else:
-                self.stdout.write("No pools with updated matches to notificate.")
+                self.stdout.write(
+                    "No pools with updated matches to notificate."
+                )
 
         else:
             self.stdout.write("No guessers to notificate.")

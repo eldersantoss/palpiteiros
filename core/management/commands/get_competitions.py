@@ -2,7 +2,7 @@ from time import sleep
 
 import requests
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition
 
@@ -46,7 +46,9 @@ class Command(BaseCommand):
 
             seasons = [d["year"] for d in json_data_response["seasons"]]
             if season not in seasons:
-                self.stderr.write(f"Season {season} not found for league {league_id}.")
+                self.stderr.write(
+                    f"Season {season} not found for league {league_id}."
+                )
                 continue
 
             competition, created = Competition.objects.get_or_create(

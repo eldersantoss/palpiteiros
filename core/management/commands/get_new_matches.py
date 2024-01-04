@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.models import Competition
@@ -22,8 +22,12 @@ class Command(BaseCommand):
             self.stdout.write("No competitions to get matches.")
 
         today = timezone.now().date()
-        deadline = (timezone.now() + timezone.timedelta(days=days_ahead)).date()
-        self.stdout.write(f"Fetching matches from {today} (today) to {deadline}...")
+        deadline = (
+            timezone.now() + timezone.timedelta(days=days_ahead)
+        ).date()
+        self.stdout.write(
+            f"Fetching matches from {today} (today) to {deadline}..."
+        )
 
         for competition in competitions:
             new_matches = competition.get_new_matches(days_ahead)
