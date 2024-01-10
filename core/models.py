@@ -36,7 +36,11 @@ class Team(models.Model):
         return self.name
 
     def logo_url(self):
-        return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+        return (
+            f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+            if self.data_source_id
+            else ""
+        )
 
 
 class Competition(models.Model):
@@ -53,8 +57,14 @@ class Competition(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def real_data_source_id(self):
+        """return the real Football APPI id of competition"""
+
+        return self.data_source_id - self.season
+
     def logo_url(self) -> str:
-        return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
+        return f"https://media.api-sports.io/football/leagues/{self.real_data_source_id}.png"
 
     def get_teams(self):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
@@ -62,7 +72,7 @@ class Competition(models.Model):
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
-        params = {"league": self.data_source_id, "season": self.season}
+        params = {"league": self.real_data_source_id, "season": self.season}
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = (
@@ -97,7 +107,7 @@ class Competition(models.Model):
         }
         params = {
             "timezone": settings.TIME_ZONE,
-            "league": self.data_source_id,
+            "league": self.real_data_source_id,
             "season": self.season,
             "from": str(timezone.now().date()),
             "to": str(timezone.now().date() + timezone.timedelta(days=days_ahead)),
@@ -146,7 +156,7 @@ class Competition(models.Model):
         to = today + timezone.timedelta(days=days_ahead or 0)
         params = {
             "timezone": settings.TIME_ZONE,
-            "league": self.data_source_id,
+            "league": self.real_data_source_id,
             "season": self.season,
             "from": str(from_),
             "to": str(to),

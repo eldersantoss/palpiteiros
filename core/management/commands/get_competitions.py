@@ -49,8 +49,10 @@ class Command(BaseCommand):
                 self.stderr.write(f"Season {season} not found for league {league_id}.")
                 continue
 
+            # The league id still the same across all seasons
+            # So data_source_id must be added with season for uniqueness constraints
             competition, created = Competition.objects.get_or_create(
-                data_source_id=json_data_response["league"]["id"],
+                data_source_id=json_data_response["league"]["id"] + season,
                 name=json_data_response["league"]["name"],
                 season=season,
             )
