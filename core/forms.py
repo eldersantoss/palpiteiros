@@ -49,7 +49,7 @@ class RankingPeriodForm(forms.Form):
         label_suffix="",
         choices=MONTH_CHOICES,
     )
-    rodada = forms.ChoiceField(
+    semana = forms.ChoiceField(
         label="3. Semana",
         label_suffix="",
         choices=WEEK_CHOICES,
@@ -73,9 +73,9 @@ class RankingPeriodForm(forms.Form):
             """
             if year == self.ALL_TIMES:
                 self.fields["mes"].choices = [(self.ALL_TIMES, "Geral")]
-                self.fields["rodada"].choices = [(self.ALL_TIMES, "Geral")]
+                self.fields["semana"].choices = [(self.ALL_TIMES, "Geral")]
                 cd["mes"] = self.ALL_TIMES
-                cd["rodada"] = self.ALL_TIMES
+                cd["semana"] = self.ALL_TIMES
 
             else:
                 """
@@ -84,8 +84,8 @@ class RankingPeriodForm(forms.Form):
                 para GERAL, resultando no período de classificação ANUAL
                 """
                 if month == self.ALL_TIMES:
-                    self.fields["rodada"].choices = [(self.ALL_TIMES, "Anual")]
-                    cd["rodada"] = self.ALL_TIMES
+                    self.fields["semana"].choices = [(self.ALL_TIMES, "Anual")]
+                    cd["semana"] = self.ALL_TIMES
 
                 else:
                     """
@@ -105,7 +105,7 @@ class RankingPeriodForm(forms.Form):
                     ]
 
                     week_choices = [(week, f"Semana #{week}") for week in weeks]
-                    self.fields["rodada"].choices = [
+                    self.fields["semana"].choices = [
                         (self.ALL_TIMES, "Mensal")
                     ] + week_choices
 
@@ -136,8 +136,8 @@ class RankingPeriodForm(forms.Form):
         self.WEEK_CHOICES = [
             (self.ALL_TIMES, "Anual"),
             (self.MONTHLY, "Mensal"),
-        ] + [(week, f"Rodada #{week}") for week in range(1, 53)]
-        self.fields["rodada"].choices = self.WEEK_CHOICES
+        ] + [(week, f"Semana #{week}") for week in range(1, 53)]
+        self.fields["semana"].choices = self.WEEK_CHOICES
 
     def _week_not_in_selected_month(self, year, month, week) -> bool:
         return month != timezone.datetime.fromisocalendar(year, week, 1).month
