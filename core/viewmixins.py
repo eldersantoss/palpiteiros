@@ -1,5 +1,3 @@
-from django.shortcuts import get_object_or_404
-
 from core.helpers import redirect_with_msg
 
 from .models import Guesser, GuessPool
@@ -13,15 +11,17 @@ class GuessPoolMembershipMixin:
         super().setup(request, *args, **kwargs)
         self.guesser = self.get_guesser()
         self.pool = self.get_pool()
-        self.pool.user_is_owner = self.pool.owner == self.guesser
-        self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
+
+        if self.pool is not None:
+            self.pool.user_is_owner = self.pool.owner == self.guesser
+            self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
 
     def get_guesser(self) -> Guesser:
-        return self.request.user.guesser
+        return self.request.user.guesser if not self.request.user.is_anonymous else None
 
     def get_pool(self) -> GuessPool:
         pool_slug = self.kwargs.get(self.pool_slug_url_kwarg)
-        return get_object_or_404(GuessPool, slug=pool_slug)
+        return GuessPool.objects.filter(slug=pool_slug).first()
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
