@@ -50,7 +50,7 @@ class RankingPeriodForm(forms.Form):
         choices=MONTH_CHOICES,
     )
     rodada = forms.ChoiceField(
-        label="3. Rodada",
+        label="3. Semana",
         label_suffix="",
         choices=WEEK_CHOICES,
     )
@@ -104,7 +104,7 @@ class RankingPeriodForm(forms.Form):
                         == int(month)
                     ]
 
-                    week_choices = [(week, f"Rodada #{week}") for week in weeks]
+                    week_choices = [(week, f"Semana #{week}") for week in weeks]
                     self.fields["rodada"].choices = [
                         (self.ALL_TIMES, "Mensal")
                     ] + week_choices
