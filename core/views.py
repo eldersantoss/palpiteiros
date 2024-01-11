@@ -375,18 +375,18 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
         current_period = {
             "mes": timezone.now().month,
             "ano": timezone.now().year,
-            "rodada": timezone.now().isocalendar().week,
+            "semana": timezone.now().isocalendar().week,
         }
         form = RankingPeriodForm(self.request.GET or current_period)
         form.is_valid()
 
         month = int(form.cleaned_data["mes"])
         year = int(form.cleaned_data["ano"])
-        round_ = int(form.cleaned_data["rodada"])
+        week = int(form.cleaned_data["semana"])
 
         context["period_form"] = form
         context["guessers"] = self.pool.get_guessers_with_score_and_guesses(
-            month, year, round_
+            month, year, week
         )
 
         return context

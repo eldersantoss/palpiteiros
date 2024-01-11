@@ -713,9 +713,9 @@ class GuessPool(TimeStampedModel):
         self,
         month: int,
         year: int,
-        round_: int,
+        week: int,
     ):
-        start, end = self._assemble_datetime_period(month, year, round_)
+        start, end = self._assemble_datetime_period(month, year, week)
         matches = self.get_finished_or_in_progress_matches_on_period(start, end)
         guessers = self.get_guessers_with_match_scores(matches)
 
@@ -726,7 +726,7 @@ class GuessPool(TimeStampedModel):
 
         return guessers
 
-    def _assemble_datetime_period(self, month: int, year: int, round_: int):
+    def _assemble_datetime_period(self, month: int, year: int, week: int):
         base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
         base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
 
@@ -743,7 +743,7 @@ class GuessPool(TimeStampedModel):
 
             else:
                 # período mensal (mes e ano recebidos)
-                if round_ == 0:
+                if week == 0:
                     start = base_start.replace(year=year, month=month)
                     end = (
                         base_end.replace(year=year, month=month + 1)
@@ -753,10 +753,10 @@ class GuessPool(TimeStampedModel):
 
                 else:
                     # período semanal (ano, mes e semanas recebidos)
-                    start = timezone.now().fromisocalendar(year, round_, 1)
+                    start = timezone.now().fromisocalendar(year, week, 1)
                     end = (
                         timezone.now()
-                        .fromisocalendar(year, round_, 7)
+                        .fromisocalendar(year, week, 7)
                         .replace(hour=23, minute=59, second=59)
                     )
 

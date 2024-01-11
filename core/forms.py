@@ -79,7 +79,7 @@ class RankingPeriodForm(forms.Form):
 
             else:
                 """
-                Quando year != GERAL, mas month == GERAL, o campo round_
+                Quando year != GERAL, mas month == GERAL, o campo week
                 assume o valor geral e tem suas choices restritas somente
                 para GERAL, resultando no período de classificação ANUAL
                 """
@@ -89,7 +89,7 @@ class RankingPeriodForm(forms.Form):
 
                 else:
                     """
-                    Quando year != GERAL e month != GERAL, o campo round_
+                    Quando year != GERAL e month != GERAL, o campo week
                     é liberado para assumir valores no intervalo entre que
                     compreende o número das semanas do mês selecionado,
                     resultando nos períodos de classificação MENSAL ou
