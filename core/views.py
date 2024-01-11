@@ -245,6 +245,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 "long",
                 self.pool,
             )
+
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):

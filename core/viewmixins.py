@@ -16,6 +16,10 @@ class GuessPoolMembershipMixin:
             self.pool.user_is_owner = self.pool.owner == self.guesser
             self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
 
+        else:
+            self.pool.user_is_owner = None
+            self.pool.user_is_guesser = None
+
     def get_guesser(self) -> Guesser:
         return self.request.user.guesser if not self.request.user.is_anonymous else None
 
