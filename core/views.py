@@ -127,7 +127,7 @@ class CreatePoolView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
-class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.UpdateView):
+class ManagePoolView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.UpdateView):
     model = GuessPool
     fields = ["name", "private", "competitions", "teams", "guessers"]
     template_name = "core/manage_pool.html"
@@ -190,7 +190,7 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
         return redirect_with_msg(self.request, msg_type, msg, "mid", pool)
 
 
-class GuessPoolSignOutView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+class GuessPoolSignOutView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def get(self, request, *args, **kwargs):
         if self.pool.user_is_owner:
             return redirect_with_msg(
@@ -228,11 +228,11 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
         return super().get(request, *args, **kwargs)
 
 
-class PoolHomeView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
+class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/pool_home.html"
 
 
-class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         if self.pool.user_is_owner and not self.pool.user_is_guesser:
             return redirect_with_msg(
@@ -353,7 +353,7 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
         )
 
 
-class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
+class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/ranking.html"
 
     def get(self, *args, **kwargs):
