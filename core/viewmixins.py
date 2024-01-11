@@ -12,7 +12,7 @@ class GuessPoolMembershipMixin:
         self.guesser = self.get_guesser()
         self.pool = self.get_pool()
 
-        if self.pool is not None:
+        if self.guesser and self.pool:
             self.pool.user_is_owner = self.pool.owner == self.guesser
             self.pool.user_is_guesser = self.pool.guessers.contains(self.guesser)
 
