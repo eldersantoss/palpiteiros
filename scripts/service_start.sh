@@ -42,4 +42,7 @@ elif [ "$PROCESS_TYPE" = "flower" ]; then
   #   flower \
   #   --basic_auth="${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD}" \
   #   --loglevel INFO
+
+elif [ "$PROCESS_TYPE" = "create_and_update_matches" ]; then
+  python manage.py create_and_update_matches
 fi

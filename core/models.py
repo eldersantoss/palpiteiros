@@ -99,6 +99,72 @@ class Competition(models.Model):
 
         return teams
 
+    def create_and_update_matches(self, days_from: int | None, days_ahead: int | None):
+        api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        today = timezone.now().date()
+        from_ = today - timezone.timedelta(days=days_from or 1)
+        to = today + timezone.timedelta(days=days_ahead or 2)
+        params = {
+            "timezone": settings.TIME_ZONE,
+            "league": self.real_data_source_id,
+            "season": self.season,
+            "from": str(from_),
+            "to": str(to),
+            "status": "-".join(
+                [Match.NOT_STARTED, *Match.IN_PROGRESS_AND_FINISHED_STATUS]
+            ),
+        }
+
+        # TODO: tratar requests.exceptions.ConnectionError:
+        response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
+        json_data = response.json()
+        json_data_response = json_data["response"]
+
+        created_matches, updated_matches = [], []
+        for data in json_data_response:
+            data_source_id = data["fixture"]["id"]
+            date_time = timezone.datetime.fromisoformat(data["fixture"]["date"])
+            status = data["fixture"]["status"]["short"]
+            home_team_source_id = data["teams"]["home"]["id"]
+            away_team_source_id = data["teams"]["away"]["id"]
+            elapsed = data["fixture"]["status"]["elapsed"]
+            home_goals = data["goals"]["home"]
+            away_goals = data["goals"]["away"]
+
+            home_team = Team.objects.filter(data_source_id=home_team_source_id).first()
+            away_team = Team.objects.filter(data_source_id=away_team_source_id).first()
+            if None in [home_team, away_team]:
+                continue
+
+            match = Match.objects.filter(data_source_id=data_source_id).first()
+
+            if match is not None:
+                match.date_time = date_time
+                match.home_goals = home_goals
+                match.away_goals = away_goals
+                match.update_status(status, elapsed)
+                match.save()
+                updated_matches.append(match)
+
+            else:
+                match = Match.objects.create(
+                    data_source_id=data_source_id,
+                    competition=self,
+                    status=status,
+                    home_team=home_team,
+                    away_team=away_team,
+                    date_time=date_time,
+                )
+                created_matches.append(match)
+
+        return created_matches, updated_matches
+
     def get_new_matches(self, days_ahead: int):
         api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
         headers = {
@@ -178,11 +244,13 @@ class Competition(models.Model):
             home_goals = data["goals"]["home"]
             away_goals = data["goals"]["away"]
 
-            try:
-                match = Match.objects.exclude(status__in=Match.FINISHED_STATUS).get(
-                    data_source_id=data_source_id
-                )
-            except Match.DoesNotExist:
+            match = (
+                Match.objects.exclude(status__in=Match.FINISHED_STATUS)
+                .filter(data_source_id=data_source_id)
+                .first()
+            )
+
+            if match is None:
                 continue
 
             match.update_status(status, elapsed)
@@ -236,11 +304,7 @@ class Match(models.Model):
 
     IN_PROGRESS_STATUS = [FIRST_HALF, HALFTIME, SECOND_HALF]
 
-    FINISHED_STATUS = [
-        FINSHED,
-        FINSHED_AFTER_EXTRA_TIME,
-        FINSHED_AFTER_PENALTYS,
-    ]
+    FINISHED_STATUS = [FINSHED, FINSHED_AFTER_EXTRA_TIME, FINSHED_AFTER_PENALTYS]
 
     IN_PROGRESS_AND_FINISHED_STATUS = [*IN_PROGRESS_STATUS, *FINISHED_STATUS]
 
@@ -434,6 +498,10 @@ class Guesser(models.Model):
         with"""
 
         return [pool for pool in self.pools.all() if pool.has_pending_match(self)]
+
+    class Meta:
+        verbose_name = "palpiteiro"
+        verbose_name_plural = "palpiteiros"
 
     def __str__(self) -> str:
         return f"{self.user.get_full_name()} ({self.user.username})"
