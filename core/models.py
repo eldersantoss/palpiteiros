@@ -842,6 +842,7 @@ class GuessPool(TimeStampedModel):
             self.get_matches()
             .filter(status__in=Match.IN_PROGRESS_AND_FINISHED_STATUS)
             .filter(date_time__gt=start, date_time__lte=end)
+            .order_by("-date_time")
         )
 
     def get_guessers_with_match_scores(self, matches: Iterable[Match]):
