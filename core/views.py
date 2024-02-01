@@ -90,7 +90,14 @@ class ProfileView(LoginRequiredMixin, generic.View):
 
 class CreatePoolView(LoginRequiredMixin, generic.CreateView):
     model = GuessPool
-    fields = ["name", "private", "competitions", "teams"]
+    fields = [
+        "name",
+        "minutes_before_start_match",
+        "hours_before_open_to_guesses",
+        "private",
+        "competitions",
+        "teams",
+    ]
     template_name = "core/create_pool.html"
 
     def post(self, request, *args, **kwargs):
@@ -129,7 +136,15 @@ class CreatePoolView(LoginRequiredMixin, generic.CreateView):
 
 class ManagePoolView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.UpdateView):
     model = GuessPool
-    fields = ["name", "private", "competitions", "teams", "guessers"]
+    fields = [
+        "name",
+        "minutes_before_start_match",
+        "hours_before_open_to_guesses",
+        "private",
+        "competitions",
+        "teams",
+        "guessers",
+    ]
     template_name = "core/manage_pool.html"
     slug_url_kwarg = "pool_slug"
 
