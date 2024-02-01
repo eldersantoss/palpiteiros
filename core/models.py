@@ -651,6 +651,14 @@ class GuessPool(TimeStampedModel):
         "partidas atualizadas",
         default=False,
     )
+    minutes_before_start_match = models.PositiveSmallIntegerField(
+        "Até quantos minutos antes do início da partida os palpites serão permitidos?",
+        default=5,
+    )
+    hours_before_open_to_guesses = models.PositiveSmallIntegerField(
+        "A partir de quantas horas antes do início de uma partida os palpites serão permitidos?",
+        default=48,
+    )
 
     class Meta:
         verbose_name = "bolão"
@@ -697,9 +705,9 @@ class GuessPool(TimeStampedModel):
 
         return self.get_matches().filter(
             date_time__gt=timezone.now()
-            + timezone.timedelta(minutes=Match.MINUTES_BEFORE_START_MATCH),
+            + timezone.timedelta(minutes=self.minutes_before_start_match),
             date_time__lte=timezone.now()
-            + timezone.timedelta(hours=Match.HOURS_BEFORE_OPEN_TO_GUESSES),
+            + timezone.timedelta(hours=self.hours_before_open_to_guesses),
         )
 
     @classmethod
