@@ -849,7 +849,7 @@ class GuessPool(TimeStampedModel):
         return (
             self.get_matches()
             .filter(status__in=Match.IN_PROGRESS_AND_FINISHED_STATUS)
-            .filter(date_time__date__gt=start.date(), date_time__date__lte=end.date())
+            .filter(date_time__date__gte=start.date(), date_time__date__lte=end.date())
             .order_by("-date_time")
         )
 
