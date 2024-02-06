@@ -635,8 +635,12 @@ input {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.clickable-row:nth-child(even) {
+.clickable-row:nth-child(4n + 1) {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.detail-row {
+  background-color: transparent;
 }
 
 .clickable-row:hover {
