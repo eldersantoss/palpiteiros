@@ -773,14 +773,21 @@ class GuessPool(TimeStampedModel):
         """Returns all matches created after this pool that belongs to
         any registered competition or involving registered teams"""
 
-        matches_post_pool_creation = Match.objects.filter(
+        matches_post_pool_creation = Match.objects.select_related(
+            "competition",
+            "home_team",
+            "away_team",
+        ).filter(
             date_time__gt=self.created,
         )
 
+        registered_competitions = self.competitions.all()
+        registered_teams = self.teams.all()
+
         competition_or_team_membership = (
-            Q(competition__in=self.competitions.all())
-            | Q(home_team__in=self.teams.all())
-            | Q(away_team__in=self.teams.all())
+            Q(competition__in=registered_competitions)
+            | Q(home_team__in=registered_teams)
+            | Q(away_team__in=registered_teams)
         )
 
         return matches_post_pool_creation.filter(competition_or_team_membership)
