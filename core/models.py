@@ -623,24 +623,25 @@ class GuessPool(TimeStampedModel):
     guessers = models.ManyToManyField(
         Guesser,
         related_name="pools",
+        verbose_name="Palpiteiros",
         blank=True,
-        verbose_name="palpiteiros",
     )
     competitions = models.ManyToManyField(
         Competition,
         related_name="pools",
-        verbose_name="competições",
+        verbose_name="Competições",
         blank=True,
     )
     teams = models.ManyToManyField(
         Team,
         related_name="pools",
-        verbose_name="times",
+        verbose_name="Times",
         blank=True,
     )
     guesses = models.ManyToManyField(
         Guess,
         related_name="pools",
+        verbose_name="Palpites",
         blank=True,
     )
     new_matches = models.BooleanField(
