@@ -133,7 +133,7 @@ class Competition(models.Model):
             status = data["fixture"]["status"]["short"]
             home_team_source_id = data["teams"]["home"]["id"]
             away_team_source_id = data["teams"]["away"]["id"]
-            elapsed = data["fixture"]["status"]["elapsed"]
+            elapsed = data["fixture"]["status"]["elapsed"] or 0
             home_goals = data["goals"]["home"]
             away_goals = data["goals"]["away"]
 
@@ -240,7 +240,7 @@ class Competition(models.Model):
         for data in json_data_response:
             data_source_id = data["fixture"]["id"]
             status = data["fixture"]["status"]["short"]
-            elapsed = data["fixture"]["status"]["elapsed"]
+            elapsed = data["fixture"]["status"]["elapsed"] or 0
             home_goals = data["goals"]["home"]
             away_goals = data["goals"]["away"]
 
