@@ -623,7 +623,7 @@ input {
 }
 
 .main-table th, td {
-  padding: 1.5vh 1vh;
+  padding: 1.5vh 0.35vh;
   text-align: center;
 }
 
