@@ -106,8 +106,8 @@ class Competition(models.Model):
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
         today = timezone.now().date()
-        from_ = today - timezone.timedelta(days=days_from or 1)
-        to = today + timezone.timedelta(days=days_ahead or 2)
+        from_ = today - timezone.timedelta(days=days_from or 3)
+        to = today + timezone.timedelta(days=days_ahead or 3)
         params = {
             "timezone": settings.TIME_ZONE,
             "league": self.real_data_source_id,
