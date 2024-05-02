@@ -45,7 +45,10 @@ class ProfileView(LoginRequiredMixin, generic.View):
         return render(
             self.request,
             self.template_name,
-            {"user_edit_form": user_edit_form, "guesser_edit_form": guesser_edit_form},
+            {
+                "user_edit_form": user_edit_form,
+                "guesser_edit_form": guesser_edit_form,
+            },
         )
 
     def post(self, *args, **kwargs):
@@ -78,13 +81,23 @@ class ProfileView(LoginRequiredMixin, generic.View):
         return render(
             self.request,
             self.template_name,
-            {"user_edit_form": user_edit_form, "guesser_edit_form": guesser_edit_form},
+            {
+                "user_edit_form": user_edit_form,
+                "guesser_edit_form": guesser_edit_form,
+            },
         )
 
 
 class CreatePoolView(LoginRequiredMixin, generic.CreateView):
     model = GuessPool
-    fields = ["name", "private", "competitions", "teams"]
+    fields = [
+        "name",
+        "minutes_before_start_match",
+        "hours_before_open_to_guesses",
+        "private",
+        "competitions",
+        "teams",
+    ]
     template_name = "core/create_pool.html"
 
     def post(self, request, *args, **kwargs):
@@ -113,16 +126,25 @@ class CreatePoolView(LoginRequiredMixin, generic.CreateView):
         slug = slugify(form.instance.name)
         if GuessPool.objects.filter(slug=slug).exists():
             form.add_error(
-                "name", "Já existe um bolão com esse nome. Por favor, escolha outro."
+                "name",
+                "Já existe um bolão com esse nome. Por favor, escolha outro.",
             )
             return self.form_invalid()
         form.instance.slug = slug
         return super().form_valid(form)
 
 
-class ManagePoolView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.UpdateView):
+class ManagePoolView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.UpdateView):
     model = GuessPool
-    fields = ["name", "private", "competitions", "teams", "guessers"]
+    fields = [
+        "name",
+        "minutes_before_start_match",
+        "hours_before_open_to_guesses",
+        "private",
+        "competitions",
+        "teams",
+        "guessers",
+    ]
     template_name = "core/manage_pool.html"
     slug_url_kwarg = "pool_slug"
 
@@ -183,7 +205,7 @@ class GuessPoolSignInView(LoginRequiredMixin, generic.View):
         return redirect_with_msg(self.request, msg_type, msg, "mid", pool)
 
 
-class GuessPoolSignOutView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+class GuessPoolSignOutView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def get(self, request, *args, **kwargs):
         if self.pool.user_is_owner:
             return redirect_with_msg(
@@ -221,11 +243,11 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
         return super().get(request, *args, **kwargs)
 
 
-class PoolHomeView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
+class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/pool_home.html"
 
 
-class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
+class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         if self.pool.user_is_owner and not self.pool.user_is_guesser:
             return redirect_with_msg(
@@ -238,6 +260,7 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
                 "long",
                 self.pool,
             )
+
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
@@ -346,7 +369,7 @@ class GuessesView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.View):
         )
 
 
-class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.TemplateView):
+class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/ranking.html"
 
     def get(self, *args, **kwargs):
@@ -365,20 +388,20 @@ class RankingView(GuessPoolMembershipMixin, LoginRequiredMixin, generic.Template
         context = super().get_context_data(**kwargs)
 
         current_period = {
+            "semana": 0,
             "mes": timezone.now().month,
             "ano": timezone.now().year,
-            "rodada": timezone.now().isocalendar().week,
         }
         form = RankingPeriodForm(self.request.GET or current_period)
         form.is_valid()
 
         month = int(form.cleaned_data["mes"])
         year = int(form.cleaned_data["ano"])
-        round_ = int(form.cleaned_data["rodada"])
+        week = int(form.cleaned_data["semana"])
 
         context["period_form"] = form
         context["guessers"] = self.pool.get_guessers_with_score_and_guesses(
-            month, year, round_
+            month, year, week
         )
 
         return context

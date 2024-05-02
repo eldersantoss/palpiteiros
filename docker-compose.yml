@@ -12,16 +12,21 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
-  rabbitmq:
-    image: rabbitmq:3-alpine
+  # rabbitmq:
+  #   image: rabbitmq:3-alpine
+  #   ports:
+  #     - 5672:5672
+
+  redis:
+    image: redis:7-alpine
     ports:
-      - 5672:5672
+      - 6379:6379
 
   web:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    command: bash -c "chmod +x ./scripts/*.sh && ./scripts/compose_start.sh"
+    command: bash -c "chmod +x ./scripts/*.sh && ./scripts/service_start.sh web"
     ports:
       - 8000:8000
     volumes:
@@ -30,31 +35,21 @@ services:
       - .env
     depends_on:
       - postgres
-      - rabbitmq
+      - redis
+      # - rabbitmq
 
-  worker:
+  worker_beat:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    command: celery -A palpiteiros worker -l info
+    command: bash -c "chmod +x ./scripts/*.sh && ./scripts/service_start.sh worker_beat"
     volumes:
       - .:/app
     env_file:
       - .env
     depends_on:
-      - rabbitmq
-
-  beat:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    command: celery -A palpiteiros beat -l info
-    volumes:
-      - .:/app
-    env_file:
-      - .env
-    depends_on:
-      - rabbitmq
+      - redis
+      # - rabbitmq
 
   flower:
     build:
@@ -66,9 +61,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - rabbitmq
+      - redis
+      # - rabbitmq
       - web
-      - worker
+      - worker_beat
 
 volumes:
   db_data:

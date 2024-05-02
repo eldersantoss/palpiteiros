@@ -103,17 +103,17 @@ main {
   align-items: center;
 }
 
-h2 {
+h2, h3 {
   align-self: flex-start;
   color: white;
-  margin: 2vh 2vh 0;
+  margin-bottom:0;
+  font-size: 1.2rem;
+
 }
 
 h3 {
-  align-self: flex-start;
-  color: yellowgreen;
-  margin: 2vh 2vh 0;
   font-size: 0.9rem;
+  color: yellowgreen;
 }
 
 article {
@@ -320,8 +320,6 @@ input {
   width: 100%;
 }
 
-
-
 .forget-password {
   font-size: 0.75rem;
   align-self: flex-end;
@@ -362,7 +360,6 @@ input {
 .match-time {
   text-align: center;
   font-size: 0.5rem;
-  margin: 0 0;
 }
 
 .guess-wrapper {
@@ -482,6 +479,10 @@ input {
   margin-top: 2vh;
   line-height: 3vh;
   text-align: justify;
+}
+
+.home-msg h2 {
+  margin: 0;
 }
 
 .help-msg p {
@@ -622,7 +623,7 @@ input {
 }
 
 .main-table th, td {
-  padding: 1.5vh 1vh;
+  padding: 1.5vh 0.35vh;
   text-align: center;
 }
 
@@ -634,8 +635,12 @@ input {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.clickable-row:nth-child(3n + 2) {
+.clickable-row:nth-child(4n + 1) {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.detail-row {
+  background-color: transparent;
 }
 
 .clickable-row:hover {
@@ -669,14 +674,13 @@ input {
   padding: 0.5vh 0 1vh;
 }
 
-.detail-table-row-match-time td{
-  padding: 1vh 0 0 0;
-  border-top: 1px solid rgba(173, 255, 47, 0.2);
+.detail-table tr {
+  border-bottom: 1px solid rgba(173, 255, 47, 0.2);
 }
 
 .detail-table p {
   margin: 0;
-  line-height: 2.2vh;
+  line-height: 2vh;
 }
 
 footer {
@@ -690,7 +694,7 @@ footer {
 
 footer address {
   font-size: 0.55rem;
-  margin-top: 3vh;
+  margin: 3vh 0;
 }
 
 /* .cookieConsentContainer {

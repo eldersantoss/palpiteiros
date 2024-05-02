@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.models import Competition

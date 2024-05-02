@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.models import Competition
@@ -20,17 +20,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        competitions = Competition.objects.all()
         days_from = options.get("days_from")
         days_ahead = options.get("days_ahead")
-
-        if not competitions.exists():
-            self.stdout.write("No competitions to get matches.")
-
         today = timezone.now().date()
         from_ = today - timezone.timedelta(days=days_from or 1)
         to = today + timezone.timedelta(days=days_ahead or 0)
-        self.stdout.write(f"Fetching matches from {from_} to {to}...")
+
+        self.stdout.write(
+            f"Fetching competitions with matches between {from_} and {to}..."
+        )
+        competitions = Competition.get_with_matches_on_period(from_, to)
+        if not competitions.exists():
+            self.stdout.write(f"No competitions with matches between {from_} and {to}.")
 
         for competition in competitions:
             updated_matches = competition.update_matches(days_from, days_ahead)

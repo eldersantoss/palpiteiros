@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import date, datetime
+from time import sleep
 from typing import Iterable, Literal
 from uuid import uuid4
 
@@ -11,7 +12,6 @@ from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
-from django.utils.translation import gettext as _
 
 
 class TimeStampedModel(models.Model):
@@ -36,7 +36,11 @@ class Team(models.Model):
         return self.name
 
     def logo_url(self):
-        return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+        return (
+            f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+            if self.data_source_id
+            else ""
+        )
 
 
 class Competition(models.Model):
@@ -53,8 +57,14 @@ class Competition(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def real_data_source_id(self):
+        """return the real Football APPI id of competition"""
+
+        return self.data_source_id - self.season
+
     def logo_url(self) -> str:
-        return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
+        return f"https://media.api-sports.io/football/leagues/{self.real_data_source_id}.png"
 
     def get_teams(self):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
@@ -62,7 +72,7 @@ class Competition(models.Model):
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
-        params = {"league": self.data_source_id, "season": self.season}
+        params = {"league": self.real_data_source_id, "season": self.season}
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = (
@@ -70,6 +80,7 @@ class Competition(models.Model):
             .json()
             .get("response")
         )
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
 
         teams = []
         for data in response:
@@ -77,7 +88,7 @@ class Competition(models.Model):
             name = data["team"]["name"]
             code = data["team"]["code"]
 
-            team, _ = Team.objects.get_or_create(
+            team, created = Team.objects.get_or_create(
                 data_source_id=data_source_id,
                 name=name,
                 code=code,
@@ -88,6 +99,72 @@ class Competition(models.Model):
 
         return teams
 
+    def create_and_update_matches(self, days_from: int | None, days_ahead: int | None):
+        api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        today = timezone.now().date()
+        from_ = today - timezone.timedelta(days=days_from or 3)
+        to = today + timezone.timedelta(days=days_ahead or 3)
+        params = {
+            "timezone": settings.TIME_ZONE,
+            "league": self.real_data_source_id,
+            "season": self.season,
+            "from": str(from_),
+            "to": str(to),
+            "status": "-".join(
+                [Match.NOT_STARTED, *Match.IN_PROGRESS_AND_FINISHED_STATUS]
+            ),
+        }
+
+        # TODO: tratar requests.exceptions.ConnectionError:
+        response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
+        json_data = response.json()
+        json_data_response = json_data["response"]
+
+        created_matches, updated_matches = [], []
+        for data in json_data_response:
+            data_source_id = data["fixture"]["id"]
+            date_time = timezone.datetime.fromisoformat(data["fixture"]["date"])
+            status = data["fixture"]["status"]["short"]
+            home_team_source_id = data["teams"]["home"]["id"]
+            away_team_source_id = data["teams"]["away"]["id"]
+            elapsed = data["fixture"]["status"]["elapsed"] or 0
+            home_goals = data["goals"]["home"]
+            away_goals = data["goals"]["away"]
+
+            home_team = Team.objects.filter(data_source_id=home_team_source_id).first()
+            away_team = Team.objects.filter(data_source_id=away_team_source_id).first()
+            if None in [home_team, away_team]:
+                continue
+
+            match = Match.objects.filter(data_source_id=data_source_id).first()
+
+            if match is not None:
+                match.date_time = date_time
+                match.home_goals = home_goals
+                match.away_goals = away_goals
+                match.update_status(status, elapsed)
+                match.save()
+                updated_matches.append(match)
+
+            else:
+                match = Match.objects.create(
+                    data_source_id=data_source_id,
+                    competition=self,
+                    status=status,
+                    home_team=home_team,
+                    away_team=away_team,
+                    date_time=date_time,
+                )
+                created_matches.append(match)
+
+        return created_matches, updated_matches
+
     def get_new_matches(self, days_ahead: int):
         api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
         headers = {
@@ -96,7 +173,7 @@ class Competition(models.Model):
         }
         params = {
             "timezone": settings.TIME_ZONE,
-            "league": self.data_source_id,
+            "league": self.real_data_source_id,
             "season": self.season,
             "from": str(timezone.now().date()),
             "to": str(timezone.now().date() + timezone.timedelta(days=days_ahead)),
@@ -105,6 +182,8 @@ class Competition(models.Model):
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
         json_data = response.json()
         json_data_response = json_data["response"]
 
@@ -143,7 +222,7 @@ class Competition(models.Model):
         to = today + timezone.timedelta(days=days_ahead or 0)
         params = {
             "timezone": settings.TIME_ZONE,
-            "league": self.data_source_id,
+            "league": self.real_data_source_id,
             "season": self.season,
             "from": str(from_),
             "to": str(to),
@@ -152,6 +231,8 @@ class Competition(models.Model):
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
         json_data = response.json()
         json_data_response = json_data["response"]
 
@@ -159,15 +240,17 @@ class Competition(models.Model):
         for data in json_data_response:
             data_source_id = data["fixture"]["id"]
             status = data["fixture"]["status"]["short"]
-            elapsed = data["fixture"]["status"]["elapsed"]
+            elapsed = data["fixture"]["status"]["elapsed"] or 0
             home_goals = data["goals"]["home"]
             away_goals = data["goals"]["away"]
 
-            try:
-                match = Match.objects.exclude(status__in=Match.FINISHED_STATUS).get(
-                    data_source_id=data_source_id
-                )
-            except Match.DoesNotExist:
+            match = (
+                Match.objects.exclude(status__in=Match.FINISHED_STATUS)
+                .filter(data_source_id=data_source_id)
+                .first()
+            )
+
+            if match is None:
                 continue
 
             match.update_status(status, elapsed)
@@ -177,6 +260,17 @@ class Competition(models.Model):
             matches.append(match)
 
         return matches
+
+    @classmethod
+    def get_with_matches_on_period(cls, from_: date, to: date):
+        """Returns competitions which that have matches on period"""
+
+        matches_on_period = Match.get_happen_on_period(from_, to)
+        competitions_with_matches_on_period = matches_on_period.values(
+            "competition"
+        ).distinct()
+
+        return cls.objects.filter(id__in=competitions_with_matches_on_period)
 
     def create_public_pool(self):
         name = f"{self.name} {self.season}"
@@ -192,6 +286,7 @@ class Competition(models.Model):
         )
 
         if created:
+            pool.guessers.remove(pool.owner)
             pool.competitions.add(self)
             return pool
 
@@ -223,7 +318,7 @@ class Match(models.Model):
         (FINSHED_AFTER_PENALTYS, "Encerrada após penalidades"),
     )
 
-    MINUTES_BEFORE_START_MATCH = 30
+    MINUTES_BEFORE_START_MATCH = 5
 
     HOURS_BEFORE_OPEN_TO_GUESSES = 48
 
@@ -348,6 +443,10 @@ class Match(models.Model):
     def pending_guess(self, guesser: "Guesser"):
         return not self.guesses.filter(guesser=guesser).exists()
 
+    @classmethod
+    def get_happen_on_period(cls, from_: date, to: date):
+        return cls.objects.filter(date_time__date__gte=from_, date_time__date__lte=to)
+
 
 class Guesser(models.Model):
     user = models.OneToOneField(
@@ -393,6 +492,16 @@ class Guesser(models.Model):
         with"""
 
         return self.pools.filter(updated_matches=True)
+
+    def get_involved_pools_with_pending_matches(self):
+        """Returns pools with pending matches that this guesser is involved
+        with"""
+
+        return [pool for pool in self.pools.all() if pool.has_pending_match(self)]
+
+    class Meta:
+        verbose_name = "palpiteiro"
+        verbose_name_plural = "palpiteiros"
 
     def __str__(self) -> str:
         return f"{self.user.get_full_name()} ({self.user.username})"
@@ -514,24 +623,25 @@ class GuessPool(TimeStampedModel):
     guessers = models.ManyToManyField(
         Guesser,
         related_name="pools",
+        verbose_name="Palpiteiros",
         blank=True,
-        verbose_name="palpiteiros",
     )
     competitions = models.ManyToManyField(
         Competition,
         related_name="pools",
-        verbose_name="competições",
+        verbose_name="Competições",
         blank=True,
     )
     teams = models.ManyToManyField(
         Team,
         related_name="pools",
-        verbose_name="times",
+        verbose_name="Times",
         blank=True,
     )
     guesses = models.ManyToManyField(
         Guess,
         related_name="pools",
+        verbose_name="Palpites",
         blank=True,
     )
     new_matches = models.BooleanField(
@@ -541,6 +651,14 @@ class GuessPool(TimeStampedModel):
     updated_matches = models.BooleanField(
         "partidas atualizadas",
         default=False,
+    )
+    minutes_before_start_match = models.PositiveSmallIntegerField(
+        "Até quantos minutos antes do início da partida os palpites serão permitidos?",
+        default=5,
+    )
+    hours_before_open_to_guesses = models.PositiveSmallIntegerField(
+        "A partir de quantas horas antes do início de uma partida os palpites serão permitidos?",
+        default=48,
     )
 
     class Meta:
@@ -575,22 +693,23 @@ class GuessPool(TimeStampedModel):
     def guesser_is_member(self, guesser: Guesser):
         return self.guessers.contains(guesser)
 
+    def has_pending_match(self, guesser: Guesser) -> bool:
+        """Returns True if pool has pending matches open to guesses"""
+
+        for match in self.get_open_matches():
+            if match.pending_guess(guesser):
+                return True
+        return False
+
     def get_open_matches(self):
         """Returns matches open to guesses"""
 
         return self.get_matches().filter(
             date_time__gt=timezone.now()
-            + timezone.timedelta(minutes=Match.MINUTES_BEFORE_START_MATCH),
+            + timezone.timedelta(minutes=self.minutes_before_start_match),
             date_time__lte=timezone.now()
-            + timezone.timedelta(hours=Match.HOURS_BEFORE_OPEN_TO_GUESSES),
+            + timezone.timedelta(hours=self.hours_before_open_to_guesses),
         )
-
-    def has_pending_match(self, guesser: Guesser) -> bool:
-        matches = self.get_open_matches()
-        for match in matches:
-            if match.pending_guess(guesser):
-                return True
-        return False
 
     @classmethod
     def toggle_flag_value(
@@ -600,7 +719,7 @@ class GuessPool(TimeStampedModel):
         desired_value: bool = False,
     ):
         if flag not in ["new_matches", "updated_matches"]:
-            raise ValueError(f"flag value must be 'new_matches' or 'updated_matches'")
+            raise ValueError("flag value must be 'new_matches' or 'updated_matches'")
 
         pools = objs or (
             cls.objects.filter(new_matches=not desired_value)
@@ -655,14 +774,21 @@ class GuessPool(TimeStampedModel):
         """Returns all matches created after this pool that belongs to
         any registered competition or involving registered teams"""
 
-        matches_post_pool_creation = Match.objects.filter(
+        matches_post_pool_creation = Match.objects.select_related(
+            "competition",
+            "home_team",
+            "away_team",
+        ).filter(
             date_time__gt=self.created,
         )
 
+        registered_competitions = self.competitions.all()
+        registered_teams = self.teams.all()
+
         competition_or_team_membership = (
-            Q(competition__in=self.competitions.all())
-            | Q(home_team__in=self.teams.all())
-            | Q(away_team__in=self.teams.all())
+            Q(competition__in=registered_competitions)
+            | Q(home_team__in=registered_teams)
+            | Q(away_team__in=registered_teams)
         )
 
         return matches_post_pool_creation.filter(competition_or_team_membership)
@@ -671,9 +797,9 @@ class GuessPool(TimeStampedModel):
         self,
         month: int,
         year: int,
-        round_: int,
+        week: int,
     ):
-        start, end = self._assemble_datetime_period(month, year, round_)
+        start, end = self._assemble_datetime_period(month, year, week)
         matches = self.get_finished_or_in_progress_matches_on_period(start, end)
         guessers = self.get_guessers_with_match_scores(matches)
 
@@ -684,7 +810,7 @@ class GuessPool(TimeStampedModel):
 
         return guessers
 
-    def _assemble_datetime_period(self, month: int, year: int, round_: int):
+    def _assemble_datetime_period(self, month: int, year: int, week: int):
         base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
         base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
 
@@ -701,7 +827,7 @@ class GuessPool(TimeStampedModel):
 
             else:
                 # período mensal (mes e ano recebidos)
-                if round_ == 0:
+                if week == 0:
                     start = base_start.replace(year=year, month=month)
                     end = (
                         base_end.replace(year=year, month=month + 1)
@@ -711,10 +837,10 @@ class GuessPool(TimeStampedModel):
 
                 else:
                     # período semanal (ano, mes e semanas recebidos)
-                    start = timezone.now().fromisocalendar(year, round_, 1)
+                    start = timezone.now().fromisocalendar(year, week, 1)
                     end = (
                         timezone.now()
-                        .fromisocalendar(year, round_, 7)
+                        .fromisocalendar(year, week, 7)
                         .replace(hour=23, minute=59, second=59)
                     )
 
@@ -731,7 +857,8 @@ class GuessPool(TimeStampedModel):
         return (
             self.get_matches()
             .filter(status__in=Match.IN_PROGRESS_AND_FINISHED_STATUS)
-            .filter(date_time__gt=start, date_time__lte=end)
+            .filter(date_time__date__gte=start.date(), date_time__date__lte=end.date())
+            .order_by("-date_time")
         )
 
     def get_guessers_with_match_scores(self, matches: Iterable[Match]):

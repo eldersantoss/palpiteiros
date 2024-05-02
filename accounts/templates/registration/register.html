@@ -1,18 +1,27 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% load static %}
 
 {% block title %}Palpiteiros | Cadastrar{% endblock title %}
 
 {% block content %}
 
+<div>
+  <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+    <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros"
+    class="small-logo">
+  </a>
+</div>
+
 <form action="{% url 'register' %}" method="post" class="main-form">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <input type="hidden" name="next" value="{{ next }}">
-    <input type="submit" value="Criar conta">
+  {% csrf_token %}
+  {{ form.as_div }}
+  <input type="hidden" name="next" value="{{ next }}">
+  <input type="submit" value="Criar conta">
 </form>
 
 <nav class="menu vertical">
-    <a href="{% url 'login' %}">Voltar para login</a>
+  <a href="{% url 'login' %}">Voltar para login</a>
 </nav>
 
 {% endblock content %}

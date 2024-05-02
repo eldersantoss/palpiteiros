@@ -1,6 +1,8 @@
+from time import sleep
+
 import requests
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition
 
@@ -37,6 +39,8 @@ class Command(BaseCommand):
 
             # TODO: tratar possíveis exceções
             response = requests.get(api_url, headers=headers, params=params)
+            sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
             json_data = response.json()
             json_data_response = json_data["response"][0]
 
@@ -45,9 +49,11 @@ class Command(BaseCommand):
                 self.stderr.write(f"Season {season} not found for league {league_id}.")
                 continue
 
+            # The league id still the same across all seasons
+            # So data_source_id must be added with season for uniqueness constraints
             competition, created = Competition.objects.get_or_create(
-                data_source_id=json_data_response["league"]["id"],
-                name=json_data_response["league"]["name"],
+                data_source_id=json_data_response["league"]["id"] + season,
+                name=f"{json_data_response['league']['name']} {season}",
                 season=season,
             )
             if created:

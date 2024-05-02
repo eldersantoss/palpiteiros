@@ -22,6 +22,16 @@
     {{ form.name.label }}
     {{ form.name }}
   </div>
+  <div class="manage-pool-form">
+    {{ form.errors }}
+    {{ form.minutes_before_start_match.label }}
+    {{ form.minutes_before_start_match }}
+  </div>
+  <div class="manage-pool-form">
+    {{ form.errors }}
+    {{ form.hours_before_open_to_guesses.label }}
+    {{ form.hours_before_open_to_guesses }}
+  </div>
   <div>
     <div class="private-checkbox">
       {{ form.private.errors }}
