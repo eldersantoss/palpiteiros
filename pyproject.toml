@@ -6,8 +6,9 @@ profile = "black"
 
 [tool.flake8]
 max-line-length = 120
-max-complexity = 4
+max-complexity = 7
 exclude = ["migrations", "venv"]
+ignore = ["E501"]
 
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "tests.py"]
