@@ -3,11 +3,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import CheckboxSelectMultiple, modelform_factory
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.views import generic
+from django.views.decorators.cache import cache_page
 
 from core.helpers import redirect_with_msg
 
+from . import constants
 from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
@@ -23,11 +26,7 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
         involved_pools = guesser.get_involved_pools()
         pools_as_guesser = guesser.pools.all()
         for pool in involved_pools:
-            pool.is_pending = (
-                pool.has_pending_match(self.request.user.guesser)
-                if pool in pools_as_guesser
-                else False
-            )
+            pool.is_pending = pool.has_pending_match(self.request.user.guesser) if pool in pools_as_guesser else False
 
         context["display_subtitle"] = any([pool.is_pending for pool in involved_pools])
         context["pools"] = involved_pools
@@ -234,10 +233,7 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
             return redirect_with_msg(
                 self.request,
                 "error",
-                "Nenhum bolão público cadastrado..."
-                + " Que tal criar um agora mesmo?"
-                + " Basta clicar em <strong>Criar bolão</strong>"
-                + " e configurar como quiser 😎",
+                "Nenhum bolão público cadastrado... Que tal criar um agora mesmo? Basta clicar em <strong>Criar bolão</strong> e configurar como quiser 😎",
                 "long",
             )
         return super().get(request, *args, **kwargs)
@@ -253,10 +249,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             return redirect_with_msg(
                 self.request,
                 "error",
-                "Você não está cadastrado como palpiteiro."
-                + " Acesse <strong>Gerenciar bolão</strong>"
-                + " e marque seu usuário como <strong>Palpiteiro</strong>"
-                + " para ter acesso à esta ação.",
+                "Você não está cadastrado como palpiteiro. Acesse <strong>Gerenciar bolão</strong> e marque seu usuário como <strong>Palpiteiro</strong> para ter acesso à esta ação.",
                 "long",
                 self.pool,
             )
@@ -372,6 +365,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
 class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/ranking.html"
 
+    @method_decorator(cache_page(constants.SEGUNDOS_24_HORAS))
     def get(self, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if not context["guessers"].exists():
@@ -400,8 +394,6 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
         week = int(form.cleaned_data["semana"])
 
         context["period_form"] = form
-        context["guessers"] = self.pool.get_guessers_with_score_and_guesses(
-            month, year, week
-        )
+        context["guessers"] = self.pool.get_guessers_with_score_and_guesses(month, year, week)
 
         return context
