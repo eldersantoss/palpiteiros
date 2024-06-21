@@ -1,0 +1,1 @@
+SEGUNDOS_24_HORAS = 60 * 60 * 24

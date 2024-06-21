@@ -1,0 +1,36 @@
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 7
+exclude = ["migrations", "venv"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "tests.py"]
+norecursedirs = ["venv", "old_tests"]
+addopts = """
+--ds=botscontabeis.settings --no-migrations --reuse-db
+--pdbcls=IPython.terminal.debugger:TerminalPdb
+--color=yes --quiet --numprocesses=auto
+--cov --cov-report=html --no-cov-on-fail --maxfail=1 --cov-fail-under=80 --cov-branch
+"""
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = [
+  "*/tests/*",
+  "*/migrations/*",
+  "venv/*",
+  "static/*",
+  "manage.py",
+  "requirements.txt",
+]
+
+[tool.ipdb]
+context=5
