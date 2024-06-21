@@ -125,8 +125,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "pt-br"
 USE_I18N = True
 
-TIME_ZONE = config("TIME_ZONE")
-USE_TZ = config("USE_TZ", cast=bool)
+TIME_ZONE = config("TIME_ZONE", default="America/Sao_Paulo")
+USE_TZ = config("USE_TZ", default=1, cast=bool)
 
 
 # Static files (CSS, JavaScript, Images)
@@ -154,9 +154,7 @@ LOGOUT_URL = "logout"
 
 # Email
 
-EMAIL_BACKEND = config(
-    "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
-)
+EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
@@ -191,3 +189,16 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 FOOTBALL_API_KEY = config("FOOTBALL_API_KEY")
 FOOTBALL_API_HOST = "v3.football.api-sports.io"
 FOOTBALL_API_RATE_LIMIT_TIME = 7
+
+
+# Cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("CACHE_LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
