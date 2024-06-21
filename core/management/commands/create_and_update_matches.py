@@ -1,10 +1,11 @@
+from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition
 
 
 class Command(BaseCommand):
-    help = "For each registered competition, send a request to the Football API to create new matches and update those already registered."
+    help = "For each registered competition, uses the Football API to create new matches and update those already registered."
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
@@ -25,13 +26,17 @@ class Command(BaseCommand):
         competitions = Competition.objects.all()
         if not competitions.exists():
             self.stdout.write("No competitions registered yet.")
+            return
 
-        for competition in competitions:
-            created_matches, updated_matches = competition.create_and_update_matches(
-                days_from, days_ahead
-            )
-            self.stdout.write(
-                f"{len(created_matches)} matches created and {len(updated_matches)} updated matches for {competition}..."
-            )
+        for comp in competitions:
+            try:
+                created, updated = comp.create_and_update_matches(days_from, days_ahead)
+                self.stdout.write(f"{len(created)} matches created and {len(updated)} updated matches for {comp}...")
+
+            except Exception as e:
+                self.stderr.write(f"Error when updating {comp}: {e}")
+
+        self.stdout.write("Cleaning cache data...")
+        cache.clear()
 
         self.stdout.write("Competitions update done.")
