@@ -137,3 +137,8 @@ dmypy.json
 
 # ssh keys
 *.pem
+
+
+# Database backups
+
+dumps/*
