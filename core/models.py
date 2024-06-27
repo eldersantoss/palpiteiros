@@ -65,6 +65,38 @@ class Competition(models.Model):
     def logo_url(self) -> str:
         return f"https://media.api-sports.io/football/leagues/{self.real_data_source_id}.png"
 
+    @classmethod
+    def get_competition(cls, season: int, league_id: int):
+        api_url = f"https://{settings.FOOTBALL_API_HOST}/leagues"
+        headers = {
+            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
+            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
+        }
+        params = {"id": league_id}
+
+        # TODO: tratar possíveis exceções
+        response = requests.get(api_url, headers=headers, params=params)
+        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
+
+        json_data = response.json()
+
+        try:
+            json_data_response = json_data["response"][0]
+        except IndexError:
+            logger.warning(f"Season {season} not found for league {league_id}.")
+            return
+
+        # TODO: remover essa gambiarra
+        # The league id still the same across all seasons
+        # So data_source_id must be added with season for uniqueness constraints
+        competition, _ = Competition.objects.get_or_create(
+            data_source_id=league_id + season,
+            name=f"{json_data_response['league']['name']} {season}",
+            season=season,
+        )
+
+        logger.info(f"Competition {competition.name} (id {competition.real_data_source_id}) was registered.")
+
     def get_teams(self):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
         headers = {
@@ -83,7 +115,7 @@ class Competition(models.Model):
             name = data["team"]["name"]
             code = data["team"]["code"]
 
-            team, created = Team.objects.get_or_create(
+            team, _ = Team.objects.get_or_create(
                 data_source_id=data_source_id,
                 name=name,
                 code=code,
@@ -94,7 +126,7 @@ class Competition(models.Model):
 
         return teams
 
-    def create_and_update_matches(self, days_from: int | None, days_ahead: int | None):
+    def create_and_update_matches(self, days_from: int | None = None, days_ahead: int | None = None):
         api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
         headers = {
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
@@ -633,7 +665,7 @@ class GuessPool(TimeStampedModel):
 
     @classmethod
     def delete_orphans_guesses(cls):
-        """Deletes Palpite instances that are not related with a Pool"""
+        """Deletes Guess instances that are not related with a Pool"""
 
         return Guess.objects.exclude(pools__in=cls.objects.all()).delete()
 
