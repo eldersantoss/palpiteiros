@@ -59,17 +59,11 @@ class Competition(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    @property
-    def real_data_source_id(self):
-        """return the real Football APPI id of competition"""
-
-        return self.data_source_id - self.season
-
     def logo_url(self) -> str:
-        return f"https://media.api-sports.io/football/leagues/{self.real_data_source_id}.png"
+        return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
 
     @classmethod
-    def get_competition(cls, season: int, league_id: int):
+    def create_or_update(cls, season: int, league_id: int):
         api_url = f"https://{settings.FOOTBALL_API_HOST}/leagues"
         headers = {
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
@@ -89,16 +83,19 @@ class Competition(models.Model):
             logger.warning(f"Season {season} not found for league {league_id}.")
             return
 
-        # TODO: remover essa gambiarra
+        # TODO: update start and end date of competitions
         # The league id still the same across all seasons
-        # So data_source_id must be added with season for uniqueness constraints
-        competition, _ = Competition.objects.get_or_create(
-            data_source_id=league_id + season,
-            name=f"{json_data_response['league']['name']} {season}",
-            season=season,
+        competition, created = cls.objects.update_or_create(
+            data_source_id=league_id,
+            defaults={
+                "name": f"{json_data_response['league']['name']}",
+                "season": season,
+            },
         )
 
-        logger.info(f"Competition {competition.name} (id {competition.real_data_source_id}) was registered.")
+        action_performed = "created" if created else "updated"
+
+        logger.info(f"Competition {competition.name} (id {competition.data_source_id}) was {action_performed}.")
 
     def get_teams(self):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
@@ -106,7 +103,7 @@ class Competition(models.Model):
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
-        params = {"league": self.real_data_source_id, "season": self.season}
+        params = {"league": self.data_source_id, "season": self.season}
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(source_url, headers=headers, params=params).json().get("response")
@@ -140,7 +137,7 @@ class Competition(models.Model):
         to = today + timezone.timedelta(days=days_ahead or 3)
         params = {
             "timezone": settings.TIME_ZONE,
-            "league": self.real_data_source_id,
+            "league": self.data_source_id,
             "season": self.season,
             "from": str(from_),
             "to": str(to),

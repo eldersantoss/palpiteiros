@@ -24,7 +24,7 @@ class Command(BaseCommand):
         league_ids = options["league_ids"]
 
         for league_id in league_ids:
-            Competition.get_competition(season, league_id)
+            Competition.create_or_update(season, league_id)
 
         self.stdout.write(
             "Registration of competitions was done. Now, you need register teams for competitions with create_or_update_teams_for_competitions command."
