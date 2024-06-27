@@ -23,7 +23,7 @@ class Command(BaseCommand):
         days_from = options.get("days_from")
         days_ahead = options.get("days_ahead")
 
-        competitions = Competition.objects.all()
+        competitions = Competition.objects.filter(in_progress=True)
         if not competitions.exists():
             self.stdout.write("No competitions registered yet.")
             return
