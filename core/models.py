@@ -47,6 +47,9 @@ class Competition(models.Model):
     name = models.CharField(max_length=100)
     season = models.PositiveIntegerField("Temporada")
     teams = models.ManyToManyField(Team, related_name="competitions")
+    in_progress = models.BooleanField("Está em andamento?", default=True)
+
+    # TODO: add date fields for start and end dates
 
     class Meta:
         verbose_name = "competição"

@@ -15,7 +15,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competition)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ("name", "season")
+    list_display = ("name", "season", "in_progress")
     search_fields = ("name", "season")
     filter_horizontal = ["teams"]
 
