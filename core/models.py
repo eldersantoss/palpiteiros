@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime
 from time import sleep
 from typing import Iterable, Literal
@@ -12,6 +13,8 @@ from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
+
+logger = logging.getLogger(__name__)
 
 
 class TimeStampedModel(models.Model):
