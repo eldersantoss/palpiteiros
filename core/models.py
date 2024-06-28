@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimeStampedModel(models.Model):
-    created = models.DateTimeField("Criação", auto_now_add=True)
-    modified = models.DateTimeField("Atualização", auto_now=True)
+    created = models.DateTimeField("Criado em", auto_now_add=True)
+    modified = models.DateTimeField("Modificado em", auto_now=True)
 
     class Meta:
         abstract = True
@@ -42,22 +42,22 @@ class Team(models.Model):
         return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png" if self.data_source_id else ""
 
 
-class Competition(models.Model):
+class Competition(TimeStampedModel):
     data_source_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
     season = models.PositiveIntegerField("Temporada")
     teams = models.ManyToManyField(Team, related_name="competitions")
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
-    # TODO: add date fields for start and end dates
+    # TODO: add date fields for start and end dates, then replace field in_progress by a calculated property
 
     class Meta:
         verbose_name = "competição"
         verbose_name_plural = "competições"
-        ordering = ("name",)
+        ordering = ("-in_progress", "name")
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} {self.season}"
 
     def logo_url(self) -> str:
         return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
