@@ -45,7 +45,6 @@ class Team(models.Model):
 class Competition(TimeStampedModel):
     data_source_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
-    season = models.PositiveIntegerField("Temporada")
     teams = models.ManyToManyField(Team, related_name="competitions")
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
@@ -57,18 +56,18 @@ class Competition(TimeStampedModel):
         ordering = ("-in_progress", "name")
 
     def __str__(self) -> str:
-        return f"{self.name} {self.season}"
+        return f"{self.name}"
 
     def logo_url(self) -> str:
         return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
 
-    def get_teams(self):
+    def get_teams(self, season: int):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
         headers = {
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
-        params = {"league": self.data_source_id, "season": self.season}
+        params = {"league": self.data_source_id, "season": season}
 
         # TODO: tratar requests.exceptions.ConnectionError:
         response = requests.get(source_url, headers=headers, params=params).json().get("response")
@@ -91,19 +90,19 @@ class Competition(TimeStampedModel):
 
         return teams
 
-    def create_and_update_matches(self, days_from: int | None = None, days_ahead: int | None = None):
+    def create_and_update_matches(self, season: int, days_from: int, days_ahead: int):
         api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
         headers = {
             "x-rapidapi-key": settings.FOOTBALL_API_KEY,
             "x-rapidapi-host": settings.FOOTBALL_API_HOST,
         }
         today = timezone.now().date()
-        from_ = today - timezone.timedelta(days=days_from or 3)
-        to = today + timezone.timedelta(days=days_ahead or 3)
+        from_ = today - timezone.timedelta(days=days_from)
+        to = today + timezone.timedelta(days=days_ahead)
         params = {
             "timezone": settings.TIME_ZONE,
             "league": self.data_source_id,
-            "season": self.season,
+            "season": season,
             "from": str(from_),
             "to": str(to),
             "status": "-".join([Match.NOT_STARTED, *Match.IN_PROGRESS_AND_FINISHED_STATUS]),
@@ -165,7 +164,7 @@ class Competition(TimeStampedModel):
         return cls.objects.filter(id__in=competitions_with_matches_on_period)
 
     def create_public_pool(self):
-        name = f"{self.name} {self.season}"
+        name = f"{self.name}"
         slug = slugify(name)
         owner = Guesser.objects.get(user__username=settings.ADMIN_USERNAME)
         private = False
