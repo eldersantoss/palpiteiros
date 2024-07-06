@@ -33,6 +33,10 @@ class Command(BaseCommand):
         days_from = options.get("days_from")
         days_ahead = options.get("days_ahead")
 
+        start_date = timezone.now().replace(year=season) - timezone.timedelta(days=days_from)
+        end_date = timezone.now().replace(year=season) + timezone.timedelta(days=days_ahead)
+        self.stdout.write(f"Getting matches for all in progress Competitions from {start_date} to {end_date}...")
+
         competitions = Competition.objects.filter(in_progress=True)
         if not competitions.exists():
             self.stdout.write("No competitions registered yet.")
