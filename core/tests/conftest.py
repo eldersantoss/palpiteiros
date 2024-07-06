@@ -27,6 +27,11 @@ def get_competition_by_id_and_season_response():
 
 
 @pytest.fixture
+def get_competition_by_id_and_season_empty_response():
+    return {"response": []}
+
+
+@pytest.fixture
 def get_teams_by_league_and_season_response():
     return {
         "response": [
