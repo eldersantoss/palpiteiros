@@ -62,41 +62,6 @@ class Competition(TimeStampedModel):
     def logo_url(self) -> str:
         return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
 
-    @classmethod
-    def create_or_update(cls, season: int, league_id: int):
-        api_url = f"https://{settings.FOOTBALL_API_HOST}/leagues"
-        headers = {
-            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
-            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
-        }
-        params = {"id": league_id}
-
-        # TODO: tratar possíveis exceções
-        response = requests.get(api_url, headers=headers, params=params)
-        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
-
-        json_data = response.json()
-
-        try:
-            json_data_response = json_data["response"][0]
-        except IndexError:
-            logger.warning(f"Season {season} not found for league {league_id}.")
-            return
-
-        # TODO: update start and end date of competitions
-        # The league id still the same across all seasons
-        competition, created = cls.objects.update_or_create(
-            data_source_id=league_id,
-            defaults={
-                "name": f"{json_data_response['league']['name']}",
-                "season": season,
-            },
-        )
-
-        action_performed = "created" if created else "updated"
-
-        logger.info(f"Competition {competition.name} (id {competition.data_source_id}) was {action_performed}.")
-
     def get_teams(self):
         source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
         headers = {
