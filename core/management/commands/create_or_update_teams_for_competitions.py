@@ -8,6 +8,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
+            "season",
+            type=int,
+            nargs=1,
+            help="Season of the league whose teams will be created or updated",
+        )
+        parser.add_argument(
             "league_ids",
             type=int,
             nargs="+",
@@ -16,6 +22,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        season = options["season"]
         league_ids = options["league_ids"]
 
         competitions = (
@@ -23,7 +30,7 @@ class Command(BaseCommand):
         )
 
         for competition in competitions:
-            competition.get_teams()
+            competition.get_teams(season)
             self.stdout.write(f"Teams updated for {competition.name}")
 
-        self.stdout.write("Teams of competitions updating done.")
+        self.stdout.write("Update of teams in competitions done.")
