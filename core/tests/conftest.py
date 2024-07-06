@@ -54,7 +54,27 @@ def get_teams_by_league_and_season_response():
                     "surface": "grass",
                     "image": "https://media.api-sports.io/football/venues/216.png",
                 },
-            }
+            },
+            {
+                "team": {
+                    "id": 119,
+                    "name": "Internacional",
+                    "code": "INT",
+                    "country": "Brazil",
+                    "founded": 1909,
+                    "national": False,
+                    "logo": "https://media.api-sports.io/football/teams/119.png",
+                },
+                "venue": {
+                    "id": 244,
+                    "name": "Estádio José Pinheiro Borda",
+                    "address": "Avenida Padre Cacique 891, Bairro Menino Deus",
+                    "city": "Porto Alegre, Rio Grande do Sul",
+                    "capacity": 50128,
+                    "surface": "grass",
+                    "image": "https://media.api-sports.io/football/venues/244.png",
+                },
+            },
         ]
     }
 
