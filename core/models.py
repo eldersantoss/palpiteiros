@@ -239,7 +239,7 @@ class Match(models.Model):
     class Meta:
         verbose_name = "partida"
         verbose_name_plural = "partidas"
-        ordering = ("date_time",)
+        ordering = ("-date_time",)
         unique_together = ["home_team", "away_team", "date_time"]
 
     def __str__(self):
