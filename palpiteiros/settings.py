@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from decouple import Csv, config
@@ -173,6 +174,30 @@ SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
 
 
 # Logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'core': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    },
+}
 
 SERVER_EMAIL = config("SERVER_EMAIL")
 
