@@ -16,7 +16,7 @@ def test_get_teams(mock_get, mock_success_response, get_teams_by_league_and_seas
 
     competition = baker.make("core.Competition")
 
-    competition.get_teams()
+    competition.get_teams(timezone.now().year)
 
     mock_get.assert_called_once()
 
@@ -35,7 +35,8 @@ def test_create_matches(mock_get, mock_success_response, get_matches_by_league_a
     away_team = baker.make("core.Team", data_source_id=response_data["response"][0]["teams"]["away"]["id"])
     competition.teams.set([home_team, away_team])
 
-    created, updated = competition.create_and_update_matches()
+    # TODO: remover parâmetros hardcoded
+    created, updated = competition.create_and_update_matches(2024, 3, 3)
 
     mock_get.assert_called_once()
 
@@ -69,7 +70,8 @@ def test_update_matches(mock_get, mock_success_response, get_matches_by_league_a
         date_time=date_time,
     )
 
-    created, updated = competition.create_and_update_matches()
+    # TODO: remover parâmetros hardcoded
+    created, updated = competition.create_and_update_matches(2024, 3, 3)
 
     mock_get.assert_called_once()
 

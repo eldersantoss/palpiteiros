@@ -19,7 +19,6 @@ class Command(BaseCommand):
             help="Football API league ids separeted by space",
         )
 
-    # TODO: REMOVER SEASON HARDCODED
     def handle(self, *args, **options):
         league_ids = options["league_ids"]
 
@@ -34,7 +33,7 @@ class Command(BaseCommand):
             name = league_data["league"]["name"]
             competition, created = Competition.objects.update_or_create(
                 data_source_id=data_source_id,
-                defaults={"name": name, "season": 2024},
+                defaults={"name": name},
             )
 
             action_performed = "created" if created else "updated"
