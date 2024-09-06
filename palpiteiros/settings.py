@@ -176,26 +176,26 @@ SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
 # Logging
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
         },
-        'core': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        }
+        "core": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
 
@@ -213,7 +213,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 FOOTBALL_API_KEY = config("FOOTBALL_API_KEY")
 FOOTBALL_API_HOST = "v3.football.api-sports.io"
-FOOTBALL_API_RATE_LIMIT_TIME = 7
+FOOTBALL_API_REQUESTS_INTERVAL = 7
 
 
 # Cache

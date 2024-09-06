@@ -1,11 +1,11 @@
 import logging
+from time import sleep
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition
 from core.services.football import FootballApiService
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -24,9 +24,10 @@ class Command(BaseCommand):
 
         for league_id in league_ids:
             league_data = FootballApiService.get_league_by_id(league_id)
+            sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
-            if not league_data:
-                logger.warning(f"League {league_id} not found")
+            if league_data is None:
+                self.stderr.write(f"League with id {league_id} not found.")
                 continue
 
             data_source_id = league_data["league"]["id"]
@@ -37,7 +38,10 @@ class Command(BaseCommand):
             )
 
             action_performed = "created" if created else "updated"
-            logger.info(f"Competition {competition.name} (id {competition.data_source_id}) was {action_performed}.")
+
+            self.stdout.write(
+                f"Competition {competition.name} (id {competition.data_source_id}) was {action_performed}."
+            )
 
         self.stdout.write(
             "Registration of competitions was done. Now, you need register teams for competitions with create_or_update_teams_for_competitions command."
