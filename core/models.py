@@ -46,6 +46,7 @@ class Competition(TimeStampedModel):
     data_source_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, related_name="competitions")
+    current_season = models.SmallIntegerField("Temporada atual", default=timezone.now().year)
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
     # TODO: add date fields for start and end dates, then replace field in_progress by a calculated property
