@@ -479,9 +479,13 @@ class GuessPool(TimeStampedModel):
     def get_open_matches(self):
         """Returns matches open to guesses"""
 
-        return self.get_matches().filter(
-            date_time__gt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
-            date_time__lte=timezone.now() + timezone.timedelta(hours=self.hours_before_open_to_guesses),
+        return (
+            self.get_matches()
+            .filter(
+                date_time__gt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
+                date_time__lte=timezone.now() + timezone.timedelta(hours=self.hours_before_open_to_guesses),
+            )
+            .order_by("date_time")
         )
 
     @classmethod
