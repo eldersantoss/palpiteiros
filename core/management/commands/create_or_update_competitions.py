@@ -32,6 +32,7 @@ class Command(BaseCommand):
 
             data_source_id = league_data["league"]["id"]
             name = league_data["league"]["name"]
+            # TODO: implementar lógica para atualizar os campos current_season e in_progress
             competition, created = Competition.objects.update_or_create(
                 data_source_id=data_source_id,
                 defaults={"name": name},
