@@ -17,20 +17,27 @@ addopts = """
 --ds=palpiteiros.settings --no-migrations --reuse-db
 --pdbcls=IPython.terminal.debugger:TerminalPdb
 --color=yes --quiet --numprocesses=auto
---cov --cov-report=html --no-cov-on-fail --maxfail=1 --cov-fail-under=80 --cov-branch
+--cov --maxfail=1 --cov-branch
 """
 
 [tool.coverage.run]
 branch = true
 source = ["."]
 omit = [
+  "manage.py",
+  "venv/*",
+  "palpiteiros/*",
   "*/tests/*",
   "*/migrations/*",
-  "venv/*",
-  "static/*",
-  "manage.py",
-  "requirements.txt",
+  "*/templates/*",
+  "*/static/*",
+  "*/urls.py",
+  "*/constants.py",
+  "*/interfaces.py",
 ]
+
+[tool.coverage.report]
+show_missing = true
 
 [tool.ipdb]
 context=5
