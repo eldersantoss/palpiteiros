@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition
-from core.services.football import FootballApiService
+from core.services.football import FootballApi
 
 
 class Command(BaseCommand):
@@ -23,7 +23,7 @@ class Command(BaseCommand):
         league_ids = options["league_ids"]
 
         for league_id in league_ids:
-            league_data = FootballApiService.get_league_by_id(league_id)
+            league_data = FootballApi.get_league_by_id(league_id)
             sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
             if league_data is None:

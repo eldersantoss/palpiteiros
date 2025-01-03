@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.models import Competition, Match, Team
-from core.services.football import FootballApiService
+from core.services.football import FootballApi
 
 
 class Command(BaseCommand):
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             created, updated = [], []
 
             try:
-                matches = FootballApiService.get_matches_of_league_by_season_and_date_period(
+                matches = FootballApi.get_matches_of_league_by_season_and_date_period(
                     comp.data_source_id, comp.current_season, start_date, end_date
                 )
                 sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)

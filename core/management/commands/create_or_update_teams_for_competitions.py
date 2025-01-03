@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
 from core.models import Competition, Team
-from core.services.football import FootballApiService
+from core.services.football import FootballApi
 
 
 class Command(BaseCommand):
@@ -39,7 +39,7 @@ class Command(BaseCommand):
             )
 
         for competition in competitions:
-            teams_data = FootballApiService.get_teams_of_league_by_season(competition.data_source_id, season)
+            teams_data = FootballApi.get_teams_of_league_by_season(competition.data_source_id, season)
             sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
             if teams_data:
