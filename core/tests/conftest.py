@@ -13,7 +13,7 @@ def mock_success_response():
 
 
 @pytest.fixture
-def get_competition_by_id_and_season_response():
+def get_league_by_id_response():
     return {
         "response": [
             {
@@ -27,12 +27,12 @@ def get_competition_by_id_and_season_response():
 
 
 @pytest.fixture
-def get_competition_by_id_and_season_empty_response():
+def football_api_empty_response():
     return {"response": []}
 
 
 @pytest.fixture
-def get_teams_by_league_and_season_response():
+def get_teams_of_league_by_season_response():
     return {
         "response": [
             {
@@ -75,12 +75,12 @@ def get_teams_by_league_and_season_response():
                     "image": "https://media.api-sports.io/football/venues/244.png",
                 },
             },
-        ]
+        ],
     }
 
 
 @pytest.fixture
-def get_matches_by_league_and_season_response():
+def get_matches_of_league_by_season_and_date_period_response():
     return {
         "response": [
             {

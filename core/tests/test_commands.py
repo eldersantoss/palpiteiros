@@ -14,9 +14,9 @@ pytestmark = pytest.mark.django_db
 def test_command_create_or_update_competitions_successfully(
     mock_get,
     mock_success_response,
-    get_competition_by_id_and_season_response,
+    get_league_by_id_response,
 ):
-    response_data = get_competition_by_id_and_season_response
+    response_data = get_league_by_id_response
     league_id = response_data["response"][0]["league"]["id"]
     league_name = response_data["response"][0]["league"]["name"]
 
@@ -36,9 +36,9 @@ def test_command_create_or_update_competitions_successfully(
 
 @patch("requests.get")
 def test_command_create_or_update_competitions_league_not_found(
-    mock_get, mock_success_response, get_competition_by_id_and_season_empty_response
+    mock_get, mock_success_response, football_api_empty_response
 ):
-    response_data = get_competition_by_id_and_season_empty_response
+    response_data = football_api_empty_response
     mock_success_response.json.return_value = response_data
     mock_get.return_value = mock_success_response
 
@@ -53,9 +53,9 @@ def test_command_create_or_update_competitions_league_not_found(
 def test_command_create_or_update_teams_for_competitions_successfully(
     mock_get,
     mock_success_response,
-    get_teams_by_league_and_season_response,
+    get_teams_of_league_by_season_response,
 ):
-    response_data = get_teams_by_league_and_season_response
+    response_data = get_teams_of_league_by_season_response
     mock_success_response.json.return_value = response_data
     mock_get.return_value = mock_success_response
     competition = baker.make("core.Competition")
