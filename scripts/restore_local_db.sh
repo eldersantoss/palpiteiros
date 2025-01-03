@@ -6,20 +6,17 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-DUMP_FILE_NAME=$1
+DUMP_FILE_PATH=$1
 
 echo """
-===================================================== ATENÇÃO ===================================================
+===================================================== ATENÇÃO =====================================================
 
-Certifique-se de ter carregado as variáveis de ambiente do projeto local no shell antes de executar este script.
-Isso pode ser feito através dos comandos:
+Certifique-se de ter aplicado as migrações do Django e carregado as variáveis de ambiente do projeto local no shell
+antes de executar este script. Isso pode ser feito através dos comandos:
 
+$ python manage.py migrate
 $ source .env
 """
-
-# Diretório onde o dump está salvo
-LOCAL_DUMP_DIR="../dumps"
-DUMP_FILE_PATH="$LOCAL_DUMP_DIR/$DUMP_FILE_NAME"
 
 # Verifica se o arquivo de dump existe
 if [ ! -f "$DUMP_FILE_PATH" ]; then
