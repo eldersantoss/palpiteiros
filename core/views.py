@@ -391,10 +391,11 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        current_date = timezone.now().date()
         current_period = {
-            "semana": 0,
-            "mes": timezone.now().month,
-            "ano": timezone.now().year,
+            "semana": current_date.isocalendar().week,
+            "mes": current_date.month,
+            "ano": current_date.year,
         }
         form = RankingPeriodForm(self.request.GET or current_period)
         form.is_valid()
