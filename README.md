@@ -13,6 +13,9 @@
   - [**Cadastrando ou atualizando competições**](#cadastrando-ou-atualizando-competições)
   - [**Cadastrando ou atualizando equipes de uma competição**](#cadastrando-ou-atualizando-equipes-de-uma-competição)
   - [**Cadastrando e atualizando partidas**](#cadastrando-e-atualizando-partidas)
+  - [**Dump e restauração do banco de dados**](#dump-e-restauração-do-banco-de-dados)
+    - [Dump](#dump)
+    - [Restauração](#restauração)
 - [**Contribuindo**](#contribuindo)
 - [**Licença**](#licença)
 
@@ -78,6 +81,19 @@ python manage.py create_or_update_teams_for_competitions <season> <league_ids>
 ```bash
 python manage.py create_or_update_matches
 ```
+
+### **Dump e restauração do banco de dados**
+#### Dump
+```bash
+./scripts/db_dump.sh
+```
+
+#### Restauração
+```bash
+./scripts/db_restore.sh
+```
+
+**Obs:** para efetuar as operações no banco de dados de produção, basta definir/carregar no shell as váriaveis solicitadas pelo script (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD e DB_PORT) com os valores de produção.
 
 ## **Contribuindo**
 
