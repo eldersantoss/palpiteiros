@@ -82,6 +82,7 @@ class Command(BaseCommand):
         self.stdout.write("Competitions update done")
 
 
+# TODO: mover para arquivo utils do service
 def parse_match_data(match_raw_data: dict) -> dict:
     return {
         "data_source_id": match_raw_data["fixture"]["id"],
