@@ -98,16 +98,11 @@ class RankingPeriodForm(forms.Form):
                     weeks = [
                         week
                         for week in range(1, 53)
-                        if timezone.datetime.fromisocalendar(
-                            int(year), int(week), 1
-                        ).month
-                        == int(month)
+                        if timezone.datetime.fromisocalendar(int(year), int(week), 7).month == int(month)
                     ]
 
                     week_choices = [(week, f"Semana #{week}") for week in weeks]
-                    self.fields["semana"].choices = [
-                        (self.ALL_TIMES, "Mensal")
-                    ] + week_choices
+                    self.fields["semana"].choices = [(self.ALL_TIMES, "Mensal")] + week_choices
 
         return cd
 
@@ -115,21 +110,13 @@ class RankingPeriodForm(forms.Form):
         self.ALL_TIMES = "0"
         self.MONTHLY = "13"
 
-        years = set(
-            [
-                year["created__year"]
-                for year in GuessPool.objects.values("created__year")
-            ]
-            + [date.today().year]
-        )
-        self.YEAR_CHOICE = [(self.ALL_TIMES, "Geral")] + [
-            (str(year), str(year)) for year in years
-        ]
+        years = set([year["created__year"] for year in GuessPool.objects.values("created__year")] + [date.today().year])
+        years = sorted(years, reverse=True)
+        self.YEAR_CHOICE = [(self.ALL_TIMES, "Geral")] + [(str(year), str(year)) for year in years]
         self.fields["ano"].choices = self.YEAR_CHOICE
 
         self.MONTH_CHOICES = [(self.ALL_TIMES, "Anual")] + [
-            (str(m), _(timezone.now().replace(day=1, month=m).strftime("%B")))
-            for m in range(1, 13)
+            (str(m), _(timezone.now().replace(day=1, month=m).strftime("%B"))) for m in range(1, 13)
         ]
         self.fields["mes"].choices = self.MONTH_CHOICES
 
@@ -145,9 +132,5 @@ class RankingPeriodForm(forms.Form):
     def _get_week_for_selected_month(self, year: int, month: int) -> str:
         return str(timezone.now().replace(year=year, month=month).isocalendar().week)
 
-    def _get_month_for_selected_week(
-        self, selected_year: int, selected_week: int
-    ) -> str:
-        return str(
-            timezone.datetime.fromisocalendar(selected_year, selected_week, 1).month
-        )
+    def _get_month_for_selected_week(self, selected_year: int, selected_week: int) -> str:
+        return str(timezone.datetime.fromisocalendar(selected_year, selected_week, 1).month)

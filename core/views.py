@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import CheckboxSelectMultiple, modelform_factory
@@ -14,6 +16,8 @@ from . import constants
 from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
+
+logger = logging.getLogger(__name__)
 
 
 class IndexView(LoginRequiredMixin, generic.TemplateView):
@@ -257,6 +261,8 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
+        logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
+
         open_matches = self.pool.get_open_matches()
 
         if not open_matches.exists():
@@ -292,6 +298,10 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         )
 
     def post(self, *args, **kwargs):
+        guesses_data = dict(**self.request.POST)
+        guesses_data.pop("csrfmiddlewaretoken")
+        logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
+
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
         open_matches = self.pool.get_open_matches()
@@ -381,10 +391,11 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        current_date = timezone.now().date()
         current_period = {
-            "semana": 0,
-            "mes": timezone.now().month,
-            "ano": timezone.now().year,
+            "semana": current_date.isocalendar().week,
+            "mes": current_date.month,
+            "ano": current_date.year,
         }
         form = RankingPeriodForm(self.request.GET or current_period)
         form.is_valid()

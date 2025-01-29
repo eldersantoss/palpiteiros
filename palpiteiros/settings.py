@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from decouple import Csv, config
@@ -125,8 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "pt-br"
 USE_I18N = True
 
-TIME_ZONE = config("TIME_ZONE", default="America/Sao_Paulo")
-USE_TZ = config("USE_TZ", default=1, cast=bool)
+TIME_ZONE = "America/Sao_Paulo"
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -174,6 +175,30 @@ SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
 
 # Logging
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "core": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
 SERVER_EMAIL = config("SERVER_EMAIL")
 
 
@@ -188,7 +213,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 FOOTBALL_API_KEY = config("FOOTBALL_API_KEY")
 FOOTBALL_API_HOST = "v3.football.api-sports.io"
-FOOTBALL_API_RATE_LIMIT_TIME = 7
+FOOTBALL_API_REQUESTS_INTERVAL = 7
 
 
 # Cache

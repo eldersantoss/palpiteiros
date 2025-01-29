@@ -45,8 +45,8 @@ class Team(models.Model):
 class Competition(TimeStampedModel):
     data_source_id = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
-    season = models.PositiveIntegerField("Temporada")
     teams = models.ManyToManyField(Team, related_name="competitions")
+    current_season = models.SmallIntegerField("Temporada atual", default=timezone.now().year)
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
     # TODO: add date fields for start and end dates, then replace field in_progress by a calculated property
@@ -57,103 +57,10 @@ class Competition(TimeStampedModel):
         ordering = ("-in_progress", "name")
 
     def __str__(self) -> str:
-        return f"{self.name} {self.season}"
+        return f"{self.name}"
 
     def logo_url(self) -> str:
         return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
-
-    def get_teams(self):
-        source_url = f"https://{settings.FOOTBALL_API_HOST}/teams"
-        headers = {
-            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
-            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
-        }
-        params = {"league": self.data_source_id, "season": self.season}
-
-        # TODO: tratar requests.exceptions.ConnectionError:
-        response = requests.get(source_url, headers=headers, params=params).json().get("response")
-        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
-
-        teams = []
-        for data in response:
-            data_source_id = data["team"]["id"]
-            name = data["team"]["name"]
-            code = data["team"]["code"]
-
-            team, _ = Team.objects.get_or_create(
-                data_source_id=data_source_id,
-                name=name,
-                code=code,
-            )
-            teams.append(team)
-
-        self.teams.set(teams)
-
-        return teams
-
-    def create_and_update_matches(self, days_from: int | None = None, days_ahead: int | None = None):
-        api_url = f"https://{settings.FOOTBALL_API_HOST}/fixtures"
-        headers = {
-            "x-rapidapi-key": settings.FOOTBALL_API_KEY,
-            "x-rapidapi-host": settings.FOOTBALL_API_HOST,
-        }
-        today = timezone.now().date()
-        from_ = today - timezone.timedelta(days=days_from or 3)
-        to = today + timezone.timedelta(days=days_ahead or 3)
-        params = {
-            "timezone": settings.TIME_ZONE,
-            "league": self.data_source_id,
-            "season": self.season,
-            "from": str(from_),
-            "to": str(to),
-            "status": "-".join([Match.NOT_STARTED, *Match.IN_PROGRESS_AND_FINISHED_STATUS]),
-        }
-
-        # TODO: tratar requests.exceptions.ConnectionError:
-        response = requests.get(api_url, headers=headers, params=params)
-        sleep(settings.FOOTBALL_API_RATE_LIMIT_TIME)
-
-        json_data = response.json()
-        json_data_response = json_data["response"]
-
-        created_matches, updated_matches = [], []
-        for data in json_data_response:
-            data_source_id = data["fixture"]["id"]
-            date_time = timezone.datetime.fromisoformat(data["fixture"]["date"])
-            status = data["fixture"]["status"]["short"]
-            home_team_source_id = data["teams"]["home"]["id"]
-            away_team_source_id = data["teams"]["away"]["id"]
-            elapsed = data["fixture"]["status"]["elapsed"] or 0
-            home_goals = data["goals"]["home"]
-            away_goals = data["goals"]["away"]
-
-            home_team = Team.objects.filter(data_source_id=home_team_source_id).first()
-            away_team = Team.objects.filter(data_source_id=away_team_source_id).first()
-            if None in [home_team, away_team]:
-                continue
-
-            match = Match.objects.filter(data_source_id=data_source_id).first()
-
-            if match is not None:
-                match.date_time = date_time
-                match.home_goals = home_goals
-                match.away_goals = away_goals
-                match.update_status(status, elapsed)
-                match.save()
-                updated_matches.append(match)
-
-            else:
-                match = Match.objects.create(
-                    data_source_id=data_source_id,
-                    competition=self,
-                    status=status,
-                    home_team=home_team,
-                    away_team=away_team,
-                    date_time=date_time,
-                )
-                created_matches.append(match)
-
-        return created_matches, updated_matches
 
     @classmethod
     def get_with_matches_on_period(cls, from_: date, to: date):
@@ -165,7 +72,7 @@ class Competition(TimeStampedModel):
         return cls.objects.filter(id__in=competitions_with_matches_on_period)
 
     def create_public_pool(self):
-        name = f"{self.name} {self.season}"
+        name = f"{self.name}"
         slug = slugify(name)
         owner = Guesser.objects.get(user__username=settings.ADMIN_USERNAME)
         private = False
@@ -240,7 +147,7 @@ class Match(models.Model):
     class Meta:
         verbose_name = "partida"
         verbose_name_plural = "partidas"
-        ordering = ("date_time",)
+        ordering = ("-date_time",)
         unique_together = ["home_team", "away_team", "date_time"]
 
     def __str__(self):
@@ -572,9 +479,13 @@ class GuessPool(TimeStampedModel):
     def get_open_matches(self):
         """Returns matches open to guesses"""
 
-        return self.get_matches().filter(
-            date_time__gt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
-            date_time__lte=timezone.now() + timezone.timedelta(hours=self.hours_before_open_to_guesses),
+        return (
+            self.get_matches()
+            .filter(
+                date_time__gt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
+                date_time__lte=timezone.now() + timezone.timedelta(hours=self.hours_before_open_to_guesses),
+            )
+            .order_by("date_time")
         )
 
     @classmethod
