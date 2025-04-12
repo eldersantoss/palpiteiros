@@ -325,6 +325,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
         open_matches = self.pool.get_open_matches()
+        closed_matches = self.pool.get_closed_recent_matches()
 
         if not open_matches.exists():
             return redirect_with_msg(
@@ -379,6 +380,22 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
 
                 guess_forms.append(GuessForm(initial_data, match=match))
 
+        closed_matches_and_guesses = []
+        for match in closed_matches:
+            try:
+                guess = self.pool.guesses.get(
+                    match=match,
+                    guesser=self.guesser,
+                )
+
+            except Guess.DoesNotExist:
+                guess = None
+
+            closed_matches_and_guesses.append({
+                'match': match,
+                'guess': guess
+            })
+
         messages.success(
             self.request,
             "Palpites salvos ✅",
@@ -388,7 +405,11 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": self.pool, "guess_forms": guess_forms},
+            {
+                "pool": self.pool,
+                "guess_forms": guess_forms,
+                "closed_matches_and_guesses": closed_matches_and_guesses
+            },
         )
 
 
