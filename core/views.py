@@ -264,12 +264,14 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
 
         open_matches = self.pool.get_open_matches()
+        closed_matches = self.pool.get_closed_recent_matches()
 
-        if not open_matches.exists():
+        has_matches = open_matches.exists() or closed_matches.exists()
+        if not has_matches:
             return redirect_with_msg(
                 self.request,
                 "error",
-                "Não existem partidas abertas neste momento ❌",
+                "Não existem partidas para exibir neste momento ❌",
                 "short",
                 self.pool,
             )
@@ -285,16 +287,34 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                     f"home_goals_{match.id}": guess.home_goals,
                     f"away_goals_{match.id}": guess.away_goals,
                 }
-
             except Guess.DoesNotExist:
                 initial_data = None
 
             guess_forms.append(GuessForm(initial_data, match=match))
 
+        closed_matches_and_guesses = []
+        for match in closed_matches:
+            try:
+                guess = self.pool.guesses.get(
+                    match=match,
+                    guesser=self.guesser,
+                )
+            except Guess.DoesNotExist:
+                guess = None
+
+            closed_matches_and_guesses.append({
+                'match': match,
+                'guess': guess
+            })
+
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": self.pool, "guess_forms": guess_forms},
+            {
+                "pool": self.pool,
+                "guess_forms": guess_forms,
+                "closed_matches_and_guesses": closed_matches_and_guesses
+            },
         )
 
     def post(self, *args, **kwargs):

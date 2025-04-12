@@ -4,6 +4,7 @@
 
 {% block content %}
 
+{% if guess_forms %}
 <h3>Palpites abertos</h3>
 
 <form action="{% url 'core:guesses' pool.slug %}" method="post" class="main-form">
@@ -47,7 +48,39 @@
     </div>
   {% endfor %}
 
+  {% if closed_matches_and_guesses %}
+    {% for item in closed_matches_and_guesses %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ item.match.date_time|date:"l d/m H:i" }}
+          {% if item.match.competition %} - {{ item.match.competition }}{% endif %}
+          {% if item.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
+              {{ item.match.home_team.name }}
+            </div>
+            <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
+            <div>
+              <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
+              {{ item.match.away_team.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
   <input type="submit" value="Salvar palpites">
 </form>
+{% endif %}
 
 {% endblock content %}

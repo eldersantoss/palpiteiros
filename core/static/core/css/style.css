@@ -697,6 +697,15 @@ footer address {
   margin: 3vh 0;
 }
 
+.guess-score {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0;
+    padding: 0.5em;
+    text-align: center;
+    min-width: 2em;
+}
+
 /* .cookieConsentContainer {
   z-index: 999;
   width: 350px;

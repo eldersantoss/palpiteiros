@@ -488,6 +488,18 @@ class GuessPool(TimeStampedModel):
             .order_by("date_time")
         )
 
+    def get_closed_recent_matches(self):
+        """Returns last closed matches for predictions"""
+
+        return (
+            self.get_matches()
+            .filter(
+                date_time__gte=timezone.now() - timezone.timedelta(hours=36),
+                date_time__lt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match)
+            )
+            .order_by("-date_time")
+        )
+
     @classmethod
     def toggle_flag_value(
         cls,
