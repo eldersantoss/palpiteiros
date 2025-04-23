@@ -2,10 +2,12 @@ from datetime import date
 from time import sleep
 
 from django.conf import settings
+from django.core import management
 from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
+from core.management.commands import create_or_update_teams_for_competitions
 from core.models import Competition, Match, Team
 from core.services.football import FootballApi
 
@@ -48,13 +50,32 @@ class Command(BaseCommand):
                 sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
                 for match in matches:
-                    match_data = parse_match_data(match)
-
-                    if match_data["home_team"] is None or match_data["away_team"] is None:
-                        self.stderr.write(
-                            f"Match {match_data['data_source_id']} skipped because teams are not registered."
+                    home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
+                    away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
+                    if home_team is None or away_team is None:
+                        self.stdout.write(
+                            f"Unregistered teams for match {match['fixture']['id']} in {comp}, "
+                            "Updating teams for this competition"
                         )
-                        continue
+                        management.call_command(
+                            create_or_update_teams_for_competitions.Command(),
+                            comp.current_season,
+                            comp.data_source_id,
+                        )
+
+                        home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
+                        away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
+                        if home_team is None or away_team is None:
+                            self.stderr.write(
+                                f"Teams not found for match {match['fixture']['id']} in {comp}, "
+                                "skipping match creation"
+                            )
+                            continue
+
+                    match_data = parse_match_data(match)
+                    match_data["competition"] = comp
+                    match_data["home_team"] = home_team
+                    match_data["away_team"] = away_team
 
                     match_instance, created_instance = Match.objects.update_or_create(
                         data_source_id=match_data["data_source_id"],
@@ -86,11 +107,8 @@ class Command(BaseCommand):
 def parse_match_data(match_raw_data: dict) -> dict:
     return {
         "data_source_id": match_raw_data["fixture"]["id"],
-        "competition": Competition.objects.filter(data_source_id=match_raw_data["league"]["id"]).first(),
         "date_time": timezone.datetime.fromisoformat(match_raw_data["fixture"]["date"]),
         "status": match_raw_data["fixture"]["status"]["short"],
-        "home_team": Team.objects.filter(data_source_id=match_raw_data["teams"]["home"]["id"]).first(),
-        "away_team": Team.objects.filter(data_source_id=match_raw_data["teams"]["away"]["id"]).first(),
         "home_goals": match_raw_data["goals"]["home"],
         "away_goals": match_raw_data["goals"]["away"],
     }
