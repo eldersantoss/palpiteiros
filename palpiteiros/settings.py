@@ -227,3 +227,4 @@ CACHES = {
         },
     }
 }
+RANKING_CACHE_PREFIX = "ranking"

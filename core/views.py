@@ -1,18 +1,17 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.forms import CheckboxSelectMultiple, modelform_factory
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 from django.utils.text import slugify
 from django.views import generic
-from django.views.decorators.cache import cache_page
 
 from core.helpers import redirect_with_msg
 
-from . import constants
 from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
@@ -302,19 +301,12 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             except Guess.DoesNotExist:
                 guess = None
 
-            closed_matches_and_guesses.append({
-                'match': match,
-                'guess': guess
-            })
+            closed_matches_and_guesses.append({"match": match, "guess": guess})
 
         return render(
             self.request,
             "core/guesses.html",
-            {
-                "pool": self.pool,
-                "guess_forms": guess_forms,
-                "closed_matches_and_guesses": closed_matches_and_guesses
-            },
+            {"pool": self.pool, "guess_forms": guess_forms, "closed_matches_and_guesses": closed_matches_and_guesses},
         )
 
     def post(self, *args, **kwargs):
@@ -391,10 +383,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             except Guess.DoesNotExist:
                 guess = None
 
-            closed_matches_and_guesses.append({
-                'match': match,
-                'guess': guess
-            })
+            closed_matches_and_guesses.append({"match": match, "guess": guess})
 
         messages.success(
             self.request,
@@ -405,18 +394,13 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return render(
             self.request,
             "core/guesses.html",
-            {
-                "pool": self.pool,
-                "guess_forms": guess_forms,
-                "closed_matches_and_guesses": closed_matches_and_guesses
-            },
+            {"pool": self.pool, "guess_forms": guess_forms, "closed_matches_and_guesses": closed_matches_and_guesses},
         )
 
 
 class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/ranking.html"
 
-    @method_decorator(cache_page(constants.SEGUNDOS_24_HORAS))
     def get(self, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if not context["guessers"].exists():
@@ -445,7 +429,14 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
         year = int(form.cleaned_data["ano"])
         week = int(form.cleaned_data["semana"])
 
+        cache_key = settings.RANKING_CACHE_PREFIX + f"_{self.pool.uuid}_{str(year)}{str(month)}{str(week)}"
+
+        guessers_data = cache.get(cache_key)
+        if guessers_data is None:
+            guessers_data = self.pool.get_guessers_with_score_and_guesses(month, year, week)
+            cache.set(key=cache_key, value=guessers_data, timeout=None)
+
         context["period_form"] = form
-        context["guessers"] = self.pool.get_guessers_with_score_and_guesses(month, year, week)
+        context["guessers"] = guessers_data
 
         return context
