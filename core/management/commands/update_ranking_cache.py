@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.cache import cache
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.models import GuessPool
@@ -10,13 +10,23 @@ from core.models import GuessPool
 class Command(BaseCommand):
     help = "Consolidates ranking data for all pools and saves it in cache."
 
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument(
+            "guess_pool_ids",
+            type=int,
+            nargs="+",
+            help="Guess Pool ids separeted by space",
+        )
+
     def handle(self, *args, **options):
         self.stdout.write("Starting ranking data consolidation")
 
         current_date = timezone.datetime.today()
         current_year = current_date.year
         current_week = current_date.isocalendar().week
-        pools = GuessPool.objects.all()
+        guess_pool_ids = options["guess_pool_ids"]
+
+        pools = GuessPool.objects.filter(id__in=guess_pool_ids) if len(guess_pool_ids) else GuessPool.objects.all()
 
         for pool in pools:
             self.stdout.write(f"Consolidating {pool.name} pool")
