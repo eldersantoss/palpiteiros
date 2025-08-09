@@ -24,10 +24,21 @@ if [ ! -f "$DUMP_FILE" ]; then
     exit 1
 fi
 
+# Se existir um arquivo .env, pergunta ao usuário se deseja carregá-lo
+if [ -f .env ]; then
+    read -p "Arquivo .env encontrado. Deseja carregar as variáveis de ambiente dele? (y/n): " resposta
+    if [ "$resposta" = "y" ]; then
+        export $(grep -v '^#' .env | xargs)
+        echo "Variáveis de ambiente do .env carregadas."
+    else
+        echo "Carregamento do .env ignorado. Seguindo com variáveis previamente carregadas no shell."
+    fi
+fi
+
 # Função para verificar se uma variável de ambiente está definida
 check_env_var() {
     local var_name=$1
-    local var_value=$(eval echo \$$var_name)
+    local var_value="${!var_name}"
 
     if [ -z "$var_value" ]; then
         echo "Erro: A variável de ambiente $var_name não está definida."
