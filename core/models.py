@@ -406,8 +406,6 @@ class Guess(models.Model):
 
 
 class GuessPool(TimeStampedModel):
-    MAX_MATCHES_TO_SHOW_INTO_RANKING = 50
-
     uuid = models.UUIDField(
         "Identificador público",
         unique=True,
@@ -574,15 +572,12 @@ class GuessPool(TimeStampedModel):
         target_pool = pool or self
 
         with transaction.atomic():
-            try:
-                old_guess = target_pool.guesses.get(
-                    match=guess.match,
-                    guesser=guess.guesser,
-                )
+            old_guesses = target_pool.guesses.filter(
+                match=guess.match,
+                guesser=guess.guesser,
+            )
+            for old_guess in old_guesses:
                 target_pool.guesses.remove(old_guess)
-
-            except Guess.DoesNotExist:
-                pass
 
             target_pool.guesses.add(guess)
 
@@ -696,12 +691,10 @@ class GuessPool(TimeStampedModel):
     def _get_guesses_per_matches(self, guesser, matches):
         matches_and_guesses = []
 
-        for match in matches[: self.MAX_MATCHES_TO_SHOW_INTO_RANKING]:
-            try:
-                guess = self.guesses.get(match=match, guesser=guesser)
-
-            except Guess.DoesNotExist:
-                guess = None
+        for match in matches[: settings.MATCHES_TO_SHOW_INTO_RANKING]:
+            guess: Guess | None = self.guesses.filter(
+                match=match, guesser=guesser
+            ).first()
 
             matches_and_guesses.append({"match": match, "guess": guess})
 
