@@ -239,12 +239,6 @@ class Match(models.Model):
             pools_with_away_team_as_pool_member,
         )
 
-    def get_guess_by_guesser(self, guesser: "Guesser"):
-        try:
-            return self.guesses.get(guesser=guesser)
-        except Guess.DoesNotExist:
-            return None
-
     def pending_guess(self, guesser: "Guesser"):
         return not self.guesses.filter(guesser=guesser).exists()
 
@@ -616,8 +610,10 @@ class GuessPool(TimeStampedModel):
         year: int,
         week: int,
     ):
-        start, end = self._assemble_datetime_period(month, year, week)
-        matches = self.get_finished_or_in_progress_matches_on_period(start, end)
+        start_date, end_date = self._assemble_datetime_period(month, year, week)
+        matches = self.get_finished_or_in_progress_matches_on_period(
+            start_date, end_date
+        )
         guessers = self.get_guessers_with_match_scores(matches)
 
         for guesser in guessers:
@@ -628,45 +624,40 @@ class GuessPool(TimeStampedModel):
         return guessers
 
     def _assemble_datetime_period(self, month: int, year: int, week: int):
-        base_start = timezone.now().replace(day=1, hour=0, minute=0, second=0)
-        base_end = timezone.now().replace(day=1, hour=23, minute=59, second=59)
+        current_local_date = timezone.localdate()
 
         # periodo geral (entre data de criação do bolão até data atual)
         if year == 0:
-            start = self.created
-            end = timezone.now().replace(hour=23, minute=59, second=59)
+            start = self.created.date()
+            end = current_local_date
 
         else:
             # período anual (todos os meses do ano recebido)
             if month == 0:
-                start = base_start.replace(year=year, month=1)
-                end = base_end.replace(year=year, month=12, day=31)
+                start = current_local_date.replace(year=year, month=1, day=1)
+                end = current_local_date.replace(year=year, month=12, day=31)
 
             else:
                 # período mensal (mes e ano recebidos)
                 if week == 0:
-                    start = base_start.replace(year=year, month=month)
-                    end = (
-                        base_end.replace(year=year, month=month + 1)
-                        if month < 12
-                        else base_end.replace(year=year + 1, month=1)
-                    ) - timezone.timedelta(days=1)
+                    start = current_local_date.replace(year=year, month=month, day=1)
+                    # Calcula o último dia do mês corretamente
+                    next_month = start.replace(day=28) + timezone.timedelta(days=4)
+                    end = next_month - timezone.timedelta(days=next_month.day)
 
                 else:
-                    # período semanal (ano, mes e semanas recebidos)
-                    start = timezone.now().fromisocalendar(year, week, 1)
-                    end = (
-                        timezone.now()
-                        .fromisocalendar(year, week, 7)
-                        .replace(hour=23, minute=59, second=59)
-                    )
+                    # período semanal (ano e semana recebidos)
+                    start_naive = date.fromisocalendar(year, week, 1)
+                    end_naive = date.fromisocalendar(year, week, 7)
+                    start = start_naive
+                    end = end_naive
 
         return start, end
 
     def get_finished_or_in_progress_matches_on_period(
         self,
-        start: datetime,
-        end: datetime,
+        start: date,
+        end: date,
     ):
         """Returns fininshed or in progress matches with date_time field
         between start and end"""
@@ -674,7 +665,7 @@ class GuessPool(TimeStampedModel):
         return (
             self.get_matches()
             .filter(status__in=Match.IN_PROGRESS_AND_FINISHED_STATUS)
-            .filter(date_time__date__gte=start.date(), date_time__date__lte=end.date())
+            .filter(date_time__date__gte=start, date_time__date__lte=end)
             .order_by("-date_time")
         )
 
