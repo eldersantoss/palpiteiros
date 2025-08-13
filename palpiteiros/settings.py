@@ -26,13 +26,16 @@ ADMIN_USERNAME = config("ADMIN_USERNAME")
 # Django Debug Toolbar
 
 if DEBUG:
-    import socket  # only if you haven't already imported this
+    import socket
 
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
-        "127.0.0.1",
-        "10.0.2.2",
-    ]
+    try:
+        hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+        INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+            "127.0.0.1",
+            "10.0.2.2",
+        ]
+    except socket.gaierror:
+        INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
 
 
 # Application definition
@@ -155,7 +158,9 @@ LOGOUT_URL = "logout"
 
 # Email
 
-EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_BACKEND = config(
+    "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+)
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
@@ -228,3 +233,10 @@ CACHES = {
     }
 }
 RANKING_CACHE_PREFIX = "ranking"
+
+
+# Ranking
+
+MATCHES_TO_SHOW_INTO_RANKING = config(
+    "MATCHES_TO_SHOW_INTO_RANKING", default=20, cast=int
+)
