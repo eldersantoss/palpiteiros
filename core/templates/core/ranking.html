@@ -24,11 +24,11 @@
     </tr>
   </thead>
   <tbody>
-    {% for guesser in guessers %}
+    {% for entry in ranking_entries %}
       <tr
         class="clickable-row"
-        name="clickable-row{{ guesser.user.id }}"
-        onclick="expandDetailRow('{{ guesser.user.id }}')"
+        name="clickable-row{{ entry.user.id }}"
+        onclick="expandDetailRow('{{ entry.user.id }}')"
       >
         <td>
           {% if forloop.counter == 1 %}
@@ -42,14 +42,14 @@
           {% endif %}
         </td>
         <td>{{ forloop.counter }}º</td>
-        <td style="text-align:left">{{ guesser }}</td>
-        <td>{{ guesser.score }}</td>
+        <td style="text-align:left">{{ entry }}</td>
+        <td>{{ entry.score }}</td>
         <td class="expand-icon">Palpites 🔽</td>
       </tr>
 
       <tr
         class="detail-row"
-        name="detail-row{{ guesser.user.id }}"
+        name="detail-row{{ entry.user.id }}"
         style="display: none"
       >
         <td colspan="5" class="detail-table-container">
@@ -64,7 +64,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for match_and_guess in guesser.matches_and_guesses %}
+              {% comment %} {% for match_and_guess in entry.matches_and_guesses %}
                 <tr class="detail-table-row">
                   <td>
                       <p class="match-time">{{ match_and_guess.match.date_time|date:"l d/m H:i" }}</p>
@@ -90,14 +90,35 @@
                     {% endif %}
                   </td>
                 </tr>
-              {% endfor %}
+              {% endfor %} {% endcomment %}
             </tbody>
           </table>
         </td>
       </tr>
 
+    {% empty %}
+      <tr>
+          <td colspan="5" style="text-align: center; padding: 20px;">
+              Não há dados de classificação para o período selecionado.
+          </td>
+      </tr>
     {% endfor %}
 </tbody>
 </table>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('ranking-period-form');
+    const selects = form.querySelectorAll('select');
+
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            form.submit();
+        });
+    });
+});
+</script>
+{% endblock extra_js %}
 
 {% endblock content %}

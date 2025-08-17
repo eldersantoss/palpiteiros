@@ -66,3 +66,9 @@ class GuessPoolAdmin(admin.ModelAdmin):
     list_editable = ("private", "new_matches", "updated_matches")
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ["competitions", "teams", "guessers", "guesses"]
+
+
+@admin.register(models.RankingEntry)
+class RankingEntryAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "score")
+    list_filter = ["guesser", "pool", "year", "month", "week"]

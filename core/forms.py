@@ -35,102 +35,119 @@ class GuessForm(forms.Form):
 
 
 class RankingPeriodForm(forms.Form):
-    YEAR_CHOICE = []
+    YEAR_CHOICES = []
     MONTH_CHOICES = []
     WEEK_CHOICES = []
 
+    ALL_TIMES_VALUE = "0"  # Valor para "Geral", "Anual", "Mensal"
+
     ano = forms.ChoiceField(
         label="1. Temporada",
-        label_suffix="",
-        choices=YEAR_CHOICE,
+        choices=YEAR_CHOICES,
     )
     mes = forms.ChoiceField(
         label="2. Mês",
-        label_suffix="",
         choices=MONTH_CHOICES,
     )
     semana = forms.ChoiceField(
         label="3. Semana",
-        label_suffix="",
         choices=WEEK_CHOICES,
     )
 
     def __init__(self, *args, **kwargs):
+        # Intercepta os dados da requisição ANTES da validação.
+        if args:
+            data = args[0].copy()  # Cria uma cópia mutável do QueryDict
+            year_selection = data.get("ano")
+            month_selection = data.get("mes")
+
+            # Regra 1: Se "Geral" for selecionado, força os campos filhos para "Geral".
+            if year_selection == self.ALL_TIMES_VALUE:
+                data["mes"] = self.ALL_TIMES_VALUE
+                data["semana"] = self.ALL_TIMES_VALUE
+
+            # Regra 2: Se "Anual" for selecionado, força o campo filho para "Anual".
+            elif month_selection == self.ALL_TIMES_VALUE:
+                data["semana"] = self.ALL_TIMES_VALUE
+
+            # Substitui os argumentos originais com os dados corrigidos.
+            args = (data,) + args[1:]
+
         super().__init__(*args, **kwargs)
-        self._setup_form_choices()
+        self._setup_dynamic_choices()
 
-    def clean(self):
-        cd = super().clean()
-
-        if not self.errors:
-            year = cd["ano"]
-            month = cd["mes"]
-
-            """
-            Quando year == GERAL, os demais campos assumem o valor geral
-            e têm suas choices restritas somente para GERAL, resultando no
-            período de classificação GERAL
-            """
-            if year == self.ALL_TIMES:
-                self.fields["mes"].choices = [(self.ALL_TIMES, "Geral")]
-                self.fields["semana"].choices = [(self.ALL_TIMES, "Geral")]
-                cd["mes"] = self.ALL_TIMES
-                cd["semana"] = self.ALL_TIMES
-
-            else:
-                """
-                Quando year != GERAL, mas month == GERAL, o campo week
-                assume o valor geral e tem suas choices restritas somente
-                para GERAL, resultando no período de classificação ANUAL
-                """
-                if month == self.ALL_TIMES:
-                    self.fields["semana"].choices = [(self.ALL_TIMES, "Anual")]
-                    cd["semana"] = self.ALL_TIMES
-
-                else:
-                    """
-                    Quando year != GERAL e month != GERAL, o campo week
-                    é liberado para assumir valores no intervalo entre que
-                    compreende o número das semanas do mês selecionado,
-                    resultando nos períodos de classificação MENSAL ou
-                    SEMANAL
-                    """
-                    weeks = [
-                        week
-                        for week in range(1, 53)
-                        if timezone.datetime.fromisocalendar(int(year), int(week), 7).month == int(month)
-                    ]
-
-                    week_choices = [(week, f"Semana #{week}") for week in weeks]
-                    self.fields["semana"].choices = [(self.ALL_TIMES, "Mensal")] + week_choices
-
-        return cd
-
-    def _setup_form_choices(self):
-        self.ALL_TIMES = "0"
-        self.MONTHLY = "13"
-
-        years = set([year["created__year"] for year in GuessPool.objects.values("created__year")] + [date.today().year])
-        years = sorted(years, reverse=True)
-        self.YEAR_CHOICE = [(self.ALL_TIMES, "Geral")] + [(str(year), str(year)) for year in years]
-        self.fields["ano"].choices = self.YEAR_CHOICE
-
-        self.MONTH_CHOICES = [(self.ALL_TIMES, "Anual")] + [
-            (str(m), _(timezone.now().replace(day=1, month=m).strftime("%B"))) for m in range(1, 13)
+    def _setup_dynamic_choices(self):
+        # Popula as escolhas de ano
+        years = sorted(
+            set(
+                [y["created__year"] for y in GuessPool.objects.values("created__year")]
+                + [date.today().year]
+            ),
+            reverse=True,
+        )
+        self.fields["ano"].choices = [(self.ALL_TIMES_VALUE, "Geral")] + [
+            (str(y), str(y)) for y in years
         ]
-        self.fields["mes"].choices = self.MONTH_CHOICES
 
-        self.WEEK_CHOICES = [
-            (self.ALL_TIMES, "Anual"),
-            (self.MONTHLY, "Mensal"),
-        ] + [(week, f"Semana #{week}") for week in range(1, 53)]
-        self.fields["semana"].choices = self.WEEK_CHOICES
+        # Popula as escolhas de mês
+        self.fields["mes"].choices = [(self.ALL_TIMES_VALUE, "Anual")] + [
+            (str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)
+        ]
 
-    def _week_not_in_selected_month(self, year, month, week) -> bool:
-        return month != timezone.datetime.fromisocalendar(year, week, 1).month
+        # Lógica para ajustar as choices com base nos dados (agora corrigidos)
+        source = self.data or self.initial or {}
+        year = source.get("ano")
+        month = source.get("mes")
 
-    def _get_week_for_selected_month(self, year: int, month: int) -> str:
-        return str(timezone.now().replace(year=year, month=month).isocalendar().week)
+        if year == self.ALL_TIMES_VALUE:
+            self.fields["mes"].choices = [(self.ALL_TIMES_VALUE, "Geral")]
+            self.fields["semana"].choices = [(self.ALL_TIMES_VALUE, "Geral")]
+        elif month and month != self.ALL_TIMES_VALUE:
+            try:
+                # Calcula as semanas para o mês/ano selecionado
+                weeks_in_month = set()
+                first_day = date(int(year), int(month), 1)
+                last_day = (
+                    first_day.replace(day=28) + timezone.timedelta(days=4)
+                ).replace(day=1) - timezone.timedelta(days=1)
 
-    def _get_month_for_selected_week(self, selected_year: int, selected_week: int) -> str:
-        return str(timezone.datetime.fromisocalendar(selected_year, selected_week, 1).month)
+                current_day = first_day
+                while current_day <= last_day:
+                    weeks_in_month.add(current_day.isocalendar().week)
+                    current_day += timezone.timedelta(days=1)
+
+                week_choices = [
+                    (str(w), f"Semana #{w}") for w in sorted(list(weeks_in_month))
+                ]
+                self.fields["semana"].choices = [
+                    (self.ALL_TIMES_VALUE, "Mensal")
+                ] + week_choices
+            except (ValueError, TypeError):
+                self.fields["semana"].choices = [(self.ALL_TIMES_VALUE, "Anual")]
+        else:  # Ano selecionado, mas mês é "Anual"
+            self.fields["semana"].choices = [(self.ALL_TIMES_VALUE, "Anual")]
+
+    def get_period_for_query(self) -> dict:
+        """
+        Retorna um dicionário com os parâmetros prontos para a consulta no modelo.
+        """
+        # Garante que cleaned_data seja populado se o form foi submetido
+        self.is_valid()
+
+        # Usa cleaned_data se disponível, senão usa initial (primeira carga) ou data.
+        source = self.cleaned_data or self.initial or self.data
+
+        year = int(source.get("ano", 0))
+        month = int(source.get("mes", 0))
+        week = int(source.get("semana", 0))
+
+        # Tradução dos valores do formulário para os valores do modelo
+        if year == 0:  # Geral
+            return {"year": 0, "month": 0, "week": 0}
+        if month == 0:  # Anual
+            return {"year": year, "month": 0, "week": 0}
+        if week == 0:  # Mensal
+            return {"year": year, "month": month, "week": 0}
+
+        # Semanal
+        return {"year": year, "month": month, "week": week}
