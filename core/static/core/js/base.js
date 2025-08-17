@@ -1,5 +1,6 @@
 window.onload = function () {
   removeTempMessagesAfterTimeout();
+  setOnChangeToSubmitInPeriodFormSelects();
 };
 
 function removeTempMessagesAfterTimeout() {
@@ -26,6 +27,13 @@ function removeTempMessagesAfterTimeout() {
         .querySelectorAll(".long-time-msg")
         .forEach((e) => e.parentElement.remove()),
     LONG_TIME_MESSAGES * 1000
+  );
+}
+
+function setOnChangeToSubmitInPeriodFormSelects() {
+  const selects = document.querySelectorAll(".period-form");
+  selects.forEach((e) =>
+    e.addEventListener("change", (e) => e.target.form.submit())
   );
 }
 

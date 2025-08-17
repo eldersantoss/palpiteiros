@@ -106,19 +106,4 @@
 </tbody>
 </table>
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('ranking-period-form');
-    const selects = form.querySelectorAll('select');
-
-    selects.forEach(select => {
-        select.addEventListener('change', function() {
-            form.submit();
-        });
-    });
-});
-</script>
-{% endblock extra_js %}
-
 {% endblock content %}
