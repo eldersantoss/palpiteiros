@@ -3,6 +3,7 @@ from datetime import date
 from typing import Iterable, Literal
 from uuid import uuid4
 
+import pytz
 from django.conf import settings
 from django.contrib import admin
 from django.db import models, transaction
@@ -352,8 +353,8 @@ class Guess(models.Model):
                 score_difference = self.score - previous_score
                 self.update_related_rankings(score_difference)
 
-    def update_related_rankings(self, score_difference: int):
-        match_date = self.match.date_time
+    def update_related_rankings(self, score: int):
+        match_date = self.match.date_time.astimezone(pytz.timezone(settings.TIME_ZONE))
         year = match_date.year
         month = match_date.month
         week = match_date.isocalendar().week
@@ -371,10 +372,10 @@ class Guess(models.Model):
                     pool=pool,
                     guesser=self.guesser,
                     **period,
-                    defaults={"score": score_difference},
+                    defaults={"score": score},
                 )
                 if not created:
-                    entry.score = models.F("score") + score_difference
+                    entry.score = models.F("score") + score
                     entry.save(update_fields=["score"])
 
     @property

@@ -1,3 +1,5 @@
+import pytz
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
@@ -29,16 +31,18 @@ class Command(BaseCommand):
             if not guess.guesser:
                 continue  # Pula palpites órfãos, se houver
 
-            match_date = guess.match.date_time
+            match_date = guess.match.date_time.astimezone(
+                pytz.timezone(settings.TIME_ZONE)
+            )
             year = match_date.year
             month = match_date.month
             week = match_date.isocalendar().week
 
             periods = [
-                (0, 0, 0),  # Geral
-                (year, 0, 0),  # Anual
-                (year, month, 0),  # Mensal
-                (year, month, week),  # Semanal
+                (0, 0, 0),  # General
+                (year, 0, 0),  # Annual
+                (year, month, 0),  # Monthly
+                (year, month, week),  # Weekly
             ]
 
             for pool in guess.pools.all():
