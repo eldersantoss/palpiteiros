@@ -55,29 +55,56 @@ class RankingPeriodForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        # Intercepta os dados da requisição ANTES da validação.
         if args:
-            data = args[0].copy()  # Cria uma cópia mutável do QueryDict
+            data = args[0].copy()
             year_selection = data.get("ano")
             month_selection = data.get("mes")
+            week_selection = data.get("semana")
 
-            # Regra 1: Se "Geral" for selecionado, força os campos filhos para "Geral".
+            # If "Geral" was selected in year field, sets the other fields to "Geral"
             if year_selection == self.ALL_TIMES_VALUE:
                 data["mes"] = self.ALL_TIMES_VALUE
                 data["semana"] = self.ALL_TIMES_VALUE
 
-            # Regra 2: Se "Anual" for selecionado, força o campo filho para "Anual".
-            elif month_selection == self.ALL_TIMES_VALUE:
-                data["semana"] = self.ALL_TIMES_VALUE
+            # If selected week was not valid for the selected month, set it to ALL_TIMES_VALUE
+            elif (
+                year_selection
+                and year_selection != self.ALL_TIMES_VALUE
+                and month_selection
+                and month_selection != self.ALL_TIMES_VALUE
+            ):
+                try:
+                    valid_weeks = self._get_weeks_for_month(
+                        int(year_selection), int(month_selection)
+                    )
+                    if week_selection not in valid_weeks:
+                        data["semana"] = self.ALL_TIMES_VALUE
 
-            # Substitui os argumentos originais com os dados corrigidos.
+                except (ValueError, TypeError):
+                    data["semana"] = self.ALL_TIMES_VALUE
+
+            # Replace original args with updated args
             args = (data,) + args[1:]
 
         super().__init__(*args, **kwargs)
         self._setup_dynamic_choices()
 
+    def _get_weeks_for_month(self, year: int, month: int) -> list[str]:
+        weeks_in_month = set()
+        first_day = date(year, month, 1)
+        last_day = (first_day.replace(day=28) + timezone.timedelta(days=4)).replace(
+            day=1
+        ) - timezone.timedelta(days=1)
+
+        current_day = first_day
+        while current_day <= last_day:
+            weeks_in_month.add(current_day.isocalendar().week)
+            current_day += timezone.timedelta(days=1)
+
+        return [str(w) for w in sorted(list(weeks_in_month))]
+
     def _setup_dynamic_choices(self):
-        # Popula as escolhas de ano
+        # Populate yaer choices
         years = sorted(
             set(
                 [y["created__year"] for y in GuessPool.objects.values("created__year")]
@@ -89,12 +116,12 @@ class RankingPeriodForm(forms.Form):
             (str(y), str(y)) for y in years
         ]
 
-        # Popula as escolhas de mês
+        # Populate month choices
         self.fields["mes"].choices = [(self.ALL_TIMES_VALUE, "Anual")] + [
             (str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)
         ]
 
-        # Lógica para ajustar as choices com base nos dados (agora corrigidos)
+        # Populate week choices
         source = self.data or self.initial or {}
         year = source.get("ano")
         month = source.get("mes")
@@ -104,21 +131,8 @@ class RankingPeriodForm(forms.Form):
             self.fields["semana"].choices = [(self.ALL_TIMES_VALUE, "Geral")]
         elif month and month != self.ALL_TIMES_VALUE:
             try:
-                # Calcula as semanas para o mês/ano selecionado
-                weeks_in_month = set()
-                first_day = date(int(year), int(month), 1)
-                last_day = (
-                    first_day.replace(day=28) + timezone.timedelta(days=4)
-                ).replace(day=1) - timezone.timedelta(days=1)
-
-                current_day = first_day
-                while current_day <= last_day:
-                    weeks_in_month.add(current_day.isocalendar().week)
-                    current_day += timezone.timedelta(days=1)
-
-                week_choices = [
-                    (str(w), f"Semana #{w}") for w in sorted(list(weeks_in_month))
-                ]
+                weeks = self._get_weeks_for_month(int(year), int(month))
+                week_choices = [(w, f"Semana #{w}") for w in weeks]
                 self.fields["semana"].choices = [
                     (self.ALL_TIMES_VALUE, "Mensal")
                 ] + week_choices
