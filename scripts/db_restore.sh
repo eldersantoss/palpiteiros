@@ -9,13 +9,16 @@ fi
 DUMP_FILE=$1
 
 echo """
-IMPORTANTE: certifique-se de ter o pg_restore disponível, ter aplicado as migrações do Django e ter definido/carregado no shell as seguintes variáveis:
-
-- DB_HOST
-- DB_NAME
-- DB_USER
-- DB_PASSWORD
-- DB_PORT
+IMPORTANTE: Este script restaura o schema 'public' de um backup.
+Ele irá APAGAR e RECRRIAR o schema 'public' no banco de dados de destino.
+Certifique-se de:
+1. Ter um container PostgreSQL padrão em execução.
+2. Ter definido/carregado as variáveis de ambiente do banco de dados:
+  - DB_HOST
+  - DB_NAME
+  - DB_USER
+  - DB_PASSWORD
+  - DB_PORT
 """
 
 # Verifica se o arquivo de dump existe
@@ -27,7 +30,7 @@ fi
 # Se existir um arquivo .env, pergunta ao usuário se deseja carregá-lo
 if [ -f .env ]; then
     read -p "Arquivo .env encontrado. Deseja carregar as variáveis de ambiente dele? (y/n): " resposta
-    if [ "$resposta" = "y" ]; then
+    if [[ "$resposta" =~ ^[Yy]$ ]]; then
         export $(grep -v '^#' .env | xargs)
         echo "Variáveis de ambiente do .env carregadas."
     else
@@ -53,16 +56,34 @@ check_env_var "DB_USER"
 check_env_var "DB_PASSWORD"
 check_env_var "DB_PORT"
 
-# Executa o pg_restore no servidor remoto utilizando o dump fornecido
-PGPASSWORD=$DB_PASSWORD pg_restore -h $DB_HOST -d $DB_NAME -U $DB_USER -p $DB_PORT -F t -c "$DUMP_FILE"
+# --- Solicitar confirmação ---
+echo ""
+echo "------------------------------------------------------------------"
+echo "ATENÇÃO: Esta ação é destrutiva e irreversível."
+echo "Você está prestes a LIMPAR e RESTAURAR o schema 'public' no seguinte banco de dados:"
+echo ""
+echo "  Banco:    $DB_NAME"
+echo "  Host:     $DB_HOST"
+echo "  Usuário:  $DB_USER"
+echo ""
+read -p "Deseja continuar? (y/n): " confirm
+if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Restauração cancelada pelo usuário."
+    exit 1
+fi
+echo "------------------------------------------------------------------"
+echo ""
+
+echo "Iniciando a restauração do schema 'public' a partir de $DUMP_FILE..."
+PGPASSWORD=$DB_PASSWORD pg_restore -h $DB_HOST -d $DB_NAME -U $DB_USER -p $DB_PORT -F t --no-owner --clean --no-privileges "$DUMP_FILE"
 
 # Verifica se o restore foi bem-sucedido
 if [ $? -eq 0 ]; then
-    echo """
-Restore do banco de dados realizado com sucesso utilizando o dump $DUMP_FILE
-"""
+    echo ""
+    echo "✅ Restore do schema 'public' realizado com sucesso."
+    echo ""
 else
-    echo """
-Ocorreu um erro ao realizar o restore do banco de dados
-"""
+    echo ""
+    echo "❌ Ocorreu um erro ao realizar o restore do banco de dados."
+    echo ""
 fi

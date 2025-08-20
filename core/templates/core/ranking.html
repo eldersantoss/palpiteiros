@@ -8,8 +8,23 @@
 
 <div class="period-form-container">
   <p>Escolha o período que deseja ver a classificação:</p>
-  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form">
-    {{ period_form.as_div }}
+  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form" id="ranking-form">
+    <div id="div_id_periodo" class="form-group">
+      <label for="id_periodo">Período:</label>
+      {{ period_form.periodo }}
+    </div>
+    <div id="div_id_ano" class="form-group" style="display: none;">
+      <label for="id_ano">Ano:</label>
+      {{ period_form.ano }}
+    </div>
+    <div id="div_id_mes" class="form-group" style="display: none;">
+      <label for="id_mes">Mês:</label>
+      {{ period_form.mes }}
+    </div>
+    <div id="div_id_semana" class="form-group">
+      <label for="id_semana">Semana:</label>
+      {{ period_form.semana }}
+    </div>
   </form>
 </div>
 
@@ -24,11 +39,11 @@
     </tr>
   </thead>
   <tbody>
-    {% for guesser in guessers %}
+    {% for entry in ranking_entries %}
       <tr
         class="clickable-row"
-        name="clickable-row{{ guesser.user.id }}"
-        onclick="expandDetailRow('{{ guesser.user.id }}')"
+        name="clickable-row{{ entry.user.id }}"
+        onclick="expandDetailRow('{{ entry.user.id }}')"
       >
         <td>
           {% if forloop.counter == 1 %}
@@ -42,14 +57,14 @@
           {% endif %}
         </td>
         <td>{{ forloop.counter }}º</td>
-        <td style="text-align:left">{{ guesser }}</td>
-        <td>{{ guesser.score }}</td>
+        <td style="text-align:left">{{ entry }}</td>
+        <td>{{ entry.score }}</td>
         <td class="expand-icon">Palpites 🔽</td>
       </tr>
 
       <tr
         class="detail-row"
-        name="detail-row{{ guesser.user.id }}"
+        name="detail-row{{ entry.user.id }}"
         style="display: none"
       >
         <td colspan="5" class="detail-table-container">
@@ -64,7 +79,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for match_and_guess in guesser.matches_and_guesses %}
+              {% comment %} {% for match_and_guess in entry.matches_and_guesses %}
                 <tr class="detail-table-row">
                   <td>
                       <p class="match-time">{{ match_and_guess.match.date_time|date:"l d/m H:i" }}</p>
@@ -90,14 +105,59 @@
                     {% endif %}
                   </td>
                 </tr>
-              {% endfor %}
+              {% endfor %} {% endcomment %}
             </tbody>
           </table>
         </td>
       </tr>
 
+    {% empty %}
+      <tr>
+          <td colspan="5" style="text-align: center; padding: 20px;">
+              Não há dados de classificação para o período selecionado.
+          </td>
+      </tr>
     {% endfor %}
 </tbody>
 </table>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('ranking-form');
+    const periodoSelect = document.getElementById('id_periodo');
+    const anoDiv = document.getElementById('div_id_ano');
+    const mesDiv = document.getElementById('div_id_mes');
+    const semanaDiv = document.getElementById('div_id_semana');
+    const anoSelect = document.getElementById('id_ano');
+    const mesSelect = document.getElementById('id_mes');
+    const semanaSelect = document.getElementById('id_semana');
+
+    function toggleFields() {
+      const selectedPeriod = periodoSelect.value;
+      anoDiv.style.display = 'none';
+      mesDiv.style.display = 'none';
+      semanaDiv.style.display = 'none';
+
+      if (selectedPeriod === 'anual') {
+        anoDiv.style.display = 'block';
+      } else if (selectedPeriod === 'mensal') {
+        mesDiv.style.display = 'block';
+      } else if (selectedPeriod === 'semanal') {
+        semanaDiv.style.display = 'block';
+      }
+    }
+
+    function submitForm() {
+      form.submit();
+    }
+
+    periodoSelect.addEventListener('change', toggleFields);
+    anoSelect.addEventListener('change', submitForm);
+    mesSelect.addEventListener('change', submitForm);
+    semanaSelect.addEventListener('change', submitForm);
+
+    toggleFields();
+  });
+</script>
 
 {% endblock content %}

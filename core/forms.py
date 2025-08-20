@@ -1,11 +1,9 @@
-from datetime import date
-
 from django import forms
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from core.models import Guesser, GuessPool
+from core.models import Guesser
 
 
 class UserEditForm(forms.ModelForm):
@@ -35,102 +33,77 @@ class GuessForm(forms.Form):
 
 
 class RankingPeriodForm(forms.Form):
-    YEAR_CHOICE = []
-    MONTH_CHOICES = []
-    WEEK_CHOICES = []
+    PERIOD_CHOICES = (
+        ("geral", "Geral"),
+        ("anual", "Anual"),
+        ("mensal", "Mensal"),
+        ("semanal", "Semanal"),
+    )
 
-    ano = forms.ChoiceField(
-        label="1. Temporada",
-        label_suffix="",
-        choices=YEAR_CHOICE,
-    )
-    mes = forms.ChoiceField(
-        label="2. Mês",
-        label_suffix="",
-        choices=MONTH_CHOICES,
-    )
-    semana = forms.ChoiceField(
-        label="3. Semana",
-        label_suffix="",
-        choices=WEEK_CHOICES,
-    )
+    periodo = forms.ChoiceField(label="Período", choices=PERIOD_CHOICES, required=False)
+    ano = forms.ChoiceField(label="Ano", required=False)
+    mes = forms.ChoiceField(label="Mês", required=False)
+    semana = forms.ChoiceField(label="Semana", required=False)
 
     def __init__(self, *args, **kwargs):
+        pool = kwargs.pop("pool", None)
+
         super().__init__(*args, **kwargs)
-        self._setup_form_choices()
 
-    def clean(self):
-        cd = super().clean()
+        # Populate year choices
+        years = sorted(
+            [year for year in range(pool.created.year, timezone.localdate().year + 1)],
+            reverse=True,
+        )
 
-        if not self.errors:
-            year = cd["ano"]
-            month = cd["mes"]
+        self.fields["ano"].choices = [(y, str(y)) for y in years]
 
-            """
-            Quando year == GERAL, os demais campos assumem o valor geral
-            e têm suas choices restritas somente para GERAL, resultando no
-            período de classificação GERAL
-            """
-            if year == self.ALL_TIMES:
-                self.fields["mes"].choices = [(self.ALL_TIMES, "Geral")]
-                self.fields["semana"].choices = [(self.ALL_TIMES, "Geral")]
-                cd["mes"] = self.ALL_TIMES
-                cd["semana"] = self.ALL_TIMES
-
-            else:
-                """
-                Quando year != GERAL, mas month == GERAL, o campo week
-                assume o valor geral e tem suas choices restritas somente
-                para GERAL, resultando no período de classificação ANUAL
-                """
-                if month == self.ALL_TIMES:
-                    self.fields["semana"].choices = [(self.ALL_TIMES, "Anual")]
-                    cd["semana"] = self.ALL_TIMES
-
-                else:
-                    """
-                    Quando year != GERAL e month != GERAL, o campo week
-                    é liberado para assumir valores no intervalo entre que
-                    compreende o número das semanas do mês selecionado,
-                    resultando nos períodos de classificação MENSAL ou
-                    SEMANAL
-                    """
-                    weeks = [
-                        week
-                        for week in range(1, 53)
-                        if timezone.datetime.fromisocalendar(int(year), int(week), 7).month == int(month)
-                    ]
-
-                    week_choices = [(week, f"Semana #{week}") for week in weeks]
-                    self.fields["semana"].choices = [(self.ALL_TIMES, "Mensal")] + week_choices
-
-        return cd
-
-    def _setup_form_choices(self):
-        self.ALL_TIMES = "0"
-        self.MONTHLY = "13"
-
-        years = set([year["created__year"] for year in GuessPool.objects.values("created__year")] + [date.today().year])
-        years = sorted(years, reverse=True)
-        self.YEAR_CHOICE = [(self.ALL_TIMES, "Geral")] + [(str(year), str(year)) for year in years]
-        self.fields["ano"].choices = self.YEAR_CHOICE
-
-        self.MONTH_CHOICES = [(self.ALL_TIMES, "Anual")] + [
-            (str(m), _(timezone.now().replace(day=1, month=m).strftime("%B"))) for m in range(1, 13)
+        # Populate month choices
+        self.fields["mes"].choices = [
+            (str(m), _(timezone.datetime(2000, m, 1).strftime("%B")))
+            for m in range(1, 13)
         ]
-        self.fields["mes"].choices = self.MONTH_CHOICES
 
-        self.WEEK_CHOICES = [
-            (self.ALL_TIMES, "Anual"),
-            (self.MONTHLY, "Mensal"),
-        ] + [(week, f"Semana #{week}") for week in range(1, 53)]
-        self.fields["semana"].choices = self.WEEK_CHOICES
+        # Populate week choices
+        current_week = timezone.localdate().isocalendar().week
+        self.fields["semana"].choices = [
+            (str(w), f"Semana #{w}") for w in range(current_week, 0, -1)
+        ]
 
-    def _week_not_in_selected_month(self, year, month, week) -> bool:
-        return month != timezone.datetime.fromisocalendar(year, week, 1).month
+    def get_period_for_query(self) -> dict:
+        """
+        Returns a dictionary with the parameters ready for the model query.
+        """
+        source = self.cleaned_data or self.initial or self.data
 
-    def _get_week_for_selected_month(self, year: int, month: int) -> str:
-        return str(timezone.now().replace(year=year, month=month).isocalendar().week)
+        period = source.get("periodo")
+        if period in ["", None]:
+            period = "semanal"
 
-    def _get_month_for_selected_week(self, selected_year: int, selected_week: int) -> str:
-        return str(timezone.datetime.fromisocalendar(selected_year, selected_week, 1).month)
+        year = source.get("ano")
+        if year in ["", None]:
+            year = timezone.localdate().year
+
+        month = source.get("mes")
+        if month in ["", None]:
+            month = timezone.localdate().month
+
+        week = source.get("semana")
+        if week in ["", None]:
+            week = timezone.localdate().isocalendar().week
+
+        if period == "anual":
+            return {"year": year, "month": 0, "week": 0}
+        if period == "mensal":
+            return {"year": year, "month": month, "week": 0}
+        if period == "semanal":
+            return {"year": year, "month": 0, "week": week}
+
+        # Default to geral
+        return {"year": 0, "month": 0, "week": 0}
+
+    def _numerical_value_or_none(form_data: str):
+        if form_data:
+            return int(form_data)
+
+        return None

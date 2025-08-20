@@ -1,8 +1,9 @@
 import logging
-from datetime import date, datetime
+from datetime import date
 from typing import Iterable, Literal
 from uuid import uuid4
 
+import pytz
 from django.conf import settings
 from django.contrib import admin
 from django.db import models, transaction
@@ -49,7 +50,7 @@ class Competition(TimeStampedModel):
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, related_name="competitions")
     current_season = models.SmallIntegerField(
-        "Temporada atual", default=timezone.now().year
+        "Temporada atual", default=timezone.localdate().year
     )
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
@@ -264,6 +265,13 @@ class Guesser(models.Model):
         default=True,
     )
 
+    class Meta:
+        verbose_name = "palpiteiro"
+        verbose_name_plural = "palpiteiros"
+
+    def __str__(self) -> str:
+        return f"{self.user.get_full_name()} ({self.user.username})"
+
     def get_involved_pools(self):
         """Returns all pools that guesser is involved with as owner, as
         guesser or both"""
@@ -297,13 +305,6 @@ class Guesser(models.Model):
         with"""
 
         return [pool for pool in self.pools.all() if pool.has_pending_match(self)]
-
-    class Meta:
-        verbose_name = "palpiteiro"
-        verbose_name_plural = "palpiteiros"
-
-    def __str__(self) -> str:
-        return f"{self.user.get_full_name()} ({self.user.username})"
 
 
 class Guess(models.Model):
@@ -340,12 +341,42 @@ class Guess(models.Model):
 
     def evaluate_and_consolidate(self):
         if self.match.result_str is not None:
+            previous_score = self.score
             self.score = self._evaluate()
 
             if self.match.is_finished():
                 self.consolidated = True
 
             self.save()
+
+            if previous_score != self.score:
+                score_difference = self.score - previous_score
+                self.update_related_rankings(score_difference)
+
+    def update_related_rankings(self, score: int):
+        match_date = self.match.date_time.astimezone(pytz.timezone(settings.TIME_ZONE))
+        year = match_date.year
+        month = match_date.month
+        week = match_date.isocalendar().week
+
+        periods_to_update = [
+            {"year": 0, "month": 0, "week": 0},  # General ranking
+            {"year": year, "month": 0, "week": 0},  # Annual ranking
+            {"year": year, "month": month, "week": 0},  # Monthly ranking
+            {"year": year, "month": 0, "week": week},  # Weekly ranking
+        ]
+
+        for pool in self.pools.all():
+            for period in periods_to_update:
+                entry, created = RankingEntry.objects.get_or_create(
+                    pool=pool,
+                    guesser=self.guesser,
+                    **period,
+                    defaults={"score": score},
+                )
+                if not created:
+                    entry.score = models.F("score") + score
+                    entry.save(update_fields=["score"])
 
     @property
     def result_str(self) -> str:
@@ -699,3 +730,53 @@ class GuessPool(TimeStampedModel):
     @admin.display(description="Partidas")
     def number_of_matches(self):
         return self.get_matches().count()
+
+    def get_ranking_for_period(self, year: int, month: int, week: int):
+        """
+        Retorna a classificação completa para um período, usando uma única query.
+        Todos os palpiteiros do bolão são incluídos, com pontuação 0 se não tiverem
+        entradas de ranking para o período.
+        """
+        # Filtro para o LEFT JOIN na tabela de ranking
+        ranking_filter = Q(
+            ranking_entries__pool=self,
+            ranking_entries__year=year,
+            ranking_entries__month=month,
+            ranking_entries__week=week,
+        )
+
+        # A consulta principal
+        return (
+            self.guessers.all()
+            .select_related("user")
+            .annotate(
+                score=Coalesce(
+                    Sum("ranking_entries__score", filter=ranking_filter),
+                    0,
+                    output_field=models.IntegerField(),
+                )
+            )
+            .order_by("-score", "user__first_name")
+        )
+
+
+class RankingEntry(TimeStampedModel):
+    pool = models.ForeignKey(
+        GuessPool, on_delete=models.CASCADE, related_name="ranking_entries"
+    )
+    guesser = models.ForeignKey(
+        Guesser, on_delete=models.CASCADE, related_name="ranking_entries"
+    )
+    year = models.PositiveSmallIntegerField("Ano")
+    month = models.PositiveSmallIntegerField("Mês")
+    week = models.PositiveSmallIntegerField("Semana")
+    score = models.IntegerField("Pontuação", default=0)
+
+    class Meta:
+        verbose_name = "Registro de Classificação"
+        verbose_name_plural = "Registros de Classificação"
+        unique_together = [["pool", "guesser", "year", "month", "week"]]
+        ordering = ["-score"]
+
+    def __str__(self):
+        return f"Classificação {self.guesser} | bolão {self.pool} | ano {self.year}) | mês {self.month or '-'} | semana {self.week or '-'}"
