@@ -363,7 +363,7 @@ class Guess(models.Model):
             {"year": 0, "month": 0, "week": 0},  # General ranking
             {"year": year, "month": 0, "week": 0},  # Annual ranking
             {"year": year, "month": month, "week": 0},  # Monthly ranking
-            {"year": year, "month": month, "week": week},  # Weekly ranking
+            {"year": year, "month": 0, "week": week},  # Weekly ranking
         ]
 
         for pool in self.pools.all():

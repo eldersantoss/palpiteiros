@@ -432,18 +432,17 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
         context = super().get_context_data(**kwargs)
 
         today = timezone.localdate()
-        initial_data = {
-            "ano": str(today.year),
-            "mes": str(today.month),
+        default_period = {
+            "periodo": "semanal",
+            "ano": today.year,
+            "mes": today.month,
             "semana": str(today.isocalendar().week),
         }
-        form_data = self.request.GET if self.request.GET else initial_data
-        form = RankingPeriodForm(form_data)
-
+        form_data = self.request.GET if self.request.GET else default_period
+        form = RankingPeriodForm(form_data, pool=self.pool)
         form.is_valid()
 
         period_params = form.get_period_for_query()
-
         ranking_entries = self.pool.get_ranking_for_period(**period_params)
 
         context["period_form"] = form

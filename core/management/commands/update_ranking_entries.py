@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 (0, 0, 0),  # General
                 (year, 0, 0),  # Annual
                 (year, month, 0),  # Monthly
-                (year, month, week),  # Weekly
+                (year, 0, week),  # Weekly
             ]
 
             for pool in guess.pools.all():

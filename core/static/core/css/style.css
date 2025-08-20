@@ -428,7 +428,7 @@ input {
 .period-form {
   margin-top: 2vh;
   display: flex;
-  justify-content: space-between;
+  column-gap: 5vh;
   align-items: center;
 }
 
@@ -445,7 +445,6 @@ input {
   color: greenyellow;
   font-size: 0.65rem;
   font-weight: bold;
-  width: 12vh;
 }
 
 .period-form select option {

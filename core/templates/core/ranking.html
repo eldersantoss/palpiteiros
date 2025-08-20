@@ -8,8 +8,23 @@
 
 <div class="period-form-container">
   <p>Escolha o período que deseja ver a classificação:</p>
-  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form">
-    {{ period_form.as_div }}
+  <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="period-form" id="ranking-form">
+    <div id="div_id_periodo" class="form-group">
+      <label for="id_periodo">Período:</label>
+      {{ period_form.periodo }}
+    </div>
+    <div id="div_id_ano" class="form-group" style="display: none;">
+      <label for="id_ano">Ano:</label>
+      {{ period_form.ano }}
+    </div>
+    <div id="div_id_mes" class="form-group" style="display: none;">
+      <label for="id_mes">Mês:</label>
+      {{ period_form.mes }}
+    </div>
+    <div id="div_id_semana" class="form-group">
+      <label for="id_semana">Semana:</label>
+      {{ period_form.semana }}
+    </div>
   </form>
 </div>
 
@@ -105,5 +120,44 @@
     {% endfor %}
 </tbody>
 </table>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('ranking-form');
+    const periodoSelect = document.getElementById('id_periodo');
+    const anoDiv = document.getElementById('div_id_ano');
+    const mesDiv = document.getElementById('div_id_mes');
+    const semanaDiv = document.getElementById('div_id_semana');
+    const anoSelect = document.getElementById('id_ano');
+    const mesSelect = document.getElementById('id_mes');
+    const semanaSelect = document.getElementById('id_semana');
+
+    function toggleFields() {
+      const selectedPeriod = periodoSelect.value;
+      anoDiv.style.display = 'none';
+      mesDiv.style.display = 'none';
+      semanaDiv.style.display = 'none';
+
+      if (selectedPeriod === 'anual') {
+        anoDiv.style.display = 'block';
+      } else if (selectedPeriod === 'mensal') {
+        mesDiv.style.display = 'block';
+      } else if (selectedPeriod === 'semanal') {
+        semanaDiv.style.display = 'block';
+      }
+    }
+
+    function submitForm() {
+      form.submit();
+    }
+
+    periodoSelect.addEventListener('change', toggleFields);
+    anoSelect.addEventListener('change', submitForm);
+    mesSelect.addEventListener('change', submitForm);
+    semanaSelect.addEventListener('change', submitForm);
+
+    toggleFields();
+  });
+</script>
 
 {% endblock content %}
