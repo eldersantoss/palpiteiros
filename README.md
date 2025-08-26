@@ -104,3 +104,4 @@ Qualquer dúvida ou sugestão, fique à vontade para abrir uma [issue](https://g
 ## **Licença**
 
 Este projeto é licenciado sob os termos da [Licença CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode).
+
