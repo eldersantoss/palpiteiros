@@ -3,12 +3,11 @@ from time import sleep
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 
 from core.management.commands import create_or_update_teams_for_competitions
-from core.models import Competition, GuessPool, Match, Team
+from core.models import Competition, Match, Team
 from core.services.football import FootballApi
 
 
@@ -33,7 +32,9 @@ class Command(BaseCommand):
         start_date = options.get("start_date")
         end_date = options.get("end_date")
 
-        self.stdout.write(f"Getting matches for all in progress Competitions from {start_date} to {end_date}")
+        self.stdout.write(
+            f"Getting matches for all in progress Competitions from {start_date} to {end_date}"
+        )
 
         competitions = Competition.objects.filter(in_progress=True)
         if not competitions.exists():
@@ -50,8 +51,12 @@ class Command(BaseCommand):
                 sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
                 for match in matches:
-                    home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
-                    away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
+                    home_team = Team.objects.filter(
+                        data_source_id=match["teams"]["home"]["id"]
+                    ).first()
+                    away_team = Team.objects.filter(
+                        data_source_id=match["teams"]["away"]["id"]
+                    ).first()
                     if home_team is None or away_team is None:
                         self.stdout.write(
                             f"Unregistered teams for match {match['fixture']['id']} in {comp}, "
@@ -63,8 +68,12 @@ class Command(BaseCommand):
                             comp.data_source_id,
                         )
 
-                        home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
-                        away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
+                        home_team = Team.objects.filter(
+                            data_source_id=match["teams"]["home"]["id"]
+                        ).first()
+                        away_team = Team.objects.filter(
+                            data_source_id=match["teams"]["away"]["id"]
+                        ).first()
                         if home_team is None or away_team is None:
                             self.stderr.write(
                                 f"Teams not found for match {match['fixture']['id']} in {comp}, "
@@ -88,44 +97,14 @@ class Command(BaseCommand):
                     else:
                         updated.append(match_instance)
 
-                self.stdout.write(f"{len(created)} matches created and {len(updated)} updated matches for {comp}")
+                self.stdout.write(
+                    f"{len(created)} matches created and {len(updated)} updated matches for {comp}"
+                )
 
             except Exception as e:
                 self.stderr.write(f"Error when updating {comp}: {e}")
 
-        udpate_ranking_data_in_cache()
-
         self.stdout.write("Competitions update done")
-
-
-# TODO: mover função para arquivo de utils relacionado a cache
-def udpate_ranking_data_in_cache():
-    current_date = timezone.datetime.today()
-    current_year = current_date.year
-    current_month = current_date.month
-    current_week = current_date.isocalendar().week
-    pools = GuessPool.objects.all()
-
-    for pool in pools:
-        current_week_cache_key = (
-            settings.RANKING_CACHE_PREFIX + f"_{pool.uuid}_{str(current_year)}{str(current_month)}{str(current_week)}"
-        )
-        current_week_data = pool.get_guessers_with_score_and_guesses(
-            month=current_month,
-            year=current_year,
-            week=current_week,
-        )
-        cache.set(current_week_cache_key, current_week_data, None)
-
-        current_month_cache_key = (
-            settings.RANKING_CACHE_PREFIX + f"_{pool.uuid}_{str(current_year)}{str(current_month)}{str(0)}"
-        )
-        current_month_data = pool.get_guessers_with_score_and_guesses(
-            month=current_month,
-            year=current_year,
-            week=0,
-        )
-        cache.set(current_month_cache_key, current_month_data, None)
 
 
 # TODO: mover para arquivo utils do service
