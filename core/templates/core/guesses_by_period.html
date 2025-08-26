@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Palpites por Período | Palpiteiros{% endblock title %}
+
+{% block content %}
+
+<h3>Palpites por Período</h3>
+
+<div class="period-form-container">
+  <p>Escolha o palpiteiro e o período que deseja ver os palpites:</p>
+  <form action="{% url 'core:guesses_by_period' pool.slug %}" method="GET" class="period-form" id="guesses-form">
+    <div id="div_id_guesser" class="form-group">
+        <label for="id_palpiteiro">Palpiteiro:</label>
+        {{ form.palpiteiro }}
+    </div>
+    <div id="div_id_periodo" class="form-group">
+      <label for="id_periodo">Período:</label>
+      {{ form.periodo }}
+    </div>
+    <div id="div_id_ano" class="form-group" style="display: none;">
+      <label for="id_ano">Ano:</label>
+      {{ form.ano }}
+    </div>
+    <div id="div_id_mes" class="form-group" style="display: none;">
+      <label for="id_mes">Mês:</label>
+      {{ form.mes }}
+    </div>
+    <div id="div_id_semana" class="form-group" style="display: none;">
+      <label for="id_semana">Semana:</label>
+      {{ form.semana }}
+    </div>
+  </form>
+</div>
+
+{% if guesses %}
+    <h4 style="margin-top: 5vh">Pontuação total no período: <span style="color:yellowgreen">{{ total_score }}<span></h4>
+    <table class="main-table detail-table">
+    <thead>
+        <tr>
+        <th style="width:50%">Partida</th>
+        <th style="width:15%">Resultado</th>
+        <th style="width:15%">Palpite</th>
+        <th style="width:15%">Pontuação</th>
+        <th style="width:5%"></th>
+        </tr>
+    </thead>
+
+    <tbody id="guesses-tbody">
+      {% for guess in guesses %}
+        <tr class="detail-table-row">
+            <td>
+                <p class="match-time">{{ guess.match.date_time|date:"l d/m H:i" }}</p>
+                <p>{{ guess.match.home_team }}</p>
+                <p>x</p>
+                <p>{{ guess.match.away_team }}</p>
+            </td>
+            <td>{{ guess.match.result_str|default:"-" }}</td>
+            <td>{{ guess.result_str }}</td>
+            {% if guess.match.result_str %}
+                <td>{{ guess.get_score }}</td>
+            {% else %}
+                <td>-</td>
+            {% endif %}
+            <td>
+            {% if guess.match.double_score %}
+            🔥
+            {% endif %}
+            </td>
+        </tr>
+      {% endfor %}
+
+      {% comment %} {% if page_obj and page_obj.has_next %}
+          <div id="load-more-btn-partial" data-page="{{ page_obj.next_page_number }}"></div>
+      {% endif %} {% endcomment %}
+    </tbody>
+    </table>
+
+    {% comment %} {% if page_obj.has_next %}
+        <button id="load-more-btn" data-page="{{ page_obj.next_page_number }}">Carregar mais palpites</button>
+    {% endif %} {% endcomment %}
+
+{% else %}
+    <p class="main-msg">Nenhum palpite encontrado para o palpiteiro no período selecionado.</p>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('guesses-form');
+    const guesserSelect = document.getElementById('id_palpiteiro');
+    const periodoSelect = document.getElementById('id_periodo');
+    const anoDiv = document.getElementById('div_id_ano');
+    const mesDiv = document.getElementById('div_id_mes');
+    const semanaDiv = document.getElementById('div_id_semana');
+    const anoSelect = document.getElementById('id_ano');
+    const mesSelect = document.getElementById('id_mes');
+    const semanaSelect = document.getElementById('id_semana');
+
+    function toggleFields() {
+        const selectedPeriod = periodoSelect.value;
+        anoDiv.style.display = 'none';
+        mesDiv.style.display = 'none';
+        semanaDiv.style.display = 'none';
+
+        if (selectedPeriod === 'anual') {
+            anoDiv.style.display = 'block';
+        } else if (selectedPeriod === 'mensal') {
+            mesDiv.style.display = 'block';
+        } else if (selectedPeriod === 'semanal') {
+            semanaDiv.style.display = 'block';
+        }
+    }
+
+    function submitForm() {
+        form.submit();
+    }
+
+    guesserSelect.addEventListener('change', submitForm);
+    periodoSelect.addEventListener('change', function() {
+        toggleFields();
+        if (periodoSelect.value === 'geral') {
+            submitForm();
+        }
+    });
+    anoSelect.addEventListener('change', submitForm);
+    mesSelect.addEventListener('change', submitForm);
+    semanaSelect.addEventListener('change', submitForm);
+
+    toggleFields();
+
+    /*
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', function() {
+        let page = this.dataset.page;
+        let url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+
+        fetch(url, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.text())
+        .then(data => {
+          const tbody = document.getElementById('guesses-tbody');
+          tbody.insertAdjacentHTML('beforeend', data);
+
+          // Check if there is a next page from the response headers or a specific element
+          // This part is tricky without sending more context from the server.
+          // A simple way is to check if the response is empty or not.
+          // A better way is to send a new `data-page` with the partial.
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = data;
+          const newLoadMoreBtn = tempDiv.querySelector('#load-more-btn-partial');
+
+          if (newLoadMoreBtn) {
+            this.dataset.page = newLoadMoreBtn.dataset.page;
+          } else {
+            this.style.display = 'none';
+          }
+        });
+      });
+    }
+    */
+});
+</script>
+
+{% endblock content %}

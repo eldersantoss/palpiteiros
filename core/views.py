@@ -2,6 +2,8 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
+from django.db.models import Q, Sum
 from django.forms import CheckboxSelectMultiple, modelform_factory
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -10,7 +12,13 @@ from django.views import generic
 
 from core.helpers import redirect_with_msg
 
-from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
+from .forms import (
+    GuesserEditForm,
+    GuessesPeriodForm,
+    GuessForm,
+    RankingPeriodForm,
+    UserEditForm,
+)
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
 
@@ -448,8 +456,65 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
         context["period_form"] = form
         context["ranking_entries"] = ranking_entries
 
-        # A verificação de "sem palpiteiros" deve ser feita no queryset do pool
         if not self.pool.guessers.exists():
             context["no_guessers"] = True
 
         return context
+
+
+class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+    template_name = "core/guesses_by_period.html"
+    paginate_by = 50
+
+    def get(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        default_period = {
+            "periodo": "semanal",
+            "ano": today.year,
+            "mes": today.month,
+            "semana": str(today.isocalendar().week),
+            "palpiteiro": self.guesser.id,
+        }
+        form = GuessesPeriodForm(request.GET or default_period, pool=self.pool)
+        form.is_valid()
+
+        query_params = form.get_period_for_query()
+        guesses_qs = self.get_queryset(**query_params)
+        total_score = guesses_qs.aggregate(total=Sum("score"))["total"] or 0
+
+        paginator = Paginator(guesses_qs, self.paginate_by)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return render(
+                request,
+                "core/partials/guesses_table_body.html",
+                {"guesses": page_obj, "page_obj": page_obj},
+            )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "pool": self.pool,
+                "form": form,
+                "guesses": page_obj,
+                "page_obj": page_obj,
+                "total_score": total_score,
+            },
+        )
+
+    def get_queryset(self, guesser, year, month, week):
+        filters = Q(guesser=guesser)
+
+        if year and not month and not week:
+            filters &= Q(match__date_time__year=year)
+
+        elif year and month and not week:
+            filters &= Q(match__date_time__year=year, match__date_time__month=month)
+
+        elif year and week:
+            filters &= Q(match__date_time__year=year, match__date_time__week=week)
+
+        return self.pool.guesses.filter(filters).order_by("-match__date_time")

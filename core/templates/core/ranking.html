@@ -59,56 +59,7 @@
         <td>{{ forloop.counter }}º</td>
         <td style="text-align:left">{{ entry }}</td>
         <td>{{ entry.score }}</td>
-        <td class="expand-icon">Palpites 🔽</td>
-      </tr>
-
-      <tr
-        class="detail-row"
-        name="detail-row{{ entry.user.id }}"
-        style="display: none"
-      >
-        <td colspan="5" class="detail-table-container">
-          <table class="detail-table">
-            <thead>
-              <tr>
-                <th style="width:50%">Partida</th>
-                <th style="width:15%">Resultado</th>
-                <th style="width:15%">Palpite</th>
-                <th style="width:15%">Pontuação</th>
-                <th style="width:5%"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% comment %} {% for match_and_guess in entry.matches_and_guesses %}
-                <tr class="detail-table-row">
-                  <td>
-                      <p class="match-time">{{ match_and_guess.match.date_time|date:"l d/m H:i" }}</p>
-                      <p>{{ match_and_guess.match.home_team }}</p>
-                      <p>x</p>
-                      <p>{{ match_and_guess.match.away_team }}</p>
-                  </td>
-                  <td>{{ match_and_guess.match.result_str|default:"-" }}</td>
-                  {% if match_and_guess.guess %}
-                    <td>{{ match_and_guess.guess.result_str }}</td>
-                    {% if match_and_guess.match.result_str %}
-                      <td>{{ match_and_guess.guess.get_score }}</td>
-                    {% else %}
-                      <td>-</td>
-                    {% endif %}
-                  {% else %}
-                    <td>-</td>
-                    <td>-</td>
-                  {% endif %}
-                  <td>
-                    {% if match_and_guess.match.double_score %}
-                    🔥
-                    {% endif %}
-                  </td>
-                </tr>
-              {% endfor %} {% endcomment %}
-            </tbody>
-          </table>
-        </td>
+        <td class="expand-icon">Ver palpites</td>
       </tr>
 
     {% empty %}
