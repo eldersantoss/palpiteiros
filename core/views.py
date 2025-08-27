@@ -1,9 +1,9 @@
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.cache import cache
+from django.core.paginator import Paginator
+from django.db.models import Q, Sum
 from django.forms import CheckboxSelectMultiple, modelform_factory
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -12,7 +12,13 @@ from django.views import generic
 
 from core.helpers import redirect_with_msg
 
-from .forms import GuesserEditForm, GuessForm, RankingPeriodForm, UserEditForm
+from .forms import (
+    GuesserEditForm,
+    GuessesPeriodForm,
+    GuessForm,
+    RankingPeriodForm,
+    UserEditForm,
+)
 from .models import Guess, GuessPool
 from .viewmixins import GuessPoolMembershipMixin
 
@@ -29,7 +35,11 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
         involved_pools = guesser.get_involved_pools()
         pools_as_guesser = guesser.pools.all()
         for pool in involved_pools:
-            pool.is_pending = pool.has_pending_match(self.request.user.guesser) if pool in pools_as_guesser else False
+            pool.is_pending = (
+                pool.has_pending_match(self.request.user.guesser)
+                if pool in pools_as_guesser
+                else False
+            )
 
         context["display_subtitle"] = any([pool.is_pending for pool in involved_pools])
         context["pools"] = involved_pools
@@ -260,7 +270,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
-        logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
+        logger.info(
+            f"{timezone.now()}: user {self.request.user} accessed the /palpites route"
+        )
 
         open_matches = self.pool.get_open_matches()
         closed_matches = self.pool.get_closed_recent_matches()
@@ -306,13 +318,19 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": self.pool, "guess_forms": guess_forms, "closed_matches_and_guesses": closed_matches_and_guesses},
+            {
+                "pool": self.pool,
+                "guess_forms": guess_forms,
+                "closed_matches_and_guesses": closed_matches_and_guesses,
+            },
         )
 
     def post(self, *args, **kwargs):
         guesses_data = dict(**self.request.POST)
         guesses_data.pop("csrfmiddlewaretoken")
-        logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
+        logger.info(
+            f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}"
+        )
 
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
@@ -394,7 +412,11 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return render(
             self.request,
             "core/guesses.html",
-            {"pool": self.pool, "guess_forms": guess_forms, "closed_matches_and_guesses": closed_matches_and_guesses},
+            {
+                "pool": self.pool,
+                "guess_forms": guess_forms,
+                "closed_matches_and_guesses": closed_matches_and_guesses,
+            },
         )
 
 
@@ -403,7 +425,7 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
 
     def get(self, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        if not context["guessers"].exists():
+        if context.get("no_guessers"):
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -411,32 +433,88 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
                 "short",
                 self.pool,
             )
+
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        current_date = timezone.now().date()
-        current_period = {
-            "semana": current_date.isocalendar().week,
-            "mes": current_date.month,
-            "ano": current_date.year,
+        today = timezone.localdate()
+        default_period = {
+            "periodo": "semanal",
+            "ano": today.year,
+            "mes": today.month,
+            "semana": str(today.isocalendar().week),
         }
-        form = RankingPeriodForm(self.request.GET or current_period)
+        form_data = self.request.GET if self.request.GET else default_period
+        form = RankingPeriodForm(form_data, pool=self.pool)
         form.is_valid()
 
-        month = int(form.cleaned_data["mes"])
-        year = int(form.cleaned_data["ano"])
-        week = int(form.cleaned_data["semana"])
-
-        cache_key = settings.RANKING_CACHE_PREFIX + f"_{self.pool.uuid}_{str(year)}{str(month)}{str(week)}"
-
-        guessers_data = cache.get(cache_key)
-        if guessers_data is None:
-            guessers_data = self.pool.get_guessers_with_score_and_guesses(month, year, week)
-            cache.set(key=cache_key, value=guessers_data, timeout=None)
+        period_params = form.get_period_for_query()
+        ranking_entries = self.pool.get_ranking_for_period(**period_params)
 
         context["period_form"] = form
-        context["guessers"] = guessers_data
+        context["ranking_entries"] = ranking_entries
+
+        if not self.pool.guessers.exists():
+            context["no_guessers"] = True
 
         return context
+
+
+class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+    template_name = "core/guesses_by_period.html"
+    paginate_by = 50
+
+    def get(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        default_period = {
+            "periodo": "semanal",
+            "ano": today.year,
+            "mes": today.month,
+            "semana": str(today.isocalendar().week),
+            "palpiteiro": self.guesser.id,
+        }
+        form = GuessesPeriodForm(request.GET or default_period, pool=self.pool)
+        form.is_valid()
+
+        query_params = form.get_period_for_query()
+        guesses_qs = self.get_queryset(**query_params)
+        total_score = guesses_qs.aggregate(total=Sum("score"))["total"] or 0
+
+        paginator = Paginator(guesses_qs, self.paginate_by)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return render(
+                request,
+                "core/partials/guesses_table_body.html",
+                {"guesses": page_obj, "page_obj": page_obj},
+            )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "pool": self.pool,
+                "form": form,
+                "guesses": page_obj,
+                "page_obj": page_obj,
+                "total_score": total_score,
+            },
+        )
+
+    def get_queryset(self, guesser, year, month, week):
+        filters = Q(guesser=guesser)
+
+        if year and not month and not week:
+            filters &= Q(match__date_time__year=year)
+
+        elif year and month and not week:
+            filters &= Q(match__date_time__year=year, match__date_time__month=month)
+
+        elif year and week:
+            filters &= Q(match__date_time__year=year, match__date_time__week=week)
+
+        return self.pool.guesses.filter(filters).order_by("-match__date_time")

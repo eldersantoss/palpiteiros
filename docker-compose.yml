@@ -10,10 +10,33 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
+  pg-admin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 5050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+
   redis:
     image: redis:7-alpine
     ports:
       - 6379:6379
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - postgres
+      - redis
 
 volumes:
   db_data:
