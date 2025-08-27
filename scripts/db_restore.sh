@@ -75,7 +75,7 @@ echo "------------------------------------------------------------------"
 echo ""
 
 echo "Iniciando a restauração do schema 'public' a partir de $DUMP_FILE..."
-PGPASSWORD=$DB_PASSWORD pg_restore -h $DB_HOST -d $DB_NAME -U $DB_USER -p $DB_PORT -F t --no-owner --clean --no-privileges "$DUMP_FILE"
+PGPASSWORD=$DB_PASSWORD pg_restore -h $DB_HOST -d $DB_NAME -U $DB_USER -p $DB_PORT -F t -c $DUMP_FILE
 
 # Verifica se o restore foi bem-sucedido
 if [ $? -eq 0 ]; then
