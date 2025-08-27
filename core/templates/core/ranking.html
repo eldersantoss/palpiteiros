@@ -59,7 +59,8 @@
         <td>{{ forloop.counter }}º</td>
         <td style="text-align:left">{{ entry }}</td>
         <td>{{ entry.score }}</td>
-        <td class="expand-icon">Ver palpites</td>
+        {% comment %} <td class="expand-icon">Ver palpites</td> {% endcomment %}
+        <td class="expand-icon"></td>
       </tr>
 
     {% empty %}
