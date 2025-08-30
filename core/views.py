@@ -506,14 +506,12 @@ class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.
         )
 
     def get_queryset(self, guesser, year, month, week):
-        filters = Q(guesser=guesser)
+        filters = Q(guesser=guesser) & Q(match__date_time__lt=timezone.localtime())
 
         if year and not month and not week:
             filters &= Q(match__date_time__year=year)
-
         elif year and month and not week:
             filters &= Q(match__date_time__year=year, match__date_time__month=month)
-
         elif year and week:
             filters &= Q(match__date_time__year=year, match__date_time__week=week)
 

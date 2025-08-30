@@ -50,11 +50,11 @@ urlpatterns = [
         views.GuessesView.as_view(),
         name="guesses",
     ),
-    # path(
-    #     "boloes/<slug:pool_slug>/palpites-por-periodo/",
-    #     views.GuessesByPeriodView.as_view(),
-    #     name="guesses_by_period",
-    # ),
+    path(
+        "boloes/<slug:pool_slug>/palpites-por-periodo/",
+        views.GuessesByPeriodView.as_view(),
+        name="guesses_by_period",
+    ),
     path(
         "boloes/<slug:pool_slug>/classificacao/",
         views.RankingView.as_view(),
