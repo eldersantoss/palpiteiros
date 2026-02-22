@@ -79,7 +79,7 @@ python manage.py create_or_update_teams_for_competitions <season> <league_ids>
 
 ### **Cadastrando e atualizando partidas**
 ```bash
-python manage.py create_or_update_matches
+python manage.py create_and_update_matches
 ```
 
 ### **Dump e restauração do banco de dados**
