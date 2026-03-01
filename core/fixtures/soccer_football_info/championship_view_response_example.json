@@ -1,0 +1,42 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [],
+  "result": [
+    {
+      "id": "5fda5fab11fbd288",
+      "name": "Italy Serie A",
+      "country": "IT",
+      "has_image": false,
+      "important": true,
+      "seasons": [
+        {
+          "name": "Serie A 20/21",
+          "from": "2020-09-19",
+          "to": "2021-05-23",
+          "groups": [
+            {
+              "name": "Serie A",
+              "table": [
+                {
+                  "team": {
+                    "id": "5fda5fcad92584cd",
+                    "name": "AC Milan"
+                  },
+                  "position": 1,
+                  "win": 11,
+                  "draw": 4,
+                  "loss": 1,
+                  "points": 37,
+                  "goals_scored": 35,
+                  "goals_conceded": 19,
+                  "note": "Champions League"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

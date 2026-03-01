@@ -1,0 +1,103 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [
+    {
+      "page": 38,
+      "per_page": 25,
+      "items": 930
+    }
+  ],
+  "result": [
+    {
+      "id": "92074e0cbe91515f",
+      "date": "2026-02-08 00:00:00",
+      "status": "ENDED",
+      "timer": "90:00",
+      "championship": {
+        "id": "57449cf280464d5c",
+        "name": "Brazil Campeonato Carioca",
+        "s_name": "Carioca, Serie A 2026"
+      },
+      "teamA": {
+        "id": "139cc13a023b3271",
+        "name": "Bangu",
+        "score": {
+          "f": 1,
+          "1h": 0,
+          "2h": 1,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": null
+      },
+      "teamB": {
+        "id": "9018421f3e79987a",
+        "name": "Boavista RJ",
+        "score": {
+          "f": 1,
+          "1h": 0,
+          "2h": 1,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": null
+      },
+      "events": [],
+      "dominance_index": [],
+      "referee": null,
+      "stadium": {
+        "id": "dcec3294fa534dfe",
+        "name": "Estadio Moca Bonita"
+      },
+      "odds": {},
+      "bet365_url": "https://www.bet365.EXT/#/AC/B1/C1/D8/E188800171/F3/I0/"
+    },
+    {
+      "id": "874218e07b39a41",
+      "date": "2026-03-01 21:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "57449cf280464d5c",
+        "name": "Brazil Campeonato Carioca",
+        "s_name": "Carioca, Serie A 2026"
+      },
+      "teamA": {
+        "id": "f29717ce5926330",
+        "name": "Fluminense",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": null
+      },
+      "teamB": {
+        "id": "92471ca40ae2d5df",
+        "name": "Vasco da Gama",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "268401a9796e8857",
+        "name": "Estadio do Maracana"
+      },
+      "odds": {},
+      "bet365_url": "https://www.bet365.EXT/#/AC/B1/C1/D8/E189951525/F3/I0/"
+    }
+  ]
+}
