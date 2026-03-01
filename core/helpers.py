@@ -3,6 +3,7 @@ from typing import Literal
 from django.contrib import messages
 from django.http import HttpRequest
 from django.shortcuts import redirect
+from django.utils import timezone
 
 
 def redirect_with_msg(
@@ -32,3 +33,7 @@ def redirect_with_msg(
     extra_tags = f"temp-msg {msg_duration}-time-msg"
     getattr(messages, msg_type)(request, msg, extra_tags)
     return redirect(to, permanent=permanent)
+
+
+def get_current_year() -> int:
+    return timezone.localdate().year

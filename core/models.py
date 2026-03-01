@@ -13,6 +13,8 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
+from core.helpers import get_current_year
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +28,7 @@ class TimeStampedModel(models.Model):
 
 class Team(models.Model):
     data_source_id = models.PositiveIntegerField(blank=True, null=True)
+    sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     name = models.CharField(max_length=50)
     code = models.CharField(max_length=3, blank=True, null=True)
 
@@ -38,20 +41,15 @@ class Team(models.Model):
         return self.name
 
     def logo_url(self):
-        return (
-            f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
-            if self.data_source_id
-            else ""
-        )
+        return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png" if self.data_source_id else ""
 
 
 class Competition(TimeStampedModel):
     data_source_id = models.PositiveIntegerField(unique=True)
+    sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, related_name="competitions")
-    current_season = models.SmallIntegerField(
-        "Temporada atual", default=timezone.localdate().year
-    )
+    current_season = models.SmallIntegerField("Temporada atual", default=get_current_year)
     in_progress = models.BooleanField("Está em andamento?", default=True)
 
     # TODO: add date fields for start and end dates, then replace field in_progress by a calculated property
@@ -72,9 +70,7 @@ class Competition(TimeStampedModel):
         """Returns competitions which that have matches on period"""
 
         matches_on_period = Match.get_happen_on_period(from_, to)
-        competitions_with_matches_on_period = matches_on_period.values(
-            "competition"
-        ).distinct()
+        competitions_with_matches_on_period = matches_on_period.values("competition").distinct()
 
         return cls.objects.filter(id__in=competitions_with_matches_on_period)
 
@@ -129,6 +125,7 @@ class Match(models.Model):
     HOURS_BEFORE_OPEN_TO_GUESSES = 48
 
     data_source_id = models.PositiveIntegerField(blank=True, null=True)
+    sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     competition = models.ForeignKey(
         Competition,
         verbose_name="Competição",
@@ -177,18 +174,12 @@ class Match(models.Model):
     ):
         self.status = new_status
 
-        match_time_limit = self.date_time + timezone.timedelta(
-            minutes=match_time_limit_minutes
-        )
+        match_time_limit = self.date_time + timezone.timedelta(minutes=match_time_limit_minutes)
         match_broke_limit_time = timezone.now() >= match_time_limit
 
         REGULAR_MATCH_DURATION = 90
 
-        if (
-            match_broke_limit_time
-            and elapsed_time >= REGULAR_MATCH_DURATION
-            and self.status == Match.SECOND_HALF
-        ):
+        if match_broke_limit_time and elapsed_time >= REGULAR_MATCH_DURATION and self.status == Match.SECOND_HALF:
             self.status = Match.FINISHED_STATUS
 
     def is_finished(self) -> bool:
@@ -218,14 +209,8 @@ class Match(models.Model):
         description="Aberta para palpites?",
     )
     def open_to_guesses(self):
-        return (
-            self.date_time
-            > timezone.now()
-            + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH)
-        ) and (
-            self.date_time
-            <= timezone.now()
-            + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
+        return (self.date_time > timezone.now() + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH)) and (
+            self.date_time <= timezone.now() + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
         )
 
     def get_pools(self):
@@ -282,11 +267,7 @@ class Guesser(models.Model):
     def get_who_should_be_notified_by_email(cls):
         """Returns guessers that should be notified by email"""
 
-        return (
-            cls.objects.exclude(user__email="")
-            .exclude(pools__isnull=True)
-            .exclude(receive_notifications=False)
-        )
+        return cls.objects.exclude(user__email="").exclude(pools__isnull=True).exclude(receive_notifications=False)
 
     def get_involved_pools_with_new_matches(self):
         """Returns pools with new matches that this guesser is involved
@@ -329,9 +310,7 @@ class Guess(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"{self.match.home_team.name} {self.home_goals}"
-            + " x "
-            + f"{self.away_goals} {self.match.away_team.name}"
+            f"{self.match.home_team.name} {self.home_goals}" + " x " + f"{self.away_goals} {self.match.away_team.name}"
         )
 
     def get_score(self) -> int:
@@ -393,16 +372,10 @@ class Guess(models.Model):
         ACERTO_VISITANTE_VENCEDOR = (self.home_goals < self.away_goals) and (
             self.match.home_goals < self.match.away_goals
         )
-        ACERTO_EMPATE = (self.home_goals == self.away_goals) and (
-            self.match.home_goals == self.match.away_goals
-        )
+        ACERTO_EMPATE = (self.home_goals == self.away_goals) and (self.match.home_goals == self.match.away_goals)
         ACERTO_PARCIAL = ACERTO_MANDANTE_VENCEDOR or ACERTO_VISITANTE_VENCEDOR
-        ACERTO_PARCIAL_COM_GOLS = ACERTO_PARCIAL and (
-            ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE
-        )
-        ACERTO_SOMENTE_GOLS = (
-            ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE
-        ) and not ACERTO_PARCIAL
+        ACERTO_PARCIAL_COM_GOLS = ACERTO_PARCIAL and (ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE)
+        ACERTO_SOMENTE_GOLS = (ACERTO_DE_GOLS_MANDANTE or ACERTO_DE_GOLS_VISITANTE) and not ACERTO_PARCIAL
         ACERTO_CRAVADO = ACERTO_DE_GOLS_MANDANTE and ACERTO_DE_GOLS_VISITANTE
 
         PONTUACAO_ACERTO_CRAVADO = 10
@@ -535,10 +508,8 @@ class GuessPool(TimeStampedModel):
         return (
             self.get_matches()
             .filter(
-                date_time__gt=timezone.now()
-                + timezone.timedelta(minutes=self.minutes_before_start_match),
-                date_time__lte=timezone.now()
-                + timezone.timedelta(hours=self.hours_before_open_to_guesses),
+                date_time__gt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
+                date_time__lte=timezone.now() + timezone.timedelta(hours=self.hours_before_open_to_guesses),
             )
             .order_by("date_time")
         )
@@ -550,8 +521,7 @@ class GuessPool(TimeStampedModel):
             self.get_matches()
             .filter(
                 date_time__gte=timezone.now() - timezone.timedelta(hours=36),
-                date_time__lt=timezone.now()
-                + timezone.timedelta(minutes=self.minutes_before_start_match),
+                date_time__lt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
             )
             .order_by("-date_time")
         )
@@ -583,9 +553,7 @@ class GuessPool(TimeStampedModel):
         if for_all_pools:
             pools_with_the_match = match.get_pools()
             pools_with_the_guesser = guesser.pools.all()
-            pools_with_match_and_guesser = pools_with_the_match.intersection(
-                pools_with_the_guesser
-            )
+            pools_with_match_and_guesser = pools_with_the_match.intersection(pools_with_the_guesser)
 
             for pool in pools_with_match_and_guesser:
                 self._replace_guess_in_pool(guess, pool)
@@ -642,15 +610,11 @@ class GuessPool(TimeStampedModel):
         week: int,
     ):
         start_date, end_date = self._assemble_datetime_period(month, year, week)
-        matches = self.get_finished_or_in_progress_matches_on_period(
-            start_date, end_date
-        )
+        matches = self.get_finished_or_in_progress_matches_on_period(start_date, end_date)
         guessers = self.get_guessers_with_match_scores(matches)
 
         for guesser in guessers:
-            guesser.matches_and_guesses = self._get_guesses_per_matches(
-                guesser, matches
-            )
+            guesser.matches_and_guesses = self._get_guesses_per_matches(guesser, matches)
 
         return guessers
 
@@ -701,9 +665,7 @@ class GuessPool(TimeStampedModel):
         )
 
     def get_guessers_with_match_scores(self, matches: Iterable[Match]):
-        guesses_of_this_pool_in_the_period = Q(guesses__match__in=matches) & Q(
-            guesses__in=self.guesses.all()
-        )
+        guesses_of_this_pool_in_the_period = Q(guesses__match__in=matches) & Q(guesses__in=self.guesses.all())
         sum_expr = Sum(
             "guesses__score",
             filter=guesses_of_this_pool_in_the_period,
@@ -714,9 +676,7 @@ class GuessPool(TimeStampedModel):
         matches_and_guesses = []
 
         for match in matches[: settings.MATCHES_TO_SHOW_INTO_RANKING]:
-            guess: Guess | None = self.guesses.filter(
-                match=match, guesser=guesser
-            ).first()
+            guess: Guess | None = self.guesses.filter(match=match, guesser=guesser).first()
 
             matches_and_guesses.append({"match": match, "guess": guess})
 
@@ -761,12 +721,8 @@ class GuessPool(TimeStampedModel):
 
 
 class RankingEntry(TimeStampedModel):
-    pool = models.ForeignKey(
-        GuessPool, on_delete=models.CASCADE, related_name="ranking_entries"
-    )
-    guesser = models.ForeignKey(
-        Guesser, on_delete=models.CASCADE, related_name="ranking_entries"
-    )
+    pool = models.ForeignKey(GuessPool, on_delete=models.CASCADE, related_name="ranking_entries")
+    guesser = models.ForeignKey(Guesser, on_delete=models.CASCADE, related_name="ranking_entries")
     year = models.PositiveSmallIntegerField("Ano")
     month = models.PositiveSmallIntegerField("Mês")
     week = models.PositiveSmallIntegerField("Semana")
