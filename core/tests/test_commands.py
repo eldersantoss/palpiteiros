@@ -216,7 +216,7 @@ def test_sync_matches_sfi_skips_untracked_competition(
 @patch("core.management.commands.sync_matches_sfi.sleep")
 @patch("core.management.commands.sync_matches_sfi.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_skips_match_with_unknown_team(
+def test_sync_matches_sfi_registers_unknown_teams_and_processes_match(
     mock_get,
     mock_tz,
     mock_sleep,
@@ -224,13 +224,16 @@ def test_sync_matches_sfi_skips_match_with_unknown_team(
     get_sfi_matches_by_day_future_response_page_1,
     get_sfi_matches_by_day_future_response_page_2,
     sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+    capsys,
 ):
-    """A match whose team is not registered under the competition is skipped with a warning."""
+    """A match with unknown teams auto-registers them and proceeds with match sync."""
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    # Competition exists but its teams do NOT have matching SFI IDs.
-    baker.make("core.Competition", sfi_id=sfi_competition_id)
+    # Competition exists but no teams are pre-registered.
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
 
     page_1 = mock_success_response
     page_1.json.return_value = get_sfi_matches_by_day_future_response_page_1
@@ -244,7 +247,18 @@ def test_sync_matches_sfi_skips_match_with_unknown_team(
 
     call_command("sync_matches_sfi", date=date(2026, 3, 3))
 
-    assert not Match.objects.exists()
+    output = capsys.readouterr().out
+
+    assert Match.objects.filter(sfi_id="match-sfi-ns-001").exists()
+
+    home_team = Team.objects.get(sfi_id=sfi_home_team_id)
+    away_team = Team.objects.get(sfi_id=sfi_away_team_id)
+    assert competition.teams.filter(pk=home_team.pk).exists()
+    assert competition.teams.filter(pk=away_team.pk).exists()
+
+    assert f"(sfi_id={sfi_home_team_id})" in output
+    assert f"(sfi_id={sfi_away_team_id})" in output
+    assert "2 teams registered" in output
 
 
 @patch("core.management.commands.sync_matches_sfi.sleep")

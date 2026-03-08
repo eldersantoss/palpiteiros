@@ -5,6 +5,7 @@ date range and upserts them into the database.
 
 Default window: yesterday through the two days after today (4 dates total).
 Matches from competitions not registered with an SFI ID are silently skipped.
+Teams not found for a tracked competition are created and linked automatically.
 """
 
 import logging
@@ -115,10 +116,12 @@ class Command(BaseCommand):
             self.stderr.write(f"  ERROR: could not fetch matches for {target_date}, skipping.")
             return
 
-        created, updated, skipped = 0, 0, 0
+        created, updated, skipped, teams_created = 0, 0, 0, 0
 
         for match in matches:
-            outcome = self._process_match(match, competitions_by_sfi_id)
+            outcome, created_teams_for_match = self._process_match(match, competitions_by_sfi_id)
+            teams_created += created_teams_for_match
+
             if outcome == ProcessMatchResult.created:
                 created += 1
             elif outcome == ProcessMatchResult.updated:
@@ -126,7 +129,10 @@ class Command(BaseCommand):
             else:
                 skipped += 1
 
-        self.stdout.write(f"  {target_date}: {created} created, {updated} updated, {skipped} skipped.")
+        self.stdout.write(
+            f"  {target_date}: {created} created, {updated} updated, {skipped} skipped, "
+            f"{teams_created} teams registered."
+        )
 
     def _fetch_all_matches_for_date(self, service: SFIService, target_date: date, today: date) -> list[SFIMatch]:
         """Return every SFI match for *target_date*, handling pagination transparently.
@@ -173,45 +179,71 @@ class Command(BaseCommand):
         self,
         match: SFIMatch,
         competitions_by_sfi_id: dict[str, Competition],
-    ) -> ProcessMatchResult:
+    ) -> tuple[ProcessMatchResult, int]:
         """Process a single SFI match dict and apply the appropriate DB operation.
 
-        Returns one of ``"created"``, ``"updated"``, or ``"skipped"`` to allow the
-        caller to aggregate counts.
+        Returns a tuple ``(result, teams_created)`` where ``result`` is one of
+        ``"created"``, ``"updated"``, or ``"skipped"``.
         """
         competition = competitions_by_sfi_id.get(match["championship"]["id"])
         if competition is None:
             # Not a tracked competition — silently ignore.
-            return ProcessMatchResult.skipped
+            return ProcessMatchResult.skipped, 0
 
         status = match["status"]
 
         if status not in SFIService.SFI_MATCH_STATUSES:
             logger.warning("Skipping match %s with unhandled status '%s'.", match["id"], status)
-            return ProcessMatchResult.skipped
+            return ProcessMatchResult.skipped, 0
 
-        home_team = Team.objects.filter(sfi_id=match["teamA"]["id"], competitions=competition).first()
-        away_team = Team.objects.filter(sfi_id=match["teamB"]["id"], competitions=competition).first()
+        home_team, home_team_created = self._get_or_create_competition_team(
+            match_id=match["id"],
+            side="home",
+            team_sfi_id=match["teamA"]["id"],
+            team_name=match["teamA"]["name"],
+            competition=competition,
+        )
+        away_team, away_team_created = self._get_or_create_competition_team(
+            match_id=match["id"],
+            side="away",
+            team_sfi_id=match["teamB"]["id"],
+            team_name=match["teamB"]["name"],
+            competition=competition,
+        )
 
-        if home_team is None or away_team is None:
-            missing = []
-            if home_team is None:
-                missing.append(f"home={match['teamA']['name']} (sfi_id={match['teamA']['id']})")
-            if away_team is None:
-                missing.append(f"away={match['teamB']['name']} (sfi_id={match['teamB']['id']})")
-
-            msg = (
-                f"  WARN: match {match['id']} skipped — team(s) not found in competition "
-                f"'{competition}': {', '.join(missing)}"
-            )
-            logger.warning(msg)
-            self.stderr.write(msg)
-            return ProcessMatchResult.skipped
+        teams_created = int(home_team_created) + int(away_team_created)
 
         if status == SFIService.SFI_NOT_STARTED_STATUS:
-            return self._upsert_not_started_match(match, competition, home_team, away_team)
+            return self._upsert_not_started_match(match, competition, home_team, away_team), teams_created
 
-        return self._update_ended_match(match)
+        return self._update_ended_match(match), teams_created
+
+    def _get_or_create_competition_team(
+        self,
+        match_id: str,
+        side: str,
+        team_sfi_id: str,
+        team_name: str,
+        competition: Competition,
+    ) -> tuple[Team, bool]:
+        """Return a team by SFI ID, creating and linking it to the competition when needed."""
+        team, created = Team.objects.get_or_create(
+            sfi_id=team_sfi_id,
+            defaults={"name": team_name},
+        )
+
+        if not competition.teams.filter(pk=team.pk).exists():
+            competition.teams.add(team)
+
+        if created:
+            msg = (
+                f"    NEW TEAM: created {team_name} (sfi_id={team_sfi_id}) "
+                f"for competition '{competition}' while processing match {match_id} ({side})."
+            )
+            self.stdout.write(msg)
+            logger.info(msg)
+
+        return team, created
 
     def _upsert_not_started_match(
         self,
