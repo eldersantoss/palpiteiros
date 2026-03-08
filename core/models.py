@@ -40,8 +40,12 @@ class Team(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def logo_url(self):
-        return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png" if self.data_source_id else ""
+    def logo_url(self) -> str:
+        if self.data_source_id:
+            return f"https://media.api-sports.io/football/teams/{self.data_source_id}.png"
+        if self.sfi_id:
+            return f"https://static.soccerfootball.info/images/?i={self.sfi_id}"
+        return ""
 
 
 class Competition(TimeStampedModel):
@@ -63,7 +67,9 @@ class Competition(TimeStampedModel):
         return f"{self.name}"
 
     def logo_url(self) -> str:
-        return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
+        if self.data_source_id:
+            return f"https://media.api-sports.io/football/leagues/{self.data_source_id}.png"
+        return ""
 
     @classmethod
     def get_with_matches_on_period(cls, from_: date, to: date):
