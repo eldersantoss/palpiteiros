@@ -1,0 +1,65 @@
+[
+  {
+    "id": "14e1ebd6d992dbd5",
+    "name": "Copa America",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "cb187b43f736b6f7",
+    "name": "Euro Cup",
+    "country": "EU",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "65c65be09f3761bf",
+    "name": "Euro 2024",
+    "country": null,
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "96e061bd0a5408a4",
+    "name": "FIFA World Intercontinental Cup",
+    "country": null,
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "cce3a616fa2b9ddd",
+    "name": "FIFA Intercontinental Cup",
+    "country": null,
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3e2611472765cdbe",
+    "name": "World Cup 2022",
+    "country": "WR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "4b884e3b0119945e",
+    "name": "Friendlies",
+    "country": "WR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "c4db47e5ef023139",
+    "name": "America Friendlies",
+    "country": "WR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3d37024539cd5a47",
+    "name": "South America - World Cup Qualifying",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  }
+]

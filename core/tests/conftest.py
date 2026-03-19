@@ -121,3 +121,132 @@ def get_matches_of_league_by_season_and_date_period_response():
             }
         ]
     }
+
+
+@pytest.fixture
+def sfi_competition_id():
+    """SFI ID used for the tracked competition in SFI fixtures."""
+    return "comp-sfi-001"
+
+
+@pytest.fixture
+def sfi_home_team_id():
+    """SFI ID used for the home team in SFI fixtures."""
+    return "team-home-sfi-001"
+
+
+@pytest.fixture
+def sfi_away_team_id():
+    """SFI ID used for the away team in SFI fixtures."""
+    return "team-away-sfi-001"
+
+
+@pytest.fixture
+def get_sfi_matches_by_day_past_response(sfi_competition_id, sfi_home_team_id, sfi_away_team_id):
+    """Non-paginated SFI response (past date).
+
+    Contains one ENDED match.  ``pagination`` is an empty list to match the
+    actual API behaviour for past dates.
+    """
+    return {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "match-sfi-ended-001",
+                "date": "2026-02-26 20:00:00",
+                "status": "ENDED",
+                "timer": "90:00",
+                "championship": {
+                    "id": sfi_competition_id,
+                    "name": "Test League",
+                    "s_name": "Test League 2026",
+                },
+                "teamA": {
+                    "id": sfi_home_team_id,
+                    "name": "Home FC",
+                    "score": {"f": 2, "1h": 1, "2h": 2, "o": None, "p": None},
+                },
+                "teamB": {
+                    "id": sfi_away_team_id,
+                    "name": "Away FC",
+                    "score": {"f": 1, "1h": 0, "2h": 1, "o": None, "p": None},
+                },
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def get_sfi_matches_by_day_future_response_page_1(sfi_competition_id, sfi_home_team_id, sfi_away_team_id):
+    """First page of a paginated SFI response (present/future date).
+
+    Reports 26 total items across 2 pages of 25, so the command must request a
+    second page.  Contains one NOT_STARTED match.
+    """
+    return {
+        "status": 200,
+        "errors": [],
+        "pagination": [{"page": 1, "per_page": 25, "items": 26}],
+        "result": [
+            {
+                "id": "match-sfi-ns-001",
+                "date": "2026-03-03 20:00:00",
+                "status": "NOT_STARTED",
+                "timer": "00:00",
+                "championship": {
+                    "id": sfi_competition_id,
+                    "name": "Test League",
+                    "s_name": "Test League 2026",
+                },
+                "teamA": {
+                    "id": sfi_home_team_id,
+                    "name": "Home FC",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+                "teamB": {
+                    "id": sfi_away_team_id,
+                    "name": "Away FC",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def get_sfi_matches_by_day_future_response_page_2():
+    """Second page of a paginated SFI response (present/future date).
+
+    Contains one match for an untracked competition so that the command skips
+    it, keeping assertions simple.
+    """
+    return {
+        "status": 200,
+        "errors": [],
+        "pagination": [{"page": 2, "per_page": 25, "items": 26}],
+        "result": [
+            {
+                "id": "match-sfi-other-001",
+                "date": "2026-03-03 20:00:00",
+                "status": "NOT_STARTED",
+                "timer": "00:00",
+                "championship": {
+                    "id": "untracked-competition",
+                    "name": "Other League",
+                    "s_name": "Other League 2026",
+                },
+                "teamA": {
+                    "id": "other-team-a",
+                    "name": "Other A",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+                "teamB": {
+                    "id": "other-team-b",
+                    "name": "Other B",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+            }
+        ],
+    }

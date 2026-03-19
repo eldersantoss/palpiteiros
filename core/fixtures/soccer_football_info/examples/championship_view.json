@@ -1,0 +1,286 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [],
+  "result": [
+    {
+      "id": "57449cf280464d5c",
+      "name": "Brazil Campeonato Carioca",
+      "country": "BR",
+      "has_image": false,
+      "important": true,
+      "seasons": [
+        {
+          "name": "Carioca 2021",
+          "id": "3bef240d00afc089",
+          "from": "2021-01-16",
+          "to": "2021-05-31",
+          "groups": [
+            {
+              "name": "Taca Guanabara",
+              "table": [
+                {
+                  "team": {
+                    "id": "74becc28c493fff8",
+                    "name": "Flamengo"
+                  },
+                  "position": 1,
+                  "win": 7,
+                  "draw": 2,
+                  "loss": 2,
+                  "points": 23,
+                  "goals_scored": 23,
+                  "goals_conceded": 10,
+                  "note": "Playoffs"
+                },
+                {
+                  "team": {
+                    "id": "f29717ce5926330",
+                    "name": "Fluminense"
+                  },
+                  "position": 2,
+                  "win": 7,
+                  "draw": 1,
+                  "loss": 3,
+                  "points": 22,
+                  "goals_scored": 20,
+                  "goals_conceded": 11,
+                  "note": "Playoffs"
+                },
+                {
+                  "team": {
+                    "id": "ac8da03e8572808f",
+                    "name": "Portuguesa RJ"
+                  },
+                  "position": 3,
+                  "win": 6,
+                  "draw": 3,
+                  "loss": 2,
+                  "points": 21,
+                  "goals_scored": 20,
+                  "goals_conceded": 8,
+                  "note": "Playoffs"
+                },
+                {
+                  "team": {
+                    "id": "eceec252ee637c5",
+                    "name": "Volta Redonda"
+                  },
+                  "position": 4,
+                  "win": 6,
+                  "draw": 3,
+                  "loss": 2,
+                  "points": 21,
+                  "goals_scored": 18,
+                  "goals_conceded": 13,
+                  "note": "Playoffs"
+                },
+                {
+                  "team": {
+                    "id": "92471ca40ae2d5df",
+                    "name": "Vasco da Gama"
+                  },
+                  "position": 5,
+                  "win": 4,
+                  "draw": 5,
+                  "loss": 2,
+                  "points": 17,
+                  "goals_scored": 21,
+                  "goals_conceded": 15,
+                  "note": "Placement matches"
+                },
+                {
+                  "team": {
+                    "id": "b9712539ca900456",
+                    "name": "Nova Iguacu"
+                  },
+                  "position": 6,
+                  "win": 4,
+                  "draw": 3,
+                  "loss": 4,
+                  "points": 15,
+                  "goals_scored": 16,
+                  "goals_conceded": 15,
+                  "note": "Placement matches"
+                },
+                {
+                  "team": {
+                    "id": "a4983214b45b972c",
+                    "name": "Botafogo"
+                  },
+                  "position": 7,
+                  "win": 3,
+                  "draw": 6,
+                  "loss": 2,
+                  "points": 15,
+                  "goals_scored": 14,
+                  "goals_conceded": 9,
+                  "note": "Placement matches"
+                },
+                {
+                  "team": {
+                    "id": "7f23dc30fd74871b",
+                    "name": "Madureira RJ"
+                  },
+                  "position": 8,
+                  "win": 3,
+                  "draw": 6,
+                  "loss": 2,
+                  "points": 15,
+                  "goals_scored": 13,
+                  "goals_conceded": 16,
+                  "note": "Placement matches"
+                },
+                {
+                  "team": {
+                    "id": "1a2d1cba473eeb76",
+                    "name": "Resende RJ"
+                  },
+                  "position": 9,
+                  "win": 3,
+                  "draw": 2,
+                  "loss": 6,
+                  "points": 11,
+                  "goals_scored": 11,
+                  "goals_conceded": 21,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "9018421f3e79987a",
+                    "name": "Boavista RJ"
+                  },
+                  "position": 10,
+                  "win": 2,
+                  "draw": 5,
+                  "loss": 4,
+                  "points": 11,
+                  "goals_scored": 14,
+                  "goals_conceded": 16,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "139cc13a023b3271",
+                    "name": "Bangu"
+                  },
+                  "position": 11,
+                  "win": 1,
+                  "draw": 3,
+                  "loss": 7,
+                  "points": 6,
+                  "goals_scored": 5,
+                  "goals_conceded": 18,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "3e973e49209d9e16",
+                    "name": "Macae Esporte FC"
+                  },
+                  "position": 12,
+                  "win": 0,
+                  "draw": 1,
+                  "loss": 10,
+                  "points": 1,
+                  "goals_scored": 6,
+                  "goals_conceded": 29,
+                  "note": "Relegation"
+                }
+              ]
+            },
+            {
+              "name": "Preliminary Round",
+              "table": [
+                {
+                  "team": {
+                    "id": "b9712539ca900456",
+                    "name": "Nova Iguacu"
+                  },
+                  "position": 1,
+                  "win": 7,
+                  "draw": 2,
+                  "loss": 1,
+                  "points": 23,
+                  "goals_scored": 12,
+                  "goals_conceded": 5,
+                  "note": "Qualified"
+                },
+                {
+                  "team": {
+                    "id": "48752c2b3304f00",
+                    "name": "Cabofriense"
+                  },
+                  "position": 2,
+                  "win": 6,
+                  "draw": 3,
+                  "loss": 1,
+                  "points": 21,
+                  "goals_scored": 17,
+                  "goals_conceded": 10,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "b5cfeed598cc092",
+                    "name": "Sampaio Correa RJ"
+                  },
+                  "position": 3,
+                  "win": 4,
+                  "draw": 2,
+                  "loss": 4,
+                  "points": 14,
+                  "goals_scored": 10,
+                  "goals_conceded": 9,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "50d9d7015f5a1ff4",
+                    "name": "America RJ"
+                  },
+                  "position": 4,
+                  "win": 2,
+                  "draw": 6,
+                  "loss": 2,
+                  "points": 12,
+                  "goals_scored": 12,
+                  "goals_conceded": 13,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "8cb79958f6e6ff79",
+                    "name": "Americano RJ"
+                  },
+                  "position": 5,
+                  "win": 3,
+                  "draw": 1,
+                  "loss": 6,
+                  "points": 10,
+                  "goals_scored": 13,
+                  "goals_conceded": 17,
+                  "note": null
+                },
+                {
+                  "team": {
+                    "id": "d558cab789d7cd9b",
+                    "name": "Friburguense"
+                  },
+                  "position": 6,
+                  "win": 0,
+                  "draw": 2,
+                  "loss": 8,
+                  "points": 2,
+                  "goals_scored": 11,
+                  "goals_conceded": 21,
+                  "note": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

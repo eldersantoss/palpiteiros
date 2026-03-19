@@ -1,0 +1,114 @@
+[
+  {
+    "id": "57449cf280464d5c",
+    "name": "Brazil Campeonato Carioca",
+    "country": "BR",
+    "has_image": false,
+    "important": true
+  },
+  {
+    "id": "e7b356fb9a0f719b",
+    "name": "Brazil Campeonato Paulista",
+    "country": "BR",
+    "has_image": false,
+    "important": true
+  },
+  {
+    "id": "77f1d6dbef98d099",
+    "name": "Brazil Campeonato Potiguar",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "59fb92dcf842d738",
+    "name": "Brazil Serie A",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "cd18715a2f38bc52",
+    "name": "Copa do Brasil",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "9eb7e1ce433c074",
+    "name": "Copa Sudamericana",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3c9b291e0c3f4958",
+    "name": "Copa Libertadores Qualification",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": true
+  },
+  {
+    "id": "de7ff4c51897da24",
+    "name": "Copa Libertadores",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "c1ea47eeb6dc7555",
+    "name": "Recopa Sudamericana",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "de091d055bcf8e44",
+    "name": "Brazil Copa Nordeste",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "c83eefc39f2126bd",
+    "name": "Brazil Serie B",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "cc2d11f49506256",
+    "name": "Brazil Serie C",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "15d33b23ef0b5299",
+    "name": "Brazil Serie D",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "5085a3cde16c822b",
+    "name": "World Cup 2026",
+    "country": "WR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "ab980fa09526171",
+    "name": "Brazil Supercopa",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3f2c3ee6eba0dd06",
+    "name": "UEFA Champions League",
+    "country": "EU",
+    "has_image": false,
+    "important": false
+  }
+]

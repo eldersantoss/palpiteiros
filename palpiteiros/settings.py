@@ -158,9 +158,7 @@ LOGOUT_URL = "logout"
 
 # Email
 
-EMAIL_BACKEND = config(
-    "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
-)
+EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
@@ -221,6 +219,13 @@ FOOTBALL_API_HOST = "v3.football.api-sports.io"
 FOOTBALL_API_REQUESTS_INTERVAL = 7
 
 
+# Soccer Football Info API
+
+SFI_API_KEY = config("SFI_API_KEY")
+SFI_API_HOST = "soccer-football-info.p.rapidapi.com"
+SFI_API_REQUESTS_INTERVAL = 5
+
+
 # Cache
 
 CACHES = {
@@ -237,6 +242,4 @@ RANKING_CACHE_PREFIX = "ranking"
 
 # Ranking
 
-MATCHES_TO_SHOW_INTO_RANKING = config(
-    "MATCHES_TO_SHOW_INTO_RANKING", default=20, cast=int
-)
+MATCHES_TO_SHOW_INTO_RANKING = config("MATCHES_TO_SHOW_INTO_RANKING", default=20, cast=int)

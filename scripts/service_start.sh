@@ -35,14 +35,9 @@ elif [ "$PROCESS_TYPE" = "beat" ]; then
 elif [ "$PROCESS_TYPE" = "worker_beat" ]; then
   celery -A palpiteiros worker --beat -l info
 
-elif [ "$PROCESS_TYPE" = "flower" ]; then
-  celery flower
-  # celery \
-  #   --app dockerapp.celery_app \
-  #   flower \
-  #   --basic_auth="${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD}" \
-  #   --loglevel INFO
-
 elif [ "$PROCESS_TYPE" = "create_and_update_matches" ]; then
   python manage.py create_and_update_matches
+
+elif [ "$PROCESS_TYPE" = "sync_matches_sfi" ]; then
+  python manage.py sync_matches_sfi
 fi

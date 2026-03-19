@@ -140,6 +140,7 @@ dmypy.json
 
 # Database backups
 dumps/*
+*.tar
 
 # Mac OS files
 .DS_Store

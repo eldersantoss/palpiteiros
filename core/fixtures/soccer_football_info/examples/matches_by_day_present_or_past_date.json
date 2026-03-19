@@ -1,0 +1,60 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [],
+  "result": [
+    {
+      "id": "9bf76a2f499772af",
+      "date": "2026-02-26 00:00:00",
+      "status": "ENDED",
+      "timer": "90:00",
+      "championship": {
+        "id": "984c36449bc6503a",
+        "name": "Colombia Primera A",
+        "s_name": "Liga DIMAYOR 2026"
+      },
+      "teamA": {
+        "id": "22f2cfc46980e4aa",
+        "name": "Independiente Santa Fe",
+        "score": {
+          "f": 1,
+          "1h": 1,
+          "2h": 1,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": {
+          "id": "5fb962e500fce365",
+          "name": "Pablo Repetto"
+        }
+      },
+      "teamB": {
+        "id": "b94c5486a8015873",
+        "name": "Atletico Nacional Medellin",
+        "score": {
+          "f": 2,
+          "1h": 0,
+          "2h": 2,
+          "o": null,
+          "p": null
+        },
+        "stats": {},
+        "manager": {
+          "id": "87a22255ee2db181",
+          "name": "Diego Alejandro Arias Hincapie"
+        }
+      },
+      "events": [],
+      "dominance_index": [],
+      "referee": {
+        "id": "403a51aaf38a54ef",
+        "name": "Diego Ulloa Angulo"
+      },
+      "stadium": {
+        "id": "98241bc0c2f4663b",
+        "name": "Estadio Nemesio Camacho El Campin"
+      }
+    }
+  ]
+}
