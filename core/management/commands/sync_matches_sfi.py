@@ -95,7 +95,7 @@ class Command(BaseCommand):
             return [single]
 
         start = options.get("start_date") or (today - timedelta(days=1))
-        end = options.get("end_date") or (today + timedelta(days=2))
+        end = options.get("end_date") or (today + timedelta(days=1))
 
         return [start + timedelta(days=i) for i in range((end - start).days + 1)]
 
