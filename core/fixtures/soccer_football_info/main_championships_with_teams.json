@@ -1,0 +1,280 @@
+[
+  {
+    "id": "57449cf280464d5c",
+    "name": "Brazil Campeonato Carioca",
+    "teams": [
+      {
+        "id": "ac8da03e8572808f",
+        "name": "Portuguesa RJ"
+      },
+      {
+        "id": "b5cfeed598cc092",
+        "name": "Sampaio Correa RJ"
+      },
+      {
+        "id": "b9712539ca900456",
+        "name": "Nova Iguacu"
+      },
+      {
+        "id": "971d93c9d35d0ab1",
+        "name": "CFRJ / Maricá"
+      },
+      {
+        "id": "a4983214b45b972c",
+        "name": "Botafogo"
+      },
+      {
+        "id": "7f23dc30fd74871b",
+        "name": "Madureira RJ"
+      },
+      {
+        "id": "9018421f3e79987a",
+        "name": "Boavista RJ"
+      },
+      {
+        "id": "74becc28c493fff8",
+        "name": "Flamengo"
+      },
+      {
+        "id": "f29717ce5926330",
+        "name": "Fluminense"
+      },
+      {
+        "id": "92471ca40ae2d5df",
+        "name": "Vasco da Gama"
+      },
+      {
+        "id": "eceec252ee637c5",
+        "name": "Volta Redonda"
+      },
+      {
+        "id": "139cc13a023b3271",
+        "name": "Bangu"
+      }
+    ]
+  },
+  {
+    "id": "e7b356fb9a0f719b",
+    "name": "Brazil Campeonato Paulista",
+    "teams": [
+      {
+        "id": "b79ba02ebe4ae64b",
+        "name": "Gremio Novorizontino"
+      },
+      {
+        "id": "98241bc0c2f4663b",
+        "name": "Palmeiras"
+      },
+      {
+        "id": "abfb0be6fb435636",
+        "name": "Bragantino"
+      },
+      {
+        "id": "bcd286b64aa7113",
+        "name": "Portuguesa"
+      },
+      {
+        "id": "a2f16620956e6cc7",
+        "name": "Corinthians"
+      },
+      {
+        "id": "6caccd6c628fccb5",
+        "name": "Sao Paulo"
+      },
+      {
+        "id": "82a9348427525ab1",
+        "name": "Capivariano SP"
+      },
+      {
+        "id": "6c855df53334576a",
+        "name": "Santos"
+      },
+      {
+        "id": "9210d75571f33c34",
+        "name": "Guarani Campinas"
+      },
+      {
+        "id": "c5101361e9a5eaf3",
+        "name": "Botafogo SP"
+      },
+      {
+        "id": "e0f21049aa2faf52",
+        "name": "Mirassol"
+      },
+      {
+        "id": "ea47265eb33d81bb",
+        "name": "Primavera SP"
+      },
+      {
+        "id": "509b5b20887fd9d6",
+        "name": "Sao Bernardo SP"
+      },
+      {
+        "id": "3289e87630cf2f7f",
+        "name": "Noroeste"
+      },
+      {
+        "id": "42983d18e0093052",
+        "name": "Velo Clube SP"
+      },
+      {
+        "id": "c9e1e517022ae464",
+        "name": "Ponte Preta"
+      }
+    ]
+  },
+  {
+    "id": "77f1d6dbef98d099",
+    "name": "Brazil Campeonato Potiguar",
+    "teams": [
+      {
+        "id": "e10b6a993dfeeeda",
+        "name": "America RN"
+      },
+      {
+        "id": "2a2b364b3f050a69",
+        "name": "ABC"
+      },
+      {
+        "id": "9ecf8975c530c6a2",
+        "name": "QFC"
+      },
+      {
+        "id": "fc00fa740605876",
+        "name": "Potiguar de Mossoro"
+      },
+      {
+        "id": "7ab8195cdb4209cb",
+        "name": "Laguna RN"
+      },
+      {
+        "id": "73d3c9ffd072e8f4",
+        "name": "Santa Cruz RN"
+      },
+      {
+        "id": "a97c2e103d5b7b0e",
+        "name": "Potyguar"
+      },
+      {
+        "id": "36a595085ea2bd7b",
+        "name": "Globo FC"
+      }
+    ]
+  },
+  {
+    "id": "59fb92dcf842d738",
+    "name": "Brazil Serie A",
+    "teams": [
+      {
+        "id": "6caccd6c628fccb5",
+        "name": "Sao Paulo"
+      },
+      {
+        "id": "98241bc0c2f4663b",
+        "name": "Palmeiras"
+      },
+      {
+        "id": "f29717ce5926330",
+        "name": "Fluminense"
+      },
+      {
+        "id": "a56eb7178d298af2",
+        "name": "EC Bahia"
+      },
+      {
+        "id": "74becc28c493fff8",
+        "name": "Flamengo"
+      },
+      {
+        "id": "6d19bb44229884b0",
+        "name": "Coritiba"
+      },
+      {
+        "id": "14e99e4fe026c0b7",
+        "name": "Gremio"
+      },
+      {
+        "id": "a2f16620956e6cc7",
+        "name": "Corinthians"
+      },
+      {
+        "id": "abfb0be6fb435636",
+        "name": "Bragantino"
+      },
+      {
+        "id": "7ffcea725570cdcf",
+        "name": "Athletico Paranaense"
+      },
+      {
+        "id": "742eba31d53cad9a",
+        "name": "Vitoria"
+      },
+      {
+        "id": "ecc836a8727151a8",
+        "name": "Chapecoense"
+      },
+      {
+        "id": "e0f21049aa2faf52",
+        "name": "Mirassol"
+      },
+      {
+        "id": "6c855df53334576a",
+        "name": "Santos"
+      },
+      {
+        "id": "92471ca40ae2d5df",
+        "name": "Vasco da Gama"
+      },
+      {
+        "id": "df85fa177f2df536",
+        "name": "Atletico-MG"
+      },
+      {
+        "id": "a4983214b45b972c",
+        "name": "Botafogo"
+      },
+      {
+        "id": "2ff82c040c8cb07b",
+        "name": "Remo"
+      },
+      {
+        "id": "91b858d789df61c6",
+        "name": "Cruzeiro"
+      },
+      {
+        "id": "13e9cb3101594563",
+        "name": "Internacional"
+      }
+    ]
+  },
+  {
+    "id": "cd18715a2f38bc52",
+    "name": "Copa do Brasil",
+    "teams": []
+  },
+  {
+    "id": "9eb7e1ce433c074",
+    "name": "Copa Sudamericana",
+    "teams": []
+  },
+  {
+    "id": "de7ff4c51897da24",
+    "name": "Copa Libertadores",
+    "teams": []
+  },
+  {
+    "id": "c83eefc39f2126bd",
+    "name": "Brazil Serie B",
+    "teams": []
+  },
+  {
+    "id": "cc2d11f49506256",
+    "name": "Brazil Serie C",
+    "teams": []
+  },
+  {
+    "id": "15d33b23ef0b5299",
+    "name": "Brazil Serie D",
+    "teams": []
+  }
+]
