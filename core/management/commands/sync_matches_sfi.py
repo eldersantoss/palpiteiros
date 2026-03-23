@@ -276,8 +276,8 @@ class Command(BaseCommand):
         """
         updated_count = Match.objects.filter(sfi_id=match["id"]).update(
             status=Match.FINSHED,  # "FT"
-            home_goals=match["teamA"]["score"]["o"] or match["teamA"]["score"]["f"],
-            away_goals=match["teamB"]["score"]["o"] or match["teamB"]["score"]["f"],
+            home_goals=match["teamA"]["score"]["2h"],
+            away_goals=match["teamB"]["score"]["2h"],
         )
 
         if updated_count == 0:
