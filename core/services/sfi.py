@@ -79,6 +79,84 @@ class SFIResponse(TypedDict, Generic[T]):
 SFIMatchesResponse = SFIResponse[SFIMatch]
 
 
+class SFITeamInTableEntry(TypedDict):
+    """Team descriptor inside a table entry."""
+
+    id: str
+    name: str
+
+
+class SFITableEntry(TypedDict):
+    """A single team entry in a group's standings table."""
+
+    team: SFITeamInTableEntry
+    position: int
+    win: int
+    draw: int
+    loss: int
+    points: int
+    goals_scored: int
+    goals_conceded: int
+    note: str | None
+
+
+class SFIGroup(TypedDict):
+    """A group (phase) within a season, containing a standings table."""
+
+    name: str
+    table: list[SFITableEntry]
+
+
+SFISeason = TypedDict(
+    "SFISeason",
+    {
+        "id": str,
+        "name": str,
+        "from": str,  # "YYYY-MM-DD"
+        "to": str,  # "YYYY-MM-DD"
+        "groups": list[SFIGroup],
+    },
+)
+
+
+class SFIChampionshipView(TypedDict):
+    """A championship with all its seasons and standings."""
+
+    id: str
+    name: str
+    country: str
+    has_image: bool
+    important: bool
+    seasons: list[SFISeason]
+
+
+SFIChampionshipViewResponse = SFIResponse[SFIChampionshipView]
+
+
+class SFITeamInfo(TypedDict):
+    """Team information in championship teams response."""
+
+    id: str
+    name: str
+
+
+class SFISeasonTeams(TypedDict):
+    """Teams data for a specific season."""
+
+    teams: list[SFITeamInfo]
+
+
+class SFIChampionshipTeamsResponse(TypedDict):
+    """Response from get_teams_of_championship method.
+
+    Contains championship metadata and teams grouped by season year.
+    """
+
+    id: str
+    name: str
+    seasons: dict[str, SFISeasonTeams]
+
+
 class SFIService:
     """Client for the Soccer Football Info (SFI) RapidAPI.
 
@@ -93,6 +171,7 @@ class SFIService:
 
     _BASE_URL = "https://{host}"
     _MATCHES_BY_DAY_PATH = "/matches/day/basic/"
+    _CHAMPIONSHIPS_VIEW_PATH = "/championships/view/"
 
     SFI_NOT_STARTED_STATUS = "NOT_STARTED"
     SFI_ENDED_STATUS = "ENDED"
@@ -140,3 +219,96 @@ class SFIService:
         )
         response.raise_for_status()
         return response.json()
+
+    def get_teams_of_championship(self, championship_id: str, year: int) -> SFIChampionshipTeamsResponse:
+        """Fetch teams from a specific championship season.
+
+        Retrieves all teams from a championship season that matches the given year
+        (extracted from the season's "from" field). Teams are deduplicated across
+        all groups within the matched season.
+
+        Args:
+            championship_id: The SFI championship ID.
+            year: The year to search for (e.g., 2026). Matched against the year
+                extracted from each season's "from" field.
+
+        Returns:
+            A dict with championship metadata and teams grouped by season year:
+            {
+                "id": "57449cf280464d5c",
+                "name": "Brazil Campeonato Carioca",
+                "seasons": {
+                    "2026": {
+                        "teams": [
+                            {"id": "74becc28c493fff8", "name": "Flamengo"},
+                            ...
+                        ]
+                    }
+                }
+            }
+            If no season matches the given year, the "teams" list will be empty.
+
+        Raises:
+            requests.HTTPError: If the HTTP response status is 4xx or 5xx.
+            requests.RequestException: On network-level errors.
+        """
+        params = {"i": championship_id}
+
+        logger.debug(
+            "SFI request: GET %s%s params=%s",
+            self._base_url,
+            self._CHAMPIONSHIPS_VIEW_PATH,
+            params,
+        )
+
+        response = requests.get(
+            self._base_url + self._CHAMPIONSHIPS_VIEW_PATH,
+            headers=self._headers,
+            params=params,
+        )
+        response.raise_for_status()
+        data: SFIChampionshipViewResponse = response.json()
+
+        result = data.get("result", [])
+        if not result:
+            return {
+                "id": championship_id,
+                "name": "",
+                "seasons": {str(year): {"teams": []}},
+            }
+
+        championship = result[0]
+        championship_id_api = championship.get("id", "")
+        championship_name = championship.get("name", "")
+        seasons = championship.get("seasons", [])
+
+        # Find season matching the given year
+        target_season = None
+        for season in seasons:
+            season_from = season.get("from", "")
+            if season_from:
+                try:
+                    season_year = date.fromisoformat(season_from).year
+                    if season_year == year:
+                        target_season = season
+                        break
+                except ValueError:
+                    logger.warning("Could not parse season date: %s", season_from)
+
+        # Extract teams, deduplicating by team ID
+        teams: list[SFITeamInfo] = []
+        if target_season:
+            seen_ids: set = set()
+            for group in target_season.get("groups", []):
+                for entry in group.get("table", []):
+                    team_data = entry.get("team", {})
+                    team_id = team_data.get("id")
+                    if team_id and team_id not in seen_ids:
+                        seen_ids.add(team_id)
+                        teams.append({"id": team_id, "name": team_data.get("name", "")})
+
+        return {
+            "id": championship_id_api,
+            "name": championship_name,
+            "seasons": {str(year): {"teams": teams}},
+        }

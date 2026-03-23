@@ -1,7 +1,9 @@
+import json
 from datetime import date
 from unittest.mock import patch
 
 import pytest
+import requests
 from django.core.management import call_command
 from django.utils import timezone
 from model_bakery import baker
@@ -308,3 +310,292 @@ def test_sync_matches_sfi_with_no_competitions(mock_get):
     call_command("sync_matches_sfi")
 
     mock_get.assert_not_called()
+
+
+@patch("core.management.commands.get_teams_of_championships_sfi.sleep")
+@patch("requests.get")
+def test_get_teams_of_championships_sfi_creates_output_with_custom_paths(
+    mock_get,
+    mock_sleep,
+    mock_success_response,
+    tmp_path,
+):
+    """Command reads custom input/output paths and persists teams from SFIService responses."""
+    input_file = tmp_path / "input.json"
+    output_file = tmp_path / "output.json"
+
+    input_file.write_text(
+        json.dumps(
+            [
+                {"id": "champ-1", "name": "League 1"},
+                {"id": "champ-2", "name": "League 2"},
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    first_response = mock_success_response
+    first_response.json.return_value = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "champ-1",
+                "name": "League 1",
+                "country": "Brazil",
+                "has_image": False,
+                "important": True,
+                "seasons": [
+                    {
+                        "id": "season-1",
+                        "name": "2026",
+                        "from": "2026-01-01",
+                        "to": "2026-12-31",
+                        "groups": [
+                            {
+                                "name": "A",
+                                "table": [
+                                    {
+                                        "team": {"id": "team-1", "name": "Team 1"},
+                                        "position": 1,
+                                        "win": 1,
+                                        "draw": 0,
+                                        "loss": 0,
+                                        "points": 3,
+                                        "goals_scored": 2,
+                                        "goals_conceded": 0,
+                                        "note": None,
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    second_response = type(mock_success_response)()
+    second_response.status_code = 200
+    second_response.raise_for_status = lambda: None
+    second_response.json.return_value = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "champ-2",
+                "name": "League 2",
+                "country": "Brazil",
+                "has_image": False,
+                "important": True,
+                "seasons": [
+                    {
+                        "id": "season-2",
+                        "name": "2026",
+                        "from": "2026-01-01",
+                        "to": "2026-12-31",
+                        "groups": [
+                            {
+                                "name": "A",
+                                "table": [
+                                    {
+                                        "team": {"id": "team-2", "name": "Team 2"},
+                                        "position": 1,
+                                        "win": 1,
+                                        "draw": 0,
+                                        "loss": 0,
+                                        "points": 3,
+                                        "goals_scored": 1,
+                                        "goals_conceded": 0,
+                                        "note": None,
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    mock_get.side_effect = [first_response, second_response]
+
+    call_command(
+        "get_teams_of_championships_sfi",
+        "--input-file",
+        str(input_file),
+        "--output-file",
+        str(output_file),
+        "--sleep-seconds",
+        "0",
+    )
+
+    saved_data = json.loads(output_file.read_text(encoding="utf-8"))
+    assert len(saved_data) == 2
+    assert saved_data[0]["id"] == "champ-1"
+    assert saved_data[0]["teams"] == [{"id": "team-1", "name": "Team 1"}]
+    assert saved_data[1]["id"] == "champ-2"
+    assert saved_data[1]["teams"] == [{"id": "team-2", "name": "Team 2"}]
+
+
+@patch("core.management.commands.get_teams_of_championships_sfi.sleep")
+@patch("requests.get")
+def test_get_teams_of_championships_sfi_overwrites_existing_entry_by_id(
+    mock_get,
+    mock_sleep,
+    mock_success_response,
+    tmp_path,
+):
+    """Existing output entry with same championship ID is replaced instead of duplicated."""
+    input_file = tmp_path / "input.json"
+    output_file = tmp_path / "output.json"
+
+    input_file.write_text(json.dumps([{"id": "champ-1", "name": "League Updated"}]), encoding="utf-8")
+    output_file.write_text(
+        json.dumps([{"id": "champ-1", "name": "Old League", "teams": [{"id": "old", "name": "Old"}]}]),
+        encoding="utf-8",
+    )
+
+    mock_success_response.json.return_value = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "champ-1",
+                "name": "League Updated",
+                "country": "Brazil",
+                "has_image": False,
+                "important": True,
+                "seasons": [
+                    {
+                        "id": "season-1",
+                        "name": "2026",
+                        "from": "2026-01-01",
+                        "to": "2026-12-31",
+                        "groups": [
+                            {
+                                "name": "A",
+                                "table": [
+                                    {
+                                        "team": {"id": "team-new", "name": "New Team"},
+                                        "position": 1,
+                                        "win": 1,
+                                        "draw": 0,
+                                        "loss": 0,
+                                        "points": 3,
+                                        "goals_scored": 1,
+                                        "goals_conceded": 0,
+                                        "note": None,
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+    mock_get.return_value = mock_success_response
+
+    call_command(
+        "get_teams_of_championships_sfi",
+        "--input-file",
+        str(input_file),
+        "--output-file",
+        str(output_file),
+        "--sleep-seconds",
+        "0",
+    )
+
+    saved_data = json.loads(output_file.read_text(encoding="utf-8"))
+    assert len(saved_data) == 1
+    assert saved_data[0]["id"] == "champ-1"
+    assert saved_data[0]["name"] == "League Updated"
+    assert saved_data[0]["teams"] == [{"id": "team-new", "name": "New Team"}]
+
+
+@patch("core.management.commands.get_teams_of_championships_sfi.sleep")
+@patch("requests.get")
+def test_get_teams_of_championships_sfi_continues_after_request_failure(
+    mock_get,
+    mock_sleep,
+    mock_success_response,
+    tmp_path,
+):
+    """When one championship fails, command logs and continues processing the next one."""
+    input_file = tmp_path / "input.json"
+    output_file = tmp_path / "output.json"
+
+    input_file.write_text(
+        json.dumps(
+            [
+                {"id": "champ-fail", "name": "Fail League"},
+                {"id": "champ-ok", "name": "OK League"},
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    mock_success_response.json.return_value = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "champ-ok",
+                "name": "OK League",
+                "country": "Brazil",
+                "has_image": False,
+                "important": True,
+                "seasons": [
+                    {
+                        "id": "season-2025",
+                        "name": "2025",
+                        "from": "2025-01-01",
+                        "to": "2025-12-31",
+                        "groups": [
+                            {
+                                "name": "A",
+                                "table": [
+                                    {
+                                        "team": {"id": "team-2025", "name": "Team 2025"},
+                                        "position": 1,
+                                        "win": 1,
+                                        "draw": 0,
+                                        "loss": 0,
+                                        "points": 3,
+                                        "goals_scored": 1,
+                                        "goals_conceded": 0,
+                                        "note": None,
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    mock_get.side_effect = [requests.RequestException("boom"), mock_success_response]
+
+    call_command(
+        "get_teams_of_championships_sfi",
+        "--input-file",
+        str(input_file),
+        "--output-file",
+        str(output_file),
+        "--year",
+        "2025",
+        "--sleep-seconds",
+        "0",
+    )
+
+    saved_data = json.loads(output_file.read_text(encoding="utf-8"))
+    assert len(saved_data) == 1
+    assert saved_data[0]["id"] == "champ-ok"
+    assert saved_data[0]["teams"] == [{"id": "team-2025", "name": "Team 2025"}]
+    assert mock_get.call_count == 2

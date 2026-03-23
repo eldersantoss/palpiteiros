@@ -1,5 +1,47 @@
 [
   {
+    "id": "5085a3cde16c822b",
+    "name": "World Cup 2026",
+    "country": "WR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "ab980fa09526171",
+    "name": "Brazil Supercopa",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3f2c3ee6eba0dd06",
+    "name": "UEFA Champions League",
+    "country": "EU",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "c1ea47eeb6dc7555",
+    "name": "Recopa Sudamericana",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "de091d055bcf8e44",
+    "name": "Brazil Copa Nordeste",
+    "country": "BR",
+    "has_image": false,
+    "important": false
+  },
+  {
+    "id": "3c9b291e0c3f4958",
+    "name": "Copa Libertadores Qualification",
+    "country": "AMERICA",
+    "has_image": false,
+    "important": true
+  },
+  {
     "id": "14e1ebd6d992dbd5",
     "name": "Copa America",
     "country": "AMERICA",
