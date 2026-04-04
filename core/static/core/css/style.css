@@ -19,6 +19,23 @@ a {
   color: yellowgreen;
 }
 
+.logout-form {
+  margin: 0;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: yellowgreen;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.logout-button:hover {
+  color: greenyellow;
+}
+
 .exit-btn {
   background-color: transparent;
   border: none;
@@ -173,6 +190,10 @@ input {
 }
 
 .profile a {
+  margin-top: 1.5vh;
+}
+
+.profile .logout-form {
   margin-top: 1.5vh;
 }
 

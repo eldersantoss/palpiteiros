@@ -37,7 +37,10 @@
               <nav>
                 <a href="{% url 'core:profile' %}">Perfil</a>
                 <a href="{% url 'password_change' %}">Alterar senha</a>
-                <a href="{% url 'logout' %}">Sair</a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                  {% csrf_token %}
+                  <button type="submit" class="logout-button">Sair</button>
+                </form>
               </nav>
             </details>
           </nav>
@@ -49,7 +52,10 @@
           <nav>
             <a href="{% url 'core:profile' %}">Perfil</a>
             <a href="{% url 'password_change' %}">Alterar senha</a>
-            <a href="{% url 'logout' %}">Sair</a>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+              {% csrf_token %}
+              <button type="submit" class="logout-button">Sair</button>
+            </form>
           </nav>
         </details>
       {% endif %}
