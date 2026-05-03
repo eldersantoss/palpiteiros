@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import patch
 
 import pytest
@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from model_bakery import baker
 
-from ..models import Competition, Match, Team
+from ..models import Competition, Match, RankingEntry, Team
 
 pytestmark = pytest.mark.django_db
 
@@ -167,6 +167,80 @@ def test_sync_matches_sfi_updates_ended_match_when_exists(
 
 @patch("core.management.commands.sync_matches_sfi.django_timezone")
 @patch("requests.get")
+def test_sync_matches_sfi_updates_ranking_entries_for_ended_match(
+    mock_get,
+    mock_tz,
+    mock_success_response,
+    get_sfi_matches_by_day_past_response,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """Ended match sync consolidates guesses and updates period rankings."""
+    mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+    guesser = baker.make("core.Guesser")
+    pool = baker.make("core.GuessPool", owner=guesser, competitions=[competition])
+
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-sfi-ended-001",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+        date_time=timezone.make_aware(datetime(2026, 2, 26, 20, 0, 0)),
+    )
+
+    guess = baker.make(
+        "core.Guess",
+        guesser=guesser,
+        match=existing_match,
+        home_goals=2,
+        away_goals=1,
+        score=0,
+        consolidated=False,
+    )
+    pool.guesses.add(guess)
+
+    mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+
+    pool.refresh_from_db()
+    guess.refresh_from_db()
+
+    assert guess.consolidated is True
+    assert guess.score == 10
+    assert pool.updated_matches is True
+
+    local_match_date = timezone.localtime(existing_match.date_time)
+    expected_periods = [
+        (0, 0, 0),
+        (local_match_date.year, 0, 0),
+        (local_match_date.year, local_match_date.month, 0),
+        (local_match_date.year, 0, local_match_date.isocalendar().week),
+    ]
+    for year, month, week in expected_periods:
+        assert RankingEntry.objects.filter(
+            pool=pool,
+            guesser=guesser,
+            year=year,
+            month=month,
+            week=week,
+            score=10,
+        ).exists()
+
+
+@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("requests.get")
 def test_sync_matches_sfi_does_not_create_ended_match_when_not_in_db(
     mock_get,
     mock_tz,
@@ -310,6 +384,68 @@ def test_sync_matches_sfi_with_no_competitions(mock_get):
     call_command("sync_matches_sfi")
 
     mock_get.assert_not_called()
+
+
+@patch("core.management.commands.create_and_update_matches.sleep")
+@patch("core.management.commands.create_and_update_matches.FootballApi.get_matches_of_league_by_season_and_date_period")
+def test_create_and_update_matches_updates_ranking_entries_for_finished_match(
+    mock_get_matches,
+    mock_sleep,
+    get_matches_of_league_by_season_and_date_period_response,
+):
+    """Legacy command updates rankings when a match result is synchronized."""
+    competition = baker.make("core.Competition", data_source_id=4, in_progress=True, current_season=2024)
+    home_team = baker.make("core.Team", data_source_id=119, competitions=[competition])
+    away_team = baker.make("core.Team", data_source_id=118, competitions=[competition])
+    guesser = baker.make("core.Guesser")
+    pool = baker.make("core.GuessPool", owner=guesser, competitions=[competition])
+
+    existing_match = baker.make(
+        "core.Match",
+        data_source_id=1180355,
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+        date_time=timezone.make_aware(datetime(2024, 4, 13, 21, 30, 0)),
+    )
+    guess = baker.make(
+        "core.Guess",
+        guesser=guesser,
+        match=existing_match,
+        home_goals=2,
+        away_goals=1,
+        score=0,
+        consolidated=False,
+    )
+    pool.guesses.add(guess)
+
+    mock_get_matches.return_value = get_matches_of_league_by_season_and_date_period_response["response"]
+
+    call_command(
+        "create_and_update_matches",
+        start_date=date(2024, 4, 13),
+        end_date=date(2024, 4, 13),
+    )
+
+    pool.refresh_from_db()
+    guess.refresh_from_db()
+
+    assert guess.consolidated is True
+    assert guess.score == 10
+    assert pool.updated_matches is True
+
+    local_match_date = timezone.localtime(existing_match.date_time)
+    assert RankingEntry.objects.filter(
+        pool=pool,
+        guesser=guesser,
+        year=local_match_date.year,
+        month=0,
+        week=0,
+        score=10,
+    ).exists()
 
 
 @patch("core.management.commands.get_teams_of_championships_sfi.sleep")

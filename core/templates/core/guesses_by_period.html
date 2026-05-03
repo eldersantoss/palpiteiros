@@ -58,7 +58,7 @@
             <td>{{ guess.match.result_str|default:"-" }}</td>
             <td>{{ guess.result_str }}</td>
             {% if guess.match.result_str %}
-                <td>{{ guess.get_score }}</td>
+                <td>{{ guess.score }}</td>
             {% else %}
                 <td>-</td>
             {% endif %}

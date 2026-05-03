@@ -274,18 +274,28 @@ class Command(BaseCommand):
         If the match is not yet registered (e.g. it happened before this command
         was set up), it is skipped rather than created with incomplete data.
         """
-        updated_count = Match.objects.filter(sfi_id=match["id"]).update(
-            status=Match.FINSHED,  # "FT"
-            home_goals=match["teamA"]["score"]["2h"],
-            away_goals=match["teamB"]["score"]["2h"],
-        )
-
-        if updated_count == 0:
+        match_instance = Match.objects.filter(sfi_id=match["id"]).first()
+        if match_instance is None:
             logger.warning(
                 "ENDED match %s not found in DB — skipping creation.",
                 match["id"],
             )
             return ProcessMatchResult.skipped
+
+        home_goals = match["teamA"]["score"]["2h"]
+        away_goals = match["teamB"]["score"]["2h"]
+        has_changes = (
+            match_instance.status != Match.FINSHED
+            or match_instance.home_goals != home_goals
+            or match_instance.away_goals != away_goals
+        )
+        needs_consolidation = match_instance.guesses.filter(consolidated=False).exists()
+
+        if has_changes or needs_consolidation:
+            match_instance.status = Match.FINSHED  # "FT"
+            match_instance.home_goals = home_goals
+            match_instance.away_goals = away_goals
+            match_instance.save(update_fields=["status", "home_goals", "away_goals"])
 
         return ProcessMatchResult.updated
 

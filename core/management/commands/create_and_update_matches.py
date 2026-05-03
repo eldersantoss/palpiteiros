@@ -32,9 +32,7 @@ class Command(BaseCommand):
         start_date = options.get("start_date")
         end_date = options.get("end_date")
 
-        self.stdout.write(
-            f"Getting matches for all in progress Competitions from {start_date} to {end_date}"
-        )
+        self.stdout.write(f"Getting matches for all in progress Competitions from {start_date} to {end_date}")
 
         competitions = Competition.objects.filter(in_progress=True)
         if not competitions.exists():
@@ -51,12 +49,8 @@ class Command(BaseCommand):
                 sleep(settings.FOOTBALL_API_REQUESTS_INTERVAL)
 
                 for match in matches:
-                    home_team = Team.objects.filter(
-                        data_source_id=match["teams"]["home"]["id"]
-                    ).first()
-                    away_team = Team.objects.filter(
-                        data_source_id=match["teams"]["away"]["id"]
-                    ).first()
+                    home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
+                    away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
                     if home_team is None or away_team is None:
                         self.stdout.write(
                             f"Unregistered teams for match {match['fixture']['id']} in {comp}, "
@@ -68,12 +62,8 @@ class Command(BaseCommand):
                             comp.data_source_id,
                         )
 
-                        home_team = Team.objects.filter(
-                            data_source_id=match["teams"]["home"]["id"]
-                        ).first()
-                        away_team = Team.objects.filter(
-                            data_source_id=match["teams"]["away"]["id"]
-                        ).first()
+                        home_team = Team.objects.filter(data_source_id=match["teams"]["home"]["id"]).first()
+                        away_team = Team.objects.filter(data_source_id=match["teams"]["away"]["id"]).first()
                         if home_team is None or away_team is None:
                             self.stderr.write(
                                 f"Teams not found for match {match['fixture']['id']} in {comp}, "
@@ -86,20 +76,33 @@ class Command(BaseCommand):
                     match_data["home_team"] = home_team
                     match_data["away_team"] = away_team
 
-                    match_instance, created_instance = Match.objects.update_or_create(
-                        data_source_id=match_data["data_source_id"],
-                        defaults=match_data,
+                    match_instance = Match.objects.filter(data_source_id=match_data["data_source_id"]).first()
+
+                    if match_instance is None:
+                        created.append(Match.objects.create(**match_data))
+                        continue
+
+                    fields_to_update = []
+                    for field_name, new_value in match_data.items():
+                        if getattr(match_instance, field_name) != new_value:
+                            setattr(match_instance, field_name, new_value)
+                            fields_to_update.append(field_name)
+
+                    should_force_consolidation = (
+                        match_instance.status in Match.FINISHED_STATUS
+                        and match_instance.guesses.filter(consolidated=False).exists()
                     )
 
-                    if created_instance:
-                        created.append(match_instance)
+                    if fields_to_update or should_force_consolidation:
+                        # Re-save score fields for finished matches with pending
+                        # consolidation so model hooks can evaluate guesses.
+                        if not fields_to_update:
+                            fields_to_update = ["status", "home_goals", "away_goals"]
+                        match_instance.save(update_fields=fields_to_update)
 
-                    else:
-                        updated.append(match_instance)
+                    updated.append(match_instance)
 
-                self.stdout.write(
-                    f"{len(created)} matches created and {len(updated)} updated matches for {comp}"
-                )
+                self.stdout.write(f"{len(created)} matches created and {len(updated)} updated matches for {comp}")
 
             except Exception as e:
                 self.stderr.write(f"Error when updating {comp}: {e}")
