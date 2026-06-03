@@ -84,6 +84,7 @@
     <p class="main-msg">Nenhum palpite encontrado para o palpiteiro no período selecionado.</p>
 {% endif %}
 
+<script src="{% static 'core/js/form-utils.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('guesses-form');
@@ -96,73 +97,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const mesSelect = document.getElementById('id_mes');
     const semanaSelect = document.getElementById('id_semana');
 
-    function toggleFields() {
-        const selectedPeriod = periodoSelect.value;
-        anoDiv.style.display = 'none';
-        mesDiv.style.display = 'none';
-        semanaDiv.style.display = 'none';
+    guesserSelect.addEventListener('change', function () { form.submit(); });
 
-        if (selectedPeriod === 'anual') {
-            anoDiv.style.display = 'block';
-        } else if (selectedPeriod === 'mensal') {
-            mesDiv.style.display = 'block';
-        } else if (selectedPeriod === 'semanal') {
-            semanaDiv.style.display = 'block';
-        }
-    }
-
-    function submitForm() {
+    periodoSelect.addEventListener('change', function () {
+        const period = periodoSelect.value;
+        anoSelect.value = period === 'anual' ? '{{ today_year }}' : '';
+        mesSelect.value = period === 'mensal' ? '{{ today_month }}' : '';
+        semanaSelect.value = period === 'semanal' ? '{{ today_week }}' : '';
+        window.formUtils.applyPeriodVisibility(period, { anoDiv, mesDiv, semanaDiv });
         form.submit();
-    }
-
-    guesserSelect.addEventListener('change', submitForm);
-    periodoSelect.addEventListener('change', function() {
-        toggleFields();
-        if (periodoSelect.value === 'geral') {
-            submitForm();
-        }
     });
-    anoSelect.addEventListener('change', submitForm);
-    mesSelect.addEventListener('change', submitForm);
-    semanaSelect.addEventListener('change', submitForm);
 
-    toggleFields();
+    anoSelect.addEventListener('change', function () { form.submit(); });
+    mesSelect.addEventListener('change', function () { form.submit(); });
+    semanaSelect.addEventListener('change', function () { form.submit(); });
 
-    /*
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', function() {
-        let page = this.dataset.page;
-        let url = new URL(window.location.href);
-        url.searchParams.set('page', page);
-
-        fetch(url, {
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        })
-        .then(response => response.text())
-        .then(data => {
-          const tbody = document.getElementById('guesses-tbody');
-          tbody.insertAdjacentHTML('beforeend', data);
-
-          // Check if there is a next page from the response headers or a specific element
-          // This part is tricky without sending more context from the server.
-          // A simple way is to check if the response is empty or not.
-          // A better way is to send a new `data-page` with the partial.
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = data;
-          const newLoadMoreBtn = tempDiv.querySelector('#load-more-btn-partial');
-
-          if (newLoadMoreBtn) {
-            this.dataset.page = newLoadMoreBtn.dataset.page;
-          } else {
-            this.style.display = 'none';
-          }
-        });
-      });
-    }
-    */
+    window.formUtils.applyPeriodVisibility(periodoSelect.value, { anoDiv, mesDiv, semanaDiv });
 });
 </script>
 

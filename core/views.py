@@ -35,11 +35,7 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
         involved_pools = guesser.get_involved_pools()
         pools_as_guesser = guesser.pools.all()
         for pool in involved_pools:
-            pool.is_pending = (
-                pool.has_pending_match(self.request.user.guesser)
-                if pool in pools_as_guesser
-                else False
-            )
+            pool.is_pending = pool.has_pending_match(self.request.user.guesser) if pool in pools_as_guesser else False
 
         context["display_subtitle"] = any([pool.is_pending for pool in involved_pools])
         context["pools"] = involved_pools
@@ -270,9 +266,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
-        logger.info(
-            f"{timezone.now()}: user {self.request.user} accessed the /palpites route"
-        )
+        logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
 
         open_matches = self.pool.get_open_matches()
         closed_matches = self.pool.get_closed_recent_matches()
@@ -328,9 +322,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def post(self, *args, **kwargs):
         guesses_data = dict(**self.request.POST)
         guesses_data.pop("csrfmiddlewaretoken")
-        logger.info(
-            f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}"
-        )
+        logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
 
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
@@ -455,6 +447,9 @@ class RankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Template
 
         context["period_form"] = form
         context["ranking_entries"] = ranking_entries
+        context["today_year"] = today.year
+        context["today_month"] = today.month
+        context["today_week"] = today.isocalendar().week
 
         if not self.pool.guessers.exists():
             context["no_guessers"] = True
@@ -502,6 +497,9 @@ class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.
                 "guesses": page_obj,
                 "page_obj": page_obj,
                 "total_score": total_score,
+                "today_year": today.year,
+                "today_month": today.month,
+                "today_week": today.isocalendar().week,
             },
         )
 

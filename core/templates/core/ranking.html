@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Classificação | Palpiteiros{% endblock title %}
 
@@ -73,6 +74,7 @@
 </tbody>
 </table>
 
+<script src="{% static 'core/js/form-utils.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('ranking-form');
@@ -84,31 +86,20 @@
     const mesSelect = document.getElementById('id_mes');
     const semanaSelect = document.getElementById('id_semana');
 
-    function toggleFields() {
-      const selectedPeriod = periodoSelect.value;
-      anoDiv.style.display = 'none';
-      mesDiv.style.display = 'none';
-      semanaDiv.style.display = 'none';
-
-      if (selectedPeriod === 'anual') {
-        anoDiv.style.display = 'block';
-      } else if (selectedPeriod === 'mensal') {
-        mesDiv.style.display = 'block';
-      } else if (selectedPeriod === 'semanal') {
-        semanaDiv.style.display = 'block';
-      }
-    }
-
-    function submitForm() {
+    periodoSelect.addEventListener('change', function () {
+      const period = periodoSelect.value;
+      anoSelect.value = period === 'anual' ? '{{ today_year }}' : '';
+      mesSelect.value = period === 'mensal' ? '{{ today_month }}' : '';
+      semanaSelect.value = period === 'semanal' ? '{{ today_week }}' : '';
+      window.formUtils.applyPeriodVisibility(period, { anoDiv, mesDiv, semanaDiv });
       form.submit();
-    }
+    });
 
-    periodoSelect.addEventListener('change', toggleFields);
-    anoSelect.addEventListener('change', submitForm);
-    mesSelect.addEventListener('change', submitForm);
-    semanaSelect.addEventListener('change', submitForm);
+    anoSelect.addEventListener('change', function () { form.submit(); });
+    mesSelect.addEventListener('change', function () { form.submit(); });
+    semanaSelect.addEventListener('change', function () { form.submit(); });
 
-    toggleFields();
+    window.formUtils.applyPeriodVisibility(periodoSelect.value, { anoDiv, mesDiv, semanaDiv });
   });
 </script>
 
