@@ -1,0 +1,545 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [
+    {
+      "page": 1,
+      "per_page": 25,
+      "items": 12
+    }
+  ],
+  "result": [
+    {
+      "id": "e0b4f5a05670d921",
+      "date": "2026-06-11 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "4494f397133822b7",
+        "name": "Mexico",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "4719a60d951411bb",
+        "name": "South Africa",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "7e7c7203df3befb3",
+      "date": "2026-06-12 02:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "8b7b58d11e4662a2",
+        "name": "South Korea",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "ef8a29059df471f8",
+        "name": "Czechia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "d9770fdfd61d0dd8",
+      "date": "2026-06-12 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "b243f013c20111e7",
+        "name": "Canada",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "cd5eb391b94c65f8",
+        "name": "Bosnia-Herzegovina",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "7bad869a64b46823",
+      "date": "2026-06-13 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "93d7279d99dfcb9f",
+        "name": "USA",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "91b5a725af948fe0",
+        "name": "Paraguay",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "9ebf7654f5a4bf3a",
+      "date": "2026-06-13 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "a917dadaa3228795",
+        "name": "Qatar",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "acded7a73883aaf5",
+        "name": "Switzerland",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "447149997396b232",
+        "name": "Levi's Stadium"
+      }
+    },
+    {
+      "id": "cde2bf321b41a633",
+      "date": "2026-06-13 22:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "ed4f17bb5f58a226",
+        "name": "Brazil",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "e5d7cb5d1e6eeeea",
+        "name": "Morocco",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "6a9e0e43c103b2b3",
+      "date": "2026-06-14 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "e4b1a2f4ef667c6",
+        "name": "Haiti",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "a08b64c3a0c10288",
+        "name": "Scotland",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "17e26dba42944943",
+        "name": "Gillette Stadium"
+      }
+    },
+    {
+      "id": "2cd1f1230152d0c",
+      "date": "2026-06-14 04:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "1f8011a1c665881c",
+        "name": "Australia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "1bd5f3ba4a71016d",
+        "name": "Türkiye",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "30506c4bc48afd65",
+        "name": "BC Place"
+      }
+    },
+    {
+      "id": "a86eb462606fd1c6",
+      "date": "2026-06-14 17:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "f1d4fd8711b33893",
+        "name": "Germany",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "bcd1b3d609435a96",
+        "name": "Curacao",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "6310f6638de6003",
+      "date": "2026-06-14 20:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "1bd3dae83ff1e298",
+        "name": "Netherlands",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "13d2ad640332aa86",
+        "name": "Japan",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    },
+    {
+      "id": "c6a569dba736f33f",
+      "date": "2026-06-14 23:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "113ed77cd2ccf09a",
+        "name": "Ivory Coast",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "30ff617439afd7",
+        "name": "Ecuador",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "name": "Grupo A",
+    "teams": [
+      {
+        "id": "4494f397133822b7",
+        "name": "México"
+      },
+      {
+        "id": "4719a60d951411bb",
+        "name": "África do Sul"
+      },
+      {
+        "id": "8b7b58d11e4662a2",
+        "name": "Coreia do Sul"
+      },
+      {
+        "id": "ef8a29059df471f8",
+        "name": "República Tcheca"
+      }
+    ]
+  },
+  {
+    "name": "Grupo B",
+    "teams": [
+      {
+        "id": "b243f013c20111e7",
+        "name": "Canadá"
+      },
+      {
+        "id": "cd5eb391b94c65f8",
+        "name": "Bósnia"
+      },
+      {
+        "id": "a917dadaa3228795",
+        "name": "Catar"
+      },
+      {
+        "id": "acded7a73883aaf5",
+        "name": "Suíça"
+      }
+    ]
+  },
+  {
+    "name": "Grupo C",
+    "teams": [
+      {
+        "id": "ed4f17bb5f58a226",
+        "name": "Brasil"
+      },
+      {
+        "id": "e5d7cb5d1e6eeeea",
+        "name": "Marrocos"
+      },
+      {
+        "id": "e4b1a2f4ef667c6",
+        "name": "Haiti"
+      },
+      {
+        "id": "a08b64c3a0c10288",
+        "name": "Escócia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo D",
+    "teams": [
+      {
+        "id": "1f8011a1c665881c",
+        "name": "Austrália"
+      },
+      {
+        "id": "1bd5f3ba4a71016d",
+        "name": "Turquia"
+      },
+      {
+        "id": "93d7279d99dfcb9f",
+        "name": "Estados Unidos"
+      },
+      {
+        "id": "91b5a725af948fe0",
+        "name": "Paraguai"
+      }
+    ]
+  },
+  {
+    "name": "Grupo E",
+    "teams": [
+      {
+        "id": "f1d4fd8711b33893",
+        "name": "Alemanha"
+      },
+      {
+        "id": "bcd1b3d609435a96",
+        "name": "Curaçao"
+      }
+    ]
+  },
+  {
+    "name": "Grupo F",
+    "teams": [
+      {
+        "id": "1bd3dae83ff1e298",
+        "name": "Holanda"
+      },
+      {
+        "id": "13d2ad640332aa86",
+        "name": "Japão"
+      }
+    ]
+  }
+]
