@@ -13,11 +13,18 @@ class TeamAdmin(admin.ModelAdmin):
     search_fields = ("name", "code")
 
 
+class CompetitionGroupInline(admin.TabularInline):
+    model = models.CompetitionGroup
+    extra = 0
+    filter_horizontal = ["teams"]
+
+
 @admin.register(models.Competition)
 class CompetitionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "in_progress", "created", "modified")
     search_fields = ("name", "season")
     filter_horizontal = ["teams"]
+    inlines = [CompetitionGroupInline]
 
 
 @admin.register(models.Guesser)

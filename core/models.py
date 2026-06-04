@@ -49,7 +49,7 @@ class Team(models.Model):
 
 
 class Competition(TimeStampedModel):
-    data_source_id = models.PositiveIntegerField(unique=True)
+    data_source_id = models.PositiveIntegerField(unique=True, blank=True, null=True)
     sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, related_name="competitions")
@@ -99,6 +99,30 @@ class Competition(TimeStampedModel):
             return pool
 
         return None
+
+
+class CompetitionGroup(models.Model):
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.CASCADE,
+        related_name="groups",
+    )
+    name = models.CharField("Nome do grupo", max_length=50)
+    teams = models.ManyToManyField(
+        Team,
+        related_name="competition_groups",
+        verbose_name="Equipes",
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = "grupo"
+        verbose_name_plural = "grupos"
+        unique_together = [["competition", "name"]]
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"{self.competition} – {self.name}"
 
 
 class Match(models.Model):
