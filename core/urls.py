@@ -56,6 +56,11 @@ urlpatterns = [
         name="guesses_by_period",
     ),
     path(
+        "boloes/<slug:pool_slug>/palpites-por-grupo/",
+        views.GroupedGuessesView.as_view(),
+        name="grouped_guesses",
+    ),
+    path(
         "boloes/<slug:pool_slug>/classificacao/",
         views.RankingView.as_view(),
         name="ranking",

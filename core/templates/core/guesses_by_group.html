@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %} Palpites por Grupo | Palpiteiros{% endblock title %}
+
+{% block content %}
+
+{% if groups_data %}
+<h3>Palpites abertos</h3>
+
+<form action="{% url 'core:grouped_guesses' pool.slug %}" method="post" class="main-form">
+  {% csrf_token %}
+
+  <div>
+    <div class="guesses-checkbox">
+      <label for="id_for_all_pools">
+        Aproveitar palpites em todos os bolões
+      </label>
+      <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
+    </div>
+  </div>
+
+  {% for group_data in groups_data %}
+    <h4 class="group-title">{{ group_data.group.name|default:"Outras partidas" }}</h4>
+
+    {% for guess_form in group_data.open_forms %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ guess_form.match.date_time|date:"l d/m H:i" }}
+          {% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
+          {% if guess_form.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
+              {{ guess_form.home_goals.label_tag }}
+            </div>
+            {{ guess_form.home_goals }}
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            {{ guess_form.away_goals }}
+            <div>
+              <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
+              {{ guess_form.away_goals.label_tag }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    {% for item in group_data.closed %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ item.match.date_time|date:"l d/m H:i" }}
+          {% if item.match.competition %} - {{ item.match.competition }}{% endif %}
+          {% if item.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
+              {{ item.match.home_team.name }}
+            </div>
+            <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
+            <div>
+              <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
+              {{ item.match.away_team.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  {% endfor %}
+
+  <input type="submit" value="Salvar palpites">
+</form>
+{% endif %}
+
+{% endblock content %}
