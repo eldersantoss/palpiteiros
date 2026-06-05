@@ -61,7 +61,7 @@ def test_command_create_or_update_teams_for_competitions_successfully(
     response_data = get_teams_of_league_by_season_response
     mock_success_response.json.return_value = response_data
     mock_get.return_value = mock_success_response
-    competition = baker.make("core.Competition")
+    competition = baker.make("core.Competition", data_source_id=71)
 
     call_command(
         "create_or_update_teams_for_competitions",
