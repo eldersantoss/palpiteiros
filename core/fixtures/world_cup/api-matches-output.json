@@ -5,10 +5,1148 @@
     {
       "page": 1,
       "per_page": 25,
-      "items": 12
+      "items": 17
     }
   ],
   "result": [
+    {
+      "id": "207c2c07165e3bd0",
+      "date": "2023-04-27 14:11:12",
+      "status": "ENDED",
+      "timer": "90:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "1c2725ea075ff4f6",
+        "name": "England",
+        "score": {
+          "f": 2,
+          "1h": null,
+          "2h": 2,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "possession": null,
+          "attacks": {
+            "n": null,
+            "d": null,
+            "o_s": null
+          },
+          "shoots": {
+            "t": "0",
+            "off": null,
+            "on": null,
+            "g_a": null
+          },
+          "penalties": "0",
+          "corners": {
+            "t": "0",
+            "f": null,
+            "h": null
+          },
+          "fouls": {
+            "t": null,
+            "y_c": "0",
+            "y_t_r_c": null,
+            "r_c": "0"
+          },
+          "substitutions": null,
+          "throwins": "0",
+          "injuries": null,
+          "dominance_avg_2_5": "0.00",
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "2e092e81543720e3",
+        "name": "France",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": 0,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "possession": null,
+          "attacks": {
+            "n": null,
+            "d": null,
+            "o_s": null
+          },
+          "shoots": {
+            "t": "0",
+            "off": null,
+            "on": null,
+            "g_a": null
+          },
+          "penalties": "0",
+          "corners": {
+            "t": "0",
+            "f": null,
+            "h": null
+          },
+          "fouls": {
+            "t": null,
+            "y_c": "3",
+            "y_t_r_c": null,
+            "r_c": "0"
+          },
+          "substitutions": null,
+          "throwins": "0",
+          "injuries": null,
+          "dominance_avg_2_5": "0.00",
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "events": [
+        {
+          "type": "goal",
+          "timer": 74,
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 66,
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 55,
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": "45+7",
+          "team": "B"
+        },
+        {
+          "type": "goal",
+          "timer": "45+7",
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 26,
+          "team": "A"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 20,
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 6,
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 4,
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 1,
+          "team": "A"
+        }
+      ],
+      "dominance_index": [
+        {
+          "timer": "02:00",
+          "teamA": "10.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "02:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "03:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "03:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "04:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "17:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "17:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "18:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "18:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "19:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "19:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "20:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "20:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "21:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "21:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "22:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "22:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "23:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "23:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "24:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "24:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "25:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "25:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "26:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "27:00",
+          "teamA": "10.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "27:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "28:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "28:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "29:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "29:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "30:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "30:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "31:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "31:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "32:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "32:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "33:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "34:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "34:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "35:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "35:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "36:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "36:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "37:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "37:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "38:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "38:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "39:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "39:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "40:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "40:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "41:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "41:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "42:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "42:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "43:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "43:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "44:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "44:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+00:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+00:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+01:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+01:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+02:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+02:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+03:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+03:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+04:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+04:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+06:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+06:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+07:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "45:00+08:30",
+          "teamA": "20.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+09:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "45:00+09:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "46:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "46:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "47:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "47:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "48:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "48:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "49:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "49:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "50:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "50:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "51:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "51:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "52:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "52:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "53:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "53:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "54:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "54:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "55:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "55:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "56:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "56:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "57:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "57:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "58:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "58:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "59:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "59:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "60:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "60:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "61:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "61:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "62:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "62:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "63:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "63:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "64:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "64:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "65:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "65:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "66:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "67:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "67:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "68:00",
+          "teamA": "20.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "68:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "69:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "69:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "70:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "70:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "71:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "71:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "72:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "72:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "73:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "73:30",
+          "teamA": "0.00",
+          "teamB": "10.00"
+        },
+        {
+          "timer": "74:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "74:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "75:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "75:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "76:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "76:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "77:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "77:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "78:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "78:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "79:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "79:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "89:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "90:00+00:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        }
+      ],
+      "referee": null,
+      "stadium": null,
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.500",
+              "X": "4.333",
+              "2": "6.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.030",
+              "u": "1.870",
+              "v": "2.75"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.840",
+              "2": "2.060",
+              "v": "-1"
+            }
+          }
+        },
+        "kickoff": {
+          "1X2": {
+            "bet365": {
+              "1": "1.181",
+              "X": "6.500",
+              "2": "15.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.850",
+              "v": "-1"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.040",
+              "u": "1.860",
+              "v": "3.75"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.780",
+              "2": "2.125",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.790",
+              "u": "2.110",
+              "v": "2"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.142",
+              "X": "6.000",
+              "2": "23.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E136816160\/F3\/I0\/"
+    },
+    {
+      "id": "d5291986550b2c7e",
+      "date": "2026-06-05 10:59:21",
+      "status": "ENDED",
+      "timer": "90:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "1c2725ea075ff4f6",
+        "name": "England",
+        "score": {
+          "f": 0,
+          "1h": 0,
+          "2h": 0,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "possession": null,
+          "attacks": {
+            "n": null,
+            "d": null,
+            "o_s": null
+          },
+          "shoots": {
+            "t": "0",
+            "off": null,
+            "on": null,
+            "g_a": null
+          },
+          "penalties": "0",
+          "corners": {
+            "t": "0",
+            "f": null,
+            "h": null
+          },
+          "fouls": {
+            "t": null,
+            "y_c": "0",
+            "y_t_r_c": null,
+            "r_c": "0"
+          },
+          "substitutions": null,
+          "throwins": "0",
+          "injuries": null,
+          "dominance_avg_2_5": "0.00",
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "ed4f17bb5f58a226",
+        "name": "Brazil",
+        "score": {
+          "f": 0,
+          "1h": 0,
+          "2h": 0,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "possession": null,
+          "attacks": {
+            "n": null,
+            "d": null,
+            "o_s": null
+          },
+          "shoots": {
+            "t": "0",
+            "off": null,
+            "on": null,
+            "g_a": null
+          },
+          "penalties": "0",
+          "corners": {
+            "t": "0",
+            "f": null,
+            "h": null
+          },
+          "fouls": {
+            "t": null,
+            "y_c": "0",
+            "y_t_r_c": null,
+            "r_c": "0"
+          },
+          "substitutions": null,
+          "throwins": "0",
+          "injuries": null,
+          "dominance_avg_2_5": "0.00",
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "events": [],
+      "dominance_index": [
+        {
+          "timer": "120:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "120:00+00:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "90:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "90:00+00:30",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        },
+        {
+          "timer": "90:00+01:00",
+          "teamA": "0.00",
+          "teamB": "0.00"
+        }
+      ],
+      "referee": null,
+      "stadium": null,
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.700",
+              "X": "3.750",
+              "2": "4.750"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.25"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "-0.75"
+            }
+          }
+        },
+        "kickoff": {
+          "1X2": {
+            "bet365": {
+              "1": "8.000",
+              "X": "1.125",
+              "2": "19.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.350",
+              "2": "3.250",
+              "v": "0"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "5.600",
+              "u": "1.150",
+              "v": "0.5"
+            }
+          },
+          "asian_corner": {
+            "bet365": {
+              "o": "2.250",
+              "u": "1.625",
+              "v": "0.5"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E195812808\/F3\/I0\/"
+    },
     {
       "id": "e0b4f5a05670d921",
       "date": "2026-06-11 19:00:00",
@@ -35,7 +1173,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e509575f1d",
+          "name": "Javier Aguirre"
+        }
       },
       "teamB": {
         "id": "4719a60d951411bb",
@@ -53,8 +1194,86 @@
             "live": null
           }
         },
-        "manager": null
-      }
+        "manager": {
+          "id": "5fb962e4d48f96da",
+          "name": "Hugo Broos"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e8b6b6fbc98bcf5e",
+        "name": "Estadio Azteca"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.500",
+              "X": "4.000",
+              "2": "5.500"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "-1"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.400",
+              "X": "4.500",
+              "2": "7.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.025",
+              "2": "1.825",
+              "v": "-1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.900",
+              "u": "1.950",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.100",
+              "2": "1.775",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.050",
+              "X": "2.300",
+              "2": "6.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942569\/F3\/I0\/"
     },
     {
       "id": "7e7c7203df3befb3",
@@ -82,7 +1301,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "6011fec949158fb3",
+          "name": "Hong Myungbo"
+        }
       },
       "teamB": {
         "id": "ef8a29059df471f8",
@@ -100,8 +1322,86 @@
             "live": null
           }
         },
-        "manager": null
-      }
+        "manager": {
+          "id": "5fb962e52b0c7fd6",
+          "name": "Miroslav Koubek"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "5d2119ea477e3e91",
+        "name": "Estadio Akron"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.375",
+              "X": "3.250",
+              "2": "2.750"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.825",
+              "2": "2.025",
+              "v": "0"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "2.625",
+              "X": "3.100",
+              "2": "2.700"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "0"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "3.250",
+              "X": "2.050",
+              "2": "3.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256611\/F3\/I0\/"
     },
     {
       "id": "d9770fdfd61d0dd8",
@@ -148,7 +1448,82 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "720880a0420f9c98",
+        "name": "BMO Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.200",
+              "X": "3.500",
+              "2": "2.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.900",
+              "u": "1.950",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.025",
+              "2": "1.825",
+              "v": "-0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.800",
+              "X": "3.700",
+              "2": "4.333"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.725",
+              "2": "2.150",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.100",
+              "u": "1.775",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "3.000",
+              "X": "2.100",
+              "2": "3.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256735\/F3\/I0\/"
     },
     {
       "id": "7bad869a64b46823",
@@ -195,7 +1570,82 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "4ac387a53df5a4d5",
+        "name": "SoFi Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.300",
+              "X": "3.250",
+              "2": "2.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.950",
+              "X": "3.400",
+              "2": "4.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.775",
+              "2": "2.100",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.750",
+              "X": "2.200",
+              "2": "3.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942662\/F3\/I0\/"
     },
     {
       "id": "9ebf7654f5a4bf3a",
@@ -247,7 +1697,77 @@
       "stadium": {
         "id": "447149997396b232",
         "name": "Levi's Stadium"
-      }
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.500",
+              "X": "4.500",
+              "2": "1.400"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "12.000",
+              "X": "6.000",
+              "2": "1.222"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "1.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.000",
+              "X": "2.500",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942671\/F3\/I0\/"
     },
     {
       "id": "cde2bf321b41a633",
@@ -294,7 +1814,82 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "63118436d8699710",
+        "name": "MetLife Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.444",
+              "X": "4.200",
+              "2": "6.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.615",
+              "X": "3.900",
+              "2": "5.250"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "-0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.909",
+              "X": "2.500",
+              "2": "7.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942576\/F3\/I0\/"
     },
     {
       "id": "6a9e0e43c103b2b3",
@@ -346,7 +1941,77 @@
       "stadium": {
         "id": "17e26dba42944943",
         "name": "Gillette Stadium"
-      }
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.250",
+              "X": "4.750",
+              "2": "1.380"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "5.500",
+              "X": "4.750",
+              "2": "1.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "1"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.500",
+              "X": "2.500",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942620\/F3\/I0\/"
     },
     {
       "id": "2cd1f1230152d0c",
@@ -378,7 +2043,7 @@
       },
       "teamB": {
         "id": "1bd5f3ba4a71016d",
-        "name": "Türkiye",
+        "name": "T\u00fcrkiye",
         "score": {
           "f": 0,
           "1h": null,
@@ -398,7 +2063,77 @@
       "stadium": {
         "id": "30506c4bc48afd65",
         "name": "BC Place"
-      }
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "4.500",
+              "X": "3.500",
+              "2": "1.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.825",
+              "u": "2.025",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "4.750",
+              "X": "3.600",
+              "2": "1.750"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.825",
+              "2": "2.025",
+              "v": "0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "5.000",
+              "X": "2.200",
+              "2": "2.375"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E195350662\/F3\/I0\/"
     },
     {
       "id": "a86eb462606fd1c6",
@@ -445,7 +2180,82 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "497df7bfe45d4062",
+        "name": "NRG Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.020",
+              "X": "21.000",
+              "2": "29.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "4.0,4.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-3.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.030",
+              "X": "19.000",
+              "2": "41.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-3.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.900",
+              "u": "1.950",
+              "v": "4.0,4.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-1.75"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.5,2.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.142",
+              "X": "5.500",
+              "2": "41.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942665\/F3\/I0\/"
     },
     {
       "id": "6310f6638de6003",
@@ -492,7 +2302,82 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e98c0f18407e7929",
+        "name": "AT&T Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.727",
+              "X": "3.750",
+              "2": "4.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.950",
+              "X": "3.800",
+              "2": "3.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.250",
+              "X": "2.300",
+              "2": "5.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942617\/F3\/I0\/"
     },
     {
       "id": "c6a569dba736f33f",
@@ -539,7 +2424,570 @@
           }
         },
         "manager": null
-      }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7ca1506f090689b4",
+        "name": "Lincoln Financial Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "3.100",
+              "X": "3.250",
+              "2": "2.150"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "3.500",
+              "X": "2.900",
+              "2": "2.300"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "0.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.5,2.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.250",
+              "2": "1.675",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "4.000",
+              "X": "2.050",
+              "2": "2.875"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942622\/F3\/I0\/"
+    },
+    {
+      "id": "b4e86695866bff88",
+      "date": "2026-06-15 02:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "61155ff668b4681b",
+        "name": "Sweden",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "e52cd9812770cbc1",
+        "name": "Tunisia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7ce8d43bcb0336e2",
+        "name": "Estadio BBVA Bancomer"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.833",
+              "X": "3.500",
+              "2": "3.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-0.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.900",
+              "X": "3.400",
+              "2": "4.100"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.500",
+              "X": "2.100",
+              "2": "4.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256742\/F3\/I0\/"
+    },
+    {
+      "id": "d88b070487cc627b",
+      "date": "2026-06-15 16:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "23731ea5d5bfbd66",
+        "name": "Spain",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "c2019f2cf30222e1",
+        "name": "Cape Verde Islands",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "94afbe99024954ab",
+        "name": "Mercedes-Benz Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.083",
+              "X": "9.000",
+              "2": "23.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "3.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-2.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.083",
+              "X": "10.000",
+              "2": "23.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-2.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "3.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.150",
+              "2": "1.725",
+              "v": "-1.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.363",
+              "X": "3.500",
+              "2": "17.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942682\/F3\/I0\/"
+    },
+    {
+      "id": "1bf20836e33ef0f5",
+      "date": "2026-06-15 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "35a8890c2f413699",
+        "name": "Belgium",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "48aeabaecc064ddf",
+        "name": "Egypt",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7c69cef439f23e0d",
+        "name": "CenturyLink Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.600",
+              "X": "3.800",
+              "2": "5.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "-0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.650",
+              "X": "3.800",
+              "2": "5.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.750",
+              "2": "2.125",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.100",
+              "X": "2.375",
+              "2": "5.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942667\/F3\/I0\/"
+    },
+    {
+      "id": "251e1c0b57777269",
+      "date": "2026-06-15 22:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": null
+      },
+      "teamA": {
+        "id": "229c241d16a26021",
+        "name": "Saudi Arabia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "cdf59a91afd12aa2",
+        "name": "Uruguay",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "b40c2626c53636b4",
+        "name": "Hard Rock Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "5.750",
+              "X": "4.500",
+              "2": "1.420"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "7.000",
+              "X": "4.500",
+              "2": "1.450"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.750",
+              "u": "2.125",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.000",
+              "X": "2.400",
+              "2": "1.909"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942680\/F3\/I0\/"
     }
   ]
 }
