@@ -80,6 +80,40 @@
       </div>
     {% endfor %}
 
+    {% if group_data.standings %}
+    <div class="group-standings">
+      <table class="main-table standings-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th title="Partidas jogadas">PJ</th>
+            <th title="Pontos">PTS</th>
+            <th title="Gols marcados">GM</th>
+            <th title="Gols sofridos">GS</th>
+            <th title="Cartões amarelos">🟨</th>
+            <th title="Cartões vermelhos">🟥</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in group_data.standings %}
+          <tr>
+            <td class="standings-team">
+              <img src="{{ entry.team.logo_url }}" class="small-team-logo">
+              {{ entry.team.name }}
+            </td>
+            <td>{{ entry.pj }}</td>
+            <td><strong>{{ entry.pts }}</strong></td>
+            <td>{{ entry.gf }}</td>
+            <td>{{ entry.ga }}</td>
+            <td>{{ entry.yc }}</td>
+            <td>{{ entry.rc }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
   {% endfor %}
 
   <input type="submit" value="Salvar palpites">

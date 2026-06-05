@@ -47,6 +47,10 @@ class MatchAdmin(admin.ModelAdmin):
         "open_to_guesses",
         "home_goals",
         "away_goals",
+        "home_yellow_cards",
+        "away_yellow_cards",
+        "home_red_cards",
+        "away_red_cards",
     )
     list_filter = ["competition", "status"]
 

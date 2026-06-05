@@ -124,6 +124,54 @@ class CompetitionGroup(models.Model):
     def __str__(self) -> str:
         return f"{self.competition} – {self.name}"
 
+    def get_standings(self):
+        teams = list(self.teams.all())
+        if not teams:
+            return []
+
+        finished_matches = (
+            Match.objects.filter(
+                competition=self.competition,
+                status__in=Match.FINISHED_STATUS,
+            )
+            .filter(Q(home_team__in=teams) | Q(away_team__in=teams))
+            .select_related("home_team", "away_team")
+        )
+
+        standings = {team.id: {"team": team, "pts": 0, "pj": 0, "gf": 0, "ga": 0, "yc": 0, "rc": 0} for team in teams}
+
+        for match in finished_matches:
+            hg = match.home_goals or 0
+            ag = match.away_goals or 0
+            home_team_id, away_team_id = match.home_team_id, match.away_team_id
+
+            if home_team_id in standings:
+                standings[home_team_id]["pj"] += 1
+                standings[home_team_id]["gf"] += hg
+                standings[home_team_id]["ga"] += ag
+                standings[home_team_id]["yc"] += match.home_yellow_cards or 0
+                standings[home_team_id]["rc"] += match.home_red_cards or 0
+                if hg > ag:
+                    standings[home_team_id]["pts"] += 3
+                elif hg == ag:
+                    standings[home_team_id]["pts"] += 1
+
+            if away_team_id in standings:
+                standings[away_team_id]["pj"] += 1
+                standings[away_team_id]["gf"] += ag
+                standings[away_team_id]["ga"] += hg
+                standings[away_team_id]["yc"] += match.away_yellow_cards or 0
+                standings[away_team_id]["rc"] += match.away_red_cards or 0
+                if ag > hg:
+                    standings[away_team_id]["pts"] += 3
+                elif ag == hg:
+                    standings[away_team_id]["pts"] += 1
+
+        return sorted(
+            standings.values(),
+            key=lambda x: (-x["pts"], -(x["gf"] - x["ga"]), -x["gf"], x["yc"], x["rc"]),
+        )
+
 
 class Match(models.Model):
     NOT_STARTED = "NS"
@@ -176,6 +224,10 @@ class Match(models.Model):
     date_time = models.DateTimeField("Data e hora")
     home_goals = models.PositiveIntegerField(blank=True, null=True)
     away_goals = models.PositiveIntegerField(blank=True, null=True)
+    home_yellow_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    away_yellow_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    home_red_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    away_red_cards = models.PositiveSmallIntegerField(blank=True, null=True)
     double_score = models.BooleanField(default=False)
 
     class Meta:
@@ -545,7 +597,7 @@ class GuessPool(TimeStampedModel):
         )
 
     def get_closed_recent_matches(self):
-        """Returns last closed matches for predictions"""
+        """Returns last closed for guesses matches that are not too old (until 36 hours after their date_time)"""
 
         return (
             self.get_matches()

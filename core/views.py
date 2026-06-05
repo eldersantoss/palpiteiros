@@ -1,11 +1,13 @@
 import logging
 from datetime import date as _date
+from typing import Any, Iterable
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.forms import CheckboxSelectMultiple, modelform_factory
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.text import slugify
@@ -20,7 +22,7 @@ from .forms import (
     RankingPeriodForm,
     UserEditForm,
 )
-from .models import CompetitionGroup, Guess, GuessPool
+from .models import CompetitionGroup, Guess, GuessPool, Match
 from .viewmixins import GuessPoolMembershipMixin
 
 GROUPED_GUESSES_WINDOW_START = _date(2026, 6, 4)
@@ -258,9 +260,7 @@ class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Templat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         today = timezone.localdate()
-        context["show_grouped_guesses"] = (
-            GROUPED_GUESSES_WINDOW_START <= today <= GROUPED_GUESSES_WINDOW_END
-        )
+        context["show_grouped_guesses"] = GROUPED_GUESSES_WINDOW_START <= today <= GROUPED_GUESSES_WINDOW_END
         return context
 
 
@@ -551,30 +551,40 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
         return super().dispatch(request, *args, **kwargs)
 
-    def _get_team_to_group_map(self, matches):
+    def _get_group_by_team_id_map(self, matches) -> dict[int, CompetitionGroup]:
         competition_ids = {m.competition_id for m in matches}
-        groups = CompetitionGroup.objects.filter(
-            competition_id__in=competition_ids
-        ).prefetch_related("teams")
+        groups = CompetitionGroup.objects.filter(competition_id__in=competition_ids).prefetch_related("teams")
 
-        team_to_group = {}
+        group_by_team_id_map: dict[int, CompetitionGroup] = {}
         for group in groups:
             for team in group.teams.all():
-                team_to_group[team.id] = group
-        return team_to_group
+                group_by_team_id_map[team.id] = group
+        return group_by_team_id_map
 
-    def _build_groups_data(self, open_matches, closed_matches, post_data=None):
+    def _build_groups_data(
+        self,
+        open_matches: Iterable[Match],
+        closed_matches: Iterable[Match],
+        post_data: QueryDict | None = None,
+    ):
         all_matches = list(open_matches) + list(closed_matches)
-        team_to_group = self._get_team_to_group_map(all_matches)
+        group_by_team_id_map = self._get_group_by_team_id_map(all_matches)
 
-        groups_dict = {}  # group.id (or None) -> {"group": ..., "open_forms": [], "closed": []}
+        groups_dict: dict[int | None, dict[str, Any]] = (
+            {}
+        )  # group.id (or None) -> {"group": ..., "open_forms": [], "closed": []}
 
         for match in open_matches:
-            group = team_to_group.get(match.home_team_id) or team_to_group.get(match.away_team_id)
-            key = group.id if group else None
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)  # type: ignore
+            group_id = group.id if group else None  # type: ignore
 
-            if key not in groups_dict:
-                groups_dict[key] = {"group": group, "open_forms": [], "closed": []}
+            if group_id not in groups_dict:
+                groups_dict[group_id] = {
+                    "group": group,
+                    "open_forms": [],
+                    "closed": [],
+                    "standings": group.get_standings() if group else [],
+                }
 
             if post_data is not None:
                 guess_form = GuessForm(post_data, match=match)
@@ -599,21 +609,26 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                     initial = None
                 guess_form = GuessForm(initial, match=match)
 
-            groups_dict[key]["open_forms"].append(guess_form)
+            groups_dict[group_id]["open_forms"].append(guess_form)
 
         for match in closed_matches:
-            group = team_to_group.get(match.home_team_id) or team_to_group.get(match.away_team_id)
-            key = group.id if group else None
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)  # type: ignore
+            group_id = group.id if group else None  # type: ignore
 
-            if key not in groups_dict:
-                groups_dict[key] = {"group": group, "open_forms": [], "closed": []}
+            if group_id not in groups_dict:
+                groups_dict[group_id] = {
+                    "group": group,
+                    "open_forms": [],
+                    "closed": [],
+                    "standings": group.get_standings() if group else [],
+                }
 
             try:
                 guess = self.pool.guesses.get(match=match, guesser=self.guesser)
             except Guess.DoesNotExist:
                 guess = None
 
-            groups_dict[key]["closed"].append({"match": match, "guess": guess})
+            groups_dict[group_id]["closed"].append({"match": match, "guess": guess})
 
         # Sort: named groups alphabetically, ungrouped (None) last
         named = sorted(

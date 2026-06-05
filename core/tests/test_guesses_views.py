@@ -327,6 +327,90 @@ def test_grouped_guesses_post_saves_guess(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
+def test_grouped_guesses_context_has_standings_key(mock_tz, client):
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    group = baker.make("core.CompetitionGroup", competition=competition, name="Grupo A")
+    group.teams.set([home_team, away_team])
+    pool, guesser = _make_pool_with_guesser(competition)
+    _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    groups_data = response.context["groups_data"]
+    assert "standings" in groups_data[0]
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_grouped_guesses_standings_reflects_closed_match_result(mock_tz, client):
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    group = baker.make("core.CompetitionGroup", competition=competition, name="Grupo A")
+    group.teams.set([home_team, away_team])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    # A closed match that is already finished (status FT) contributes to standings
+    baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        date_time=timezone.now() - timezone.timedelta(hours=1),
+        status="FT",
+        home_goals=2,
+        away_goals=0,
+    )
+    _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    groups_data = response.context["groups_data"]
+    group_entry = next(gd for gd in groups_data if gd["group"] and gd["group"].name == "Grupo A")
+    standings = group_entry["standings"]
+    home_entry = next(e for e in standings if e["team"] == home_team)
+    assert home_entry["pts"] == 3
+    assert home_entry["gf"] == 2
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_grouped_guesses_standings_empty_for_ungrouped_matches(mock_tz, client):
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    ungrouped_home = baker.make("core.Team", competitions=[competition])
+    ungrouped_away = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+    _open_match(pool, competition, ungrouped_home, ungrouped_away)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    groups_data = response.context["groups_data"]
+    ungrouped_entry = next(gd for gd in groups_data if gd["group"] is None)
+    assert ungrouped_entry["standings"] == []
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
 def test_grouped_guesses_owner_without_guesser_redirects(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now

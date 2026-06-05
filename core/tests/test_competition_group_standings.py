@@ -1,0 +1,218 @@
+import pytest
+from model_bakery import baker
+
+pytestmark = pytest.mark.django_db
+
+
+def _make_finished_match(competition, home, away, hg, ag, hyc=0, ayc=0, hrc=0, arc=0):
+    return baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=home,
+        away_team=away,
+        status="FT",
+        home_goals=hg,
+        away_goals=ag,
+        home_yellow_cards=hyc,
+        away_yellow_cards=ayc,
+        home_red_cards=hrc,
+        away_red_cards=arc,
+    )
+
+
+def test_get_standings_empty_when_no_teams():
+    competition = baker.make("core.Competition")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+
+    assert group.get_standings() == []
+
+
+def test_get_standings_empty_when_no_finished_matches():
+    competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=home,
+        away_team=away,
+        status="NS",
+        home_goals=None,
+        away_goals=None,
+    )
+
+    standings = group.get_standings()
+    assert all(entry["pj"] == 0 for entry in standings)
+    assert all(entry["pts"] == 0 for entry in standings)
+
+
+def test_get_standings_victory_gives_3_points():
+    competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    _make_finished_match(competition, home, away, hg=2, ag=0)
+
+    standings = group.get_standings()
+    home_entry = next(e for e in standings if e["team"] == home)
+    away_entry = next(e for e in standings if e["team"] == away)
+
+    assert home_entry["pts"] == 3
+    assert away_entry["pts"] == 0
+
+
+def test_get_standings_draw_gives_1_point_each():
+    competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    _make_finished_match(competition, home, away, hg=1, ag=1)
+
+    standings = group.get_standings()
+    for entry in standings:
+        assert entry["pts"] == 1
+
+
+def test_get_standings_goal_counts():
+    competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    _make_finished_match(competition, home, away, hg=3, ag=1)
+
+    standings = group.get_standings()
+    home_entry = next(e for e in standings if e["team"] == home)
+    away_entry = next(e for e in standings if e["team"] == away)
+
+    assert home_entry["gf"] == 3
+    assert home_entry["ga"] == 1
+    assert away_entry["gf"] == 1
+    assert away_entry["ga"] == 3
+
+
+def test_get_standings_card_counts():
+    competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    _make_finished_match(competition, home, away, hg=1, ag=0, hyc=2, ayc=3, hrc=0, arc=1)
+
+    standings = group.get_standings()
+    home_entry = next(e for e in standings if e["team"] == home)
+    away_entry = next(e for e in standings if e["team"] == away)
+
+    assert home_entry["yc"] == 2
+    assert home_entry["rc"] == 0
+    assert away_entry["yc"] == 3
+    assert away_entry["rc"] == 1
+
+
+def test_get_standings_ordering_by_points():
+    competition = baker.make("core.Competition")
+    team_a = baker.make("core.Team")
+    team_b = baker.make("core.Team")
+    team_c = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([team_a, team_b, team_c])
+
+    _make_finished_match(competition, team_a, team_b, hg=1, ag=0)  # A: 3pts, B: 0pts
+    _make_finished_match(competition, team_c, team_b, hg=1, ag=1)  # C: 1pt, B: 1pt
+
+    standings = group.get_standings()
+    assert standings[0]["team"] == team_a
+    assert standings[0]["pts"] == 3
+
+
+def test_get_standings_tiebreak_by_goal_difference():
+    competition = baker.make("core.Competition")
+    team_a = baker.make("core.Team")
+    team_b = baker.make("core.Team")
+    team_c = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([team_a, team_b, team_c])
+
+    # Both A and B get 3pts but A has better goal diff (+2 vs +1)
+    _make_finished_match(competition, team_a, team_c, hg=3, ag=1)  # A: 3pts, saldo +2
+    _make_finished_match(competition, team_b, team_c, hg=2, ag=1)  # B: 3pts, saldo +1
+
+    standings = group.get_standings()
+    assert standings[0]["team"] == team_a
+    assert standings[1]["team"] == team_b
+
+
+def test_get_standings_tiebreak_by_goals_scored():
+    competition = baker.make("core.Competition")
+    team_a = baker.make("core.Team")
+    team_b = baker.make("core.Team")
+    team_c = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([team_a, team_b, team_c])
+
+    # A and B: same pts (3), same goal diff (+1), but A scored more
+    _make_finished_match(competition, team_a, team_c, hg=2, ag=1)  # A: 3pts, gf=2, saldo +1
+    _make_finished_match(competition, team_b, team_c, hg=1, ag=0)  # B: 3pts, gf=1, saldo +1
+
+    standings = group.get_standings()
+    assert standings[0]["team"] == team_a
+    assert standings[1]["team"] == team_b
+
+
+def test_get_standings_tiebreak_by_yellow_cards():
+    competition = baker.make("core.Competition")
+    team_a = baker.make("core.Team")
+    team_b = baker.make("core.Team")
+    team_c = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([team_a, team_b, team_c])
+
+    # Same pts, same goal diff, same goals scored; A has fewer yellow cards
+    _make_finished_match(competition, team_a, team_c, hg=1, ag=0, hyc=1)
+    _make_finished_match(competition, team_b, team_c, hg=1, ag=0, hyc=2)
+
+    standings = group.get_standings()
+    assert standings[0]["team"] == team_a
+    assert standings[1]["team"] == team_b
+
+
+def test_get_standings_tiebreak_by_red_cards():
+    competition = baker.make("core.Competition")
+    team_a = baker.make("core.Team")
+    team_b = baker.make("core.Team")
+    team_c = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([team_a, team_b, team_c])
+
+    # Same pts, same goal diff, same goals, same yellow; A has fewer red cards
+    _make_finished_match(competition, team_a, team_c, hg=1, ag=0, hyc=1, hrc=0)
+    _make_finished_match(competition, team_b, team_c, hg=1, ag=0, hyc=1, hrc=1)
+
+    standings = group.get_standings()
+    assert standings[0]["team"] == team_a
+    assert standings[1]["team"] == team_b
+
+
+def test_get_standings_ignores_matches_of_other_competitions():
+    competition = baker.make("core.Competition")
+    other_competition = baker.make("core.Competition")
+    home = baker.make("core.Team")
+    away = baker.make("core.Team")
+    group = baker.make("core.CompetitionGroup", competition=competition)
+    group.teams.set([home, away])
+
+    # Match from another competition should not affect standings
+    _make_finished_match(other_competition, home, away, hg=5, ag=0)
+
+    standings = group.get_standings()
+    assert all(entry["pts"] == 0 for entry in standings)
+    assert all(entry["pj"] == 0 for entry in standings)

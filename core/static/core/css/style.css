@@ -719,3 +719,25 @@ footer address {
     text-align: center;
     min-width: 2em;
 }
+
+.group-standings {
+  margin-top: 1vh;
+  padding-top: 1vh;
+  border-top: 0.3vh solid rgba(154, 205, 50, 0.2);
+  width: 100%;
+}
+
+.standings-table {
+  margin-top: 2vh;
+  font-size: 0.65rem;
+}
+
+.standings-table thead th {
+  font-size: 0.6rem;
+  color: #9acd32;
+}
+
+.standings-team {
+  text-align: left;
+  white-space: nowrap;
+}
