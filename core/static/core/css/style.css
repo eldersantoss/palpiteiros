@@ -608,6 +608,7 @@ input {
 
 .temp-msg {
   padding: 3vh;
+  margin: 2vh 0;
   border-radius: 1vh;
   line-height: 2.75vh;
 }

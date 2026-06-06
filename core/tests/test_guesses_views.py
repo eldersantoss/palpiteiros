@@ -55,6 +55,20 @@ def _closed_match(pool, competition, home_team, away_team):
     )
 
 
+def _about_to_start_match(competition, home_team, away_team, pool_minutes=5):
+    """Creates a match inside the deadline window: starts before minutes_before_start_match."""
+    return baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        date_time=timezone.now() + timezone.timedelta(minutes=pool_minutes - 1),
+        status="NS",
+        home_goals=None,
+        away_goals=None,
+    )
+
+
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 def test_guesses_view_get_returns_200_with_open_matches(client):
     competition = baker.make("core.Competition")
@@ -430,3 +444,128 @@ def test_grouped_guesses_owner_without_guesser_redirects(mock_tz, client):
     response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 302
+
+
+# --- minutes_before_start_match boundary tests ---
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_does_not_save_guess_past_deadline(client):
+    """POST with data for a match inside the deadline window creates no Guess and redirects."""
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+    pool.minutes_before_start_match = 5
+    pool.save()
+
+    match = _about_to_start_match(competition, home_team, away_team, pool_minutes=5)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match.id}": "2",
+            f"away_goals_{match.id}": "1",
+        },
+    )
+
+    assert response.status_code == 302
+    assert not pool.guesses.filter(guesser=guesser, match=match).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_saves_open_match_but_ignores_past_deadline(client):
+    """When submitting both an open and a deadline-expired match, only the open one is saved."""
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+    pool.minutes_before_start_match = 5
+    pool.save()
+
+    open_match = _open_match(pool, competition, home_team, away_team)
+    expired_match = _about_to_start_match(competition, home_team, away_team, pool_minutes=5)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{open_match.id}": "1",
+            f"away_goals_{open_match.id}": "0",
+            f"home_goals_{expired_match.id}": "3",
+            f"away_goals_{expired_match.id}": "2",
+        },
+    )
+
+    assert response.status_code == 200
+    assert pool.guesses.filter(guesser=guesser, match=open_match).exists()
+    assert not pool.guesses.filter(guesser=guesser, match=expired_match).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_grouped_guesses_post_does_not_save_guess_past_deadline(mock_tz, client):
+    """GroupedGuessesView POST ignores matches inside the deadline window."""
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+    pool.minutes_before_start_match = 5
+    pool.save()
+
+    match = _about_to_start_match(competition, home_team, away_team, pool_minutes=5)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match.id}": "2",
+            f"away_goals_{match.id}": "1",
+        },
+    )
+
+    assert response.status_code == 302
+    assert not pool.guesses.filter(guesser=guesser, match=match).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_grouped_guesses_post_saves_open_match_but_ignores_past_deadline(mock_tz, client):
+    """GroupedGuessesView POST saves open matches and ignores deadline-expired ones."""
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+    pool.minutes_before_start_match = 5
+    pool.save()
+
+    open_match = _open_match(pool, competition, home_team, away_team)
+    expired_match = _about_to_start_match(competition, home_team, away_team, pool_minutes=5)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{open_match.id}": "1",
+            f"away_goals_{open_match.id}": "0",
+            f"home_goals_{expired_match.id}": "3",
+            f"away_goals_{expired_match.id}": "2",
+        },
+    )
+
+    assert response.status_code == 200
+    assert pool.guesses.filter(guesser=guesser, match=open_match).exists()
+    assert not pool.guesses.filter(guesser=guesser, match=expired_match).exists()

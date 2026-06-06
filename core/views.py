@@ -349,6 +349,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 self.pool,
             )
 
+        submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
+        open_match_ids = set(open_matches.values_list("id", flat=True))
+
         guess_forms = []
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
@@ -411,6 +414,13 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             "Palpites salvos ✅",
             "temp-msg short-time-msg",
         )
+
+        if submitted_match_ids - open_match_ids:
+            messages.warning(
+                self.request,
+                "🚨 <strong>ATENÇÃO</strong> 🚨<br>Alguns palpites não foram salvos porque o tempo limite foi atingido.",
+                "temp-msg mid-time-msg",
+            )
 
         return render(
             self.request,
@@ -681,6 +691,9 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                 self.pool,
             )
 
+        submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
+        open_match_ids = set(open_matches.values_list("id", flat=True))
+
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
             if guess_form.is_valid():
@@ -700,6 +713,13 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
             "Palpites salvos ✅",
             "temp-msg short-time-msg",
         )
+
+        if submitted_match_ids - open_match_ids:
+            messages.warning(
+                self.request,
+                "🚨 <strong>ATENÇÃO</strong> 🚨<br>Alguns palpites não foram salvos porque o tempo limite foi atingido.",
+                "temp-msg mid-time-msg",
+            )
 
         return render(
             self.request,

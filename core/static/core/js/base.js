@@ -10,21 +10,21 @@ function removeTempMessagesAfterTimeout() {
     () =>
       document
         .querySelectorAll(".short-time-msg")
-        .forEach((e) => e.parentElement.remove()),
+        .forEach((e) => e.remove()),
     SHORT_TIME_MESSAGES * 1000
   );
   setTimeout(
     () =>
       document
         .querySelectorAll(".mid-time-msg")
-        .forEach((e) => e.parentElement.remove()),
+        .forEach((e) => e.remove()),
     MID_TIME_MESSAGES * 1000
   );
   setTimeout(
     () =>
       document
         .querySelectorAll(".long-time-msg")
-        .forEach((e) => e.parentElement.remove()),
+        .forEach((e) => e.remove()),
     LONG_TIME_MESSAGES * 1000
   );
 }
