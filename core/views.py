@@ -248,7 +248,7 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
                 self.request,
                 "error",
                 "Nenhum bolão público cadastrado... Que tal criar um agora mesmo? Basta clicar em <strong>Criar bolão</strong> e configurar como quiser 😎",
-                "long",
+                "mid",
             )
         return super().get(request, *args, **kwargs)
 
@@ -270,7 +270,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 self.request,
                 "error",
                 "Você não está cadastrado como palpiteiro. Acesse <strong>Gerenciar bolão</strong> e marque seu usuário como <strong>Palpiteiro</strong> para ter acesso à esta ação.",
-                "long",
+                "mid",
                 self.pool,
             )
 
@@ -554,7 +554,7 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                 request,
                 "error",
                 "Você não está cadastrado como palpiteiro. Acesse <strong>Gerenciar bolão</strong> e marque seu usuário como <strong>Palpiteiro</strong> para ter acesso à esta ação.",
-                "long",
+                "mid",
                 self.pool,
             )
 

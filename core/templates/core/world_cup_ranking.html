@@ -3,61 +3,71 @@
 
 {% block title %}Classificação Copa | Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<h3>Classificação Copa do Mundo</h3>
+<div class="page-container">
+  <div class="scrollable-content">
+    <h3>Classificação Copa do Mundo</h3>
 
-<div class="period-form-container">
-  <p>Fase que deseja ver a classificação:</p>
-  <form action="{% url 'core:world_cup_ranking' pool.slug %}" method="GET" class="period-form" id="ranking-form">
-    <div class="world-cup-ranking-form-group">
-      {{ period_form.periodo }}
+    <div class="period-form-container">
+      <p>Fase que deseja ver a classificação:</p>
+      <form action="{% url 'core:world_cup_ranking' pool.slug %}" method="GET" class="period-form" id="ranking-form">
+        <div class="world-cup-ranking-form-group">
+          {{ period_form.periodo }}
+        </div>
+      </form>
     </div>
-  </form>
-</div>
 
-<table class="main-table ranking-table">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th style="width:60%"></th>
-      <th>Pontos</th>
-      {% comment %} <th style="width:30%"></th> {% endcomment %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in ranking_entries %}
-      <tr
-        class="clickable-row"
-        name="clickable-row{{ entry.user.id }}"
-        onclick="expandDetailRow('{{ entry.user.id }}')"
-      >
-        <td>
-          {% if forloop.counter == 1 %}
-          🥇
-          {% elif forloop.counter == 2 %}
-          🥈
-          {% elif forloop.counter == 3 %}
-          🥉
-          {% elif forloop.last %}
-          🔦
-          {% endif %}
-        </td>
-        <td>{{ forloop.counter }}º</td>
-        <td style="text-align:left">{{ entry }}</td>
-        <td>{{ entry.score }}</td>
-        {% comment %} <td class="expand-icon"></td> {% endcomment %}
-      </tr>
-    {% empty %}
-      <tr>
-        <td colspan="5" style="text-align: center; padding: 20px;">
-          Não há dados de classificação para o período selecionado.
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    <table class="main-table ranking-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th style="width:60%"></th>
+          <th>Pontos</th>
+          {% comment %} <th style="width:30%"></th> {% endcomment %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in ranking_entries %}
+          <tr
+            class="clickable-row"
+            name="clickable-row{{ entry.user.id }}"
+            onclick="expandDetailRow('{{ entry.user.id }}')"
+          >
+            <td>
+              {% if forloop.counter == 1 %}
+              🥇
+              {% elif forloop.counter == 2 %}
+              🥈
+              {% elif forloop.counter == 3 %}
+              🥉
+              {% elif forloop.last %}
+              🔦
+              {% endif %}
+            </td>
+            <td>{{ forloop.counter }}º</td>
+            <td style="text-align:left">{{ entry }}</td>
+            <td>{{ entry.score }}</td>
+            {% comment %} <td class="expand-icon"></td> {% endcomment %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 20px;">
+              Não há dados de classificação para o período selecionado.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action-bar">
+    <a href="{% url 'core:pool_home' pool.slug %}" class="btn btn-primary">Voltar</a>
+  </div>
+</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

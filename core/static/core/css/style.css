@@ -120,18 +120,17 @@ main {
   align-items: center;
 }
 
-h2, h3 {
+h2 {
   align-self: flex-start;
   color: black;
-  margin: 0;
+  margin: 1vh 0;
   font-size: 1.2rem;
 }
 
 h3 {
-  margin-top: 2vh;
-}
-
-h3 {
+  align-self: flex-start;
+  color: black;
+  margin: 1vh 0;
   font-size: 0.9rem;
   color: #1c57b7;
 }
@@ -283,10 +282,9 @@ input {
 }
 
 @media screen and (max-width: 480px) {
-
-  body {
+  /* body {
     height: 85vh;
-  }
+  } */
 
   header {
     display: flex;
@@ -315,24 +313,6 @@ input {
 
   .profile.mobile {
     display: flex;
-  }
-}
-
-@media screen and (min-width: 480px) {
-  .hamburger-btn {
-    display: none;
-  }
-
-  .top-action-menu {
-    display: flex;
-  }
-
-  .bottom-action-menu {
-    display: none;
-  }
-
-  .mobile {
-    display: none;
   }
 }
 
@@ -365,7 +345,6 @@ input {
   justify-content: center;
   line-height: 2.5vh;
   font-size: 0.85rem;
-  width: 90%;
 }
 
 .main-form p {
@@ -451,7 +430,6 @@ input {
   justify-content: center;
   line-height: 2.5vh;
   font-size: 0.85rem;
-  width: 90%;
 }
 
 .guesses-form input, .guesses-form select {
@@ -504,8 +482,8 @@ input {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-top: 2vh !important;
-  padding: 0.5vh 0.5vh 2vh 0.5vh;
+  margin-bottom: 1vh;
+  padding: 1vh;
   background-color: rgba(4, 0, 0, 0.125);
   border-radius: 1vh;
 }
@@ -521,7 +499,6 @@ input {
   justify-content: center;
   align-items: center;
   font-size: 0.7rem;
-  margin-top: 0.75vh;
 }
 
 .small-team-logo {
@@ -618,7 +595,6 @@ input {
   align-items: center;
   text-align: center;
   font-size: 0.6rem;
-  width: 90%;
 }
 
 .home-msg {
@@ -708,7 +684,7 @@ input {
   padding: 3vh;
   margin: 2vh 0;
   border-radius: 1vh;
-  line-height: 2.75vh;
+  line-height: 3.25vh;
 }
 
 .success {
@@ -730,7 +706,6 @@ input {
   align-items: center;
   margin-top: 2vh;
   text-align: center;
-  width: 90%;
 }
 
 .signin-pool-url p {
@@ -829,9 +804,8 @@ input {
 }
 
 footer {
-  margin-top: 2vh;
-  padding: 1vh 2vh;
-  display: flex;
+  padding: 1vh;
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -852,7 +826,7 @@ footer address {
 }
 
 .group-standings {
-  margin-top: 1vh;
+  /* margin-top: 1vh; */
   padding-top: 1vh;
   width: 100%;
   margin-bottom: 3vh;
@@ -896,7 +870,7 @@ footer address {
 }
 
 .group-title {
-  margin: 1.5vh 0 0.5vh;
+  margin: 1vh 0;
   font-size: 0.85rem;
 }
 
@@ -914,4 +888,96 @@ footer address {
   flex: 1;
 }
 
+/* --- Fixed layout: conteúdo scrollável + action bar fixa --- */
 
+body.fixed-layout main {
+  overflow: hidden;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.scrollable-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 2vh;
+  scrollbar-width: none;
+}
+
+.scrollable-content::-webkit-scrollbar {
+  display: none;
+}
+
+.action-bar {
+  flex-shrink: 0;
+  display: flex;
+  gap: 2vw;
+  padding: 2vh 0 1vh;
+  background-color: #f4f4f4;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5vh 2vh;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #083e93;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1c57b7;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #083e93;
+  border: 1px solid #083e93;
+}
+
+.btn-secondary:hover {
+  background-color: #f0f4ff;
+  color: #083e93;
+}
+
+@media screen and (min-width: 480px) {
+  .hamburger-btn {
+    display: none;
+  }
+
+  .top-action-menu {
+    display: flex;
+  }
+
+  .bottom-action-menu {
+    display: none;
+  }
+
+  .mobile {
+    display: none;
+  }
+
+  footer {
+    display: flex;
+  }
+}

@@ -13,7 +13,7 @@
   <title>{% block title %}{% endblock title %}</title>
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
   <header>
     {% if request.user.is_authenticated %}

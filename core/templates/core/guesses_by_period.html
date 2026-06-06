@@ -3,86 +3,88 @@
 
 {% block title %}Palpites por Período | Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<h3>Palpites por Período</h3>
+<div class="page-container">
+  <div class="scrollable-content">
+    <h3>Palpites por Período</h3>
 
-<div class="period-form-container">
-  <p>Escolha o palpiteiro e o período que deseja ver os palpites:</p>
-  <form action="{% url 'core:guesses_by_period' pool.slug %}" method="GET" class="period-form" id="guesses-form">
-    <div id="div_id_guesser" class="form-group">
-        <label for="id_palpiteiro">Palpiteiro:</label>
-        {{ form.palpiteiro }}
+    <div class="period-form-container">
+      <p>Escolha o palpiteiro e o período que deseja ver os palpites:</p>
+      <form action="{% url 'core:guesses_by_period' pool.slug %}" method="GET" class="period-form" id="guesses-form">
+        <div id="div_id_guesser" class="form-group">
+            <label for="id_palpiteiro">Palpiteiro:</label>
+            {{ form.palpiteiro }}
+        </div>
+        <div id="div_id_periodo" class="form-group">
+          <label for="id_periodo">Período:</label>
+          {{ form.periodo }}
+        </div>
+        <div id="div_id_ano" class="form-group" style="display: none;">
+          <label for="id_ano">Ano:</label>
+          {{ form.ano }}
+        </div>
+        <div id="div_id_mes" class="form-group" style="display: none;">
+          <label for="id_mes">Mês:</label>
+          {{ form.mes }}
+        </div>
+        <div id="div_id_semana" class="form-group" style="display: none;">
+          <label for="id_semana">Semana:</label>
+          {{ form.semana }}
+        </div>
+      </form>
     </div>
-    <div id="div_id_periodo" class="form-group">
-      <label for="id_periodo">Período:</label>
-      {{ form.periodo }}
-    </div>
-    <div id="div_id_ano" class="form-group" style="display: none;">
-      <label for="id_ano">Ano:</label>
-      {{ form.ano }}
-    </div>
-    <div id="div_id_mes" class="form-group" style="display: none;">
-      <label for="id_mes">Mês:</label>
-      {{ form.mes }}
-    </div>
-    <div id="div_id_semana" class="form-group" style="display: none;">
-      <label for="id_semana">Semana:</label>
-      {{ form.semana }}
-    </div>
-  </form>
+
+    {% if guesses %}
+        <h4 style="margin-top: 5vh">Pontuação total no período: <span style="color:#1c57b7">{{ total_score }}<span></h4>
+        <table class="main-table detail-table">
+        <thead>
+            <tr>
+            <th style="width:50%">Partida</th>
+            <th style="width:15%">Resultado</th>
+            <th style="width:15%">Palpite</th>
+            <th style="width:15%">Pontuação</th>
+            <th style="width:5%"></th>
+            </tr>
+        </thead>
+
+        <tbody id="guesses-tbody">
+          {% for guess in guesses %}
+            <tr class="detail-table-row">
+                <td>
+                    <p class="match-time">{{ guess.match.date_time|date:"l d/m H:i" }}</p>
+                    <p>{{ guess.match.home_team }}</p>
+                    <p>x</p>
+                    <p>{{ guess.match.away_team }}</p>
+                </td>
+                <td>{{ guess.match.result_str|default:"-" }}</td>
+                <td>{{ guess.result_str }}</td>
+                {% if guess.match.result_str %}
+                    <td>{{ guess.score }}</td>
+                {% else %}
+                    <td>-</td>
+                {% endif %}
+                <td>
+                {% if guess.match.double_score %}
+                🔥
+                {% endif %}
+                </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+
+    {% else %}
+        <p class="main-msg">Nenhum palpite encontrado para o palpiteiro no período selecionado.</p>
+    {% endif %}
+  </div>
+
+  <div class="action-bar">
+    <a href="{% url 'core:pool_home' pool.slug %}" class="btn btn-primary">Voltar</a>
+  </div>
 </div>
-
-{% if guesses %}
-    <h4 style="margin-top: 5vh">Pontuação total no período: <span style="color:#1c57b7">{{ total_score }}<span></h4>
-    <table class="main-table detail-table">
-    <thead>
-        <tr>
-        <th style="width:50%">Partida</th>
-        <th style="width:15%">Resultado</th>
-        <th style="width:15%">Palpite</th>
-        <th style="width:15%">Pontuação</th>
-        <th style="width:5%"></th>
-        </tr>
-    </thead>
-
-    <tbody id="guesses-tbody">
-      {% for guess in guesses %}
-        <tr class="detail-table-row">
-            <td>
-                <p class="match-time">{{ guess.match.date_time|date:"l d/m H:i" }}</p>
-                <p>{{ guess.match.home_team }}</p>
-                <p>x</p>
-                <p>{{ guess.match.away_team }}</p>
-            </td>
-            <td>{{ guess.match.result_str|default:"-" }}</td>
-            <td>{{ guess.result_str }}</td>
-            {% if guess.match.result_str %}
-                <td>{{ guess.score }}</td>
-            {% else %}
-                <td>-</td>
-            {% endif %}
-            <td>
-            {% if guess.match.double_score %}
-            🔥
-            {% endif %}
-            </td>
-        </tr>
-      {% endfor %}
-
-      {% comment %} {% if page_obj and page_obj.has_next %}
-          <div id="load-more-btn-partial" data-page="{{ page_obj.next_page_number }}"></div>
-      {% endif %} {% endcomment %}
-    </tbody>
-    </table>
-
-    {% comment %} {% if page_obj.has_next %}
-        <button id="load-more-btn" data-page="{{ page_obj.next_page_number }}">Carregar mais palpites</button>
-    {% endif %} {% endcomment %}
-
-{% else %}
-    <p class="main-msg">Nenhum palpite encontrado para o palpiteiro no período selecionado.</p>
-{% endif %}
 
 <script src="{% static 'core/js/form-utils.js' %}"></script>
 <script>

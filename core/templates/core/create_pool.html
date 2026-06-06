@@ -2,67 +2,76 @@
 
 {% block title %}Criar Bolão | Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<h2>Criar bolão</h2>
+<div class="page-container">
+  <div class="scrollable-content">
+    <h2>Criar bolão</h2>
 
-<form method="post" class="main-form">
-  {% csrf_token %}
+    <form id="create-pool-form" method="post" class="main-form">
+      {% csrf_token %}
 
-  {{ form.non_field_errors }}
+      {{ form.non_field_errors }}
 
-  <div>
-    {{ form.errors }}
-    {{ form.name.label }}
-    {{ form.name }}
-  </div>
-  <div class="manage-pool-form">
-    {{ form.errors }}
-    {{ form.minutes_before_start_match.label }}
-    {{ form.minutes_before_start_match }}
-  </div>
-  <div class="manage-pool-form">
-    {{ form.errors }}
-    {{ form.hours_before_open_to_guesses.label }}
-    {{ form.hours_before_open_to_guesses }}
-  </div>
-  <div>
-    <div class="private-checkbox">
-      {{ form.private.errors }}
-      <label for={{ form.private.auto_id }}>Privado</label>
-      {{ form.private }}
-    </div>
-    <div class="help-msg">
-      <p>Somente palpiteiros com o link de acesso poderão entrar</p>
-    </div>
-  </div>
-
-  <div>
-    <details open>
-      {{ form.errors }}
-      <summary>
-        Competições
-        <div class="help-msg">
-          <p>TODAS as partidas das competições selecionadas serão incluídas no bolão.</p>
+      <div>
+        {{ form.errors }}
+        {{ form.name.label }}
+        {{ form.name }}
+      </div>
+      <div class="manage-pool-form">
+        {{ form.errors }}
+        {{ form.minutes_before_start_match.label }}
+        {{ form.minutes_before_start_match }}
+      </div>
+      <div class="manage-pool-form">
+        {{ form.errors }}
+        {{ form.hours_before_open_to_guesses.label }}
+        {{ form.hours_before_open_to_guesses }}
+      </div>
+      <div>
+        <div class="private-checkbox">
+          {{ form.private.errors }}
+          <label for={{ form.private.auto_id }}>Privado</label>
+          {{ form.private }}
         </div>
-      </summary>
-      {{ form.competitions }}
-    </details>
-  </div>
-  <div>
-    <details>
-      {{ form.errors }}
-      <summary>
-        Equipes avulsas
         <div class="help-msg">
-          <p>TODAS as partidas das equipes selecionadas serão incluídas no bolão.</p>
+          <p>Somente palpiteiros com o link de acesso poderão entrar</p>
         </div>
-      </summary>
-      {{ form.teams }}
-    </details>
+      </div>
+
+      <div>
+        <details open>
+          {{ form.errors }}
+          <summary>
+            Competições
+            <div class="help-msg">
+              <p>TODAS as partidas das competições selecionadas serão incluídas no bolão.</p>
+            </div>
+          </summary>
+          {{ form.competitions }}
+        </details>
+      </div>
+      <div>
+        <details>
+          {{ form.errors }}
+          <summary>
+            Equipes avulsas
+            <div class="help-msg">
+              <p>TODAS as partidas das equipes selecionadas serão incluídas no bolão.</p>
+            </div>
+          </summary>
+          {{ form.teams }}
+        </details>
+      </div>
+    </form>
   </div>
 
-  <input type="submit" value="Criar bolão">
-</form>
+  <div class="action-bar">
+    <a href="{% url 'core:index' %}" class="btn btn-secondary">Voltar</a>
+    <button type="submit" form="create-pool-form" class="btn btn-primary">Criar bolão</button>
+  </div>
+</div>
 
 {% endblock content %}
