@@ -42,3 +42,13 @@ function showPoolLeavingConfirmation() {
 function hidePoolLeavingConfirmation() {
   document.querySelector(".exit-confirmation").style.display = "none";
 }
+
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebar-overlay").classList.toggle("open");
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("open");
+}

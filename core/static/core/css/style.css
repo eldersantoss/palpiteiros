@@ -204,10 +204,101 @@ input {
   text-align: right;
 }
 
+.hamburger-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #083e93;
+  padding: 0;
+  display: none;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 70vw;
+  max-width: 280px;
+  height: 100%;
+  background-color: #f4f4f4;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 2vh 5vw;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar a {
+  margin-top: 3vh;
+  font-size: 0.9rem;
+}
+
+.sidebar-logo {
+  align-self: center;
+  margin: 2vh 0;
+}
+
+.sidebar-address {
+  margin-top: auto;
+  padding-top: 3vh;
+  font-size: 0.75rem;
+  text-align: center;
+  font-style: normal;
+}
+
+.sidebar-address a {
+  font-size: 0.75rem;
+}
+
+.sidebar-close {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #083e93;
+  padding: 0;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+.sidebar-overlay.open {
+  display: block;
+}
+
 @media screen and (max-width: 480px) {
 
   body {
     height: 85vh;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .logo-link {
+    display: none;
   }
 
   .top-action-menu {
@@ -215,15 +306,23 @@ input {
   }
 
   .bottom-action-menu {
-    display: flex;
+    display: none;
   }
 
-  .profile .mobile {
+  .footer-address {
+    display: none;
+  }
+
+  .profile.mobile {
     display: flex;
   }
 }
 
 @media screen and (min-width: 480px) {
+  .hamburger-btn {
+    display: none;
+  }
+
   .top-action-menu {
     display: flex;
   }
@@ -413,9 +512,8 @@ input {
 
 .match-time {
   text-align: center;
-  /* font-size: 0.5rem; */
   margin: 0;
-  padding: 0.25vh 0;
+  padding: 1vh 0;
 }
 
 .guess-wrapper {
@@ -671,13 +769,13 @@ input {
   font-size: 0.75rem;
 }
 
-.ranking-table {
-  font-size: 0.70rem;
-}
-
 .main-table th, td {
   padding: 1.5vh 0.35vh;
   text-align: center;
+}
+
+.ranking-table th, td {
+  padding: 2vh 1vh;
 }
 
 .open-pools-table {
@@ -811,7 +909,7 @@ footer address {
 
 
 .world-cup-ranking-form-group select {
-  height: 3vh;
+  height: 5vh;
   font-size: 1rem;
   flex: 1;
 }

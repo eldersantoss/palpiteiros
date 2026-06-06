@@ -23,7 +23,7 @@
       <th></th>
       <th style="width:60%"></th>
       <th>Pontos</th>
-      <th style="width:30%"></th>
+      {% comment %} <th style="width:30%"></th> {% endcomment %}
     </tr>
   </thead>
   <tbody>
@@ -47,7 +47,7 @@
         <td>{{ forloop.counter }}º</td>
         <td style="text-align:left">{{ entry }}</td>
         <td>{{ entry.score }}</td>
-        <td class="expand-icon"></td>
+        {% comment %} <td class="expand-icon"></td> {% endcomment %}
       </tr>
     {% empty %}
       <tr>

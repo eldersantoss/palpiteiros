@@ -17,7 +17,9 @@
 
   <header>
     {% if request.user.is_authenticated %}
-      <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+
+      <a class="logo-link" href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
 
@@ -60,9 +62,27 @@
         </details>
       {% endif %}
 
-
     {% endif %}
   </header>
+
+  {% if request.user.is_authenticated %}
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <nav class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+      <a class="sidebar-logo" href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+        <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
+      </a>
+      {% if pool %}
+        <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
+      {% endif %}
+      <a href="{% url 'core:index' %}">🍀 Bolões</a>
+      <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+      <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+      <address class="sidebar-address">
+        Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
+      </address>
+    </nav>
+  {% endif %}
 
   <main>
     {% if messages %}
@@ -98,7 +118,7 @@
       </div>
     {% endif %}
 
-    <address>
+    <address class="footer-address">
       Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
     </address>
   </footer>
