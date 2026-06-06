@@ -1,5 +1,4 @@
 import logging
-from datetime import date as _date
 from typing import Any, Iterable
 
 from django.contrib import messages
@@ -13,6 +12,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.views import generic
 
+from core.constants import WORLD_CUP_END_DATE, WORLD_CUP_START_DATE
 from core.helpers import redirect_with_msg
 
 from .forms import (
@@ -24,9 +24,6 @@ from .forms import (
 )
 from .models import CompetitionGroup, Guess, GuessPool, Match
 from .viewmixins import GuessPoolMembershipMixin
-
-GROUPED_GUESSES_WINDOW_START = _date(2026, 6, 4)
-GROUPED_GUESSES_WINDOW_END = _date(2026, 7, 20)
 
 logger = logging.getLogger(__name__)
 
@@ -260,7 +257,7 @@ class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Templat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         today = timezone.localdate()
-        context["show_grouped_guesses"] = GROUPED_GUESSES_WINDOW_START <= today <= GROUPED_GUESSES_WINDOW_END
+        context["show_grouped_guesses"] = WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE
         return context
 
 
@@ -531,7 +528,7 @@ class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.
 class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         today = timezone.localdate()
-        if not (GROUPED_GUESSES_WINDOW_START <= today <= GROUPED_GUESSES_WINDOW_END):
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
             return redirect_with_msg(
                 request,
                 "error",
