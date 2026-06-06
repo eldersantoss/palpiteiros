@@ -395,11 +395,6 @@ class Guess(models.Model):
             f"{self.match.home_team.name} {self.home_goals}" + " x " + f"{self.away_goals} {self.match.away_team.name}"
         )
 
-    def get_score(self) -> int:
-        if not self.consolidated:
-            self.evaluate_and_consolidate()
-        return self.score
-
     def evaluate_and_consolidate(self):
         if self.match.result_str is not None:
             previous_score = self.score
@@ -438,6 +433,25 @@ class Guess(models.Model):
                 if not created:
                     entry.score = models.F("score") + score
                     entry.save(update_fields=["score"])
+
+        from core.constants import WORLD_CUP_PERIOD_DATE_RANGES
+
+        match_date_only = match_date.date()
+        for from_date, to_date in WORLD_CUP_PERIOD_DATE_RANGES.values():
+            if not from_date <= match_date_only <= to_date:
+                continue
+
+            for pool in self.pools.all():
+                wc_entry, created = WorldCupRankingEntry.objects.get_or_create(
+                    pool=pool,
+                    guesser=self.guesser,
+                    start_date=from_date,
+                    end_date=to_date,
+                    defaults={"score": score},
+                )
+                if not created:
+                    wc_entry.score = models.F("score") + score
+                    wc_entry.save(update_fields=["score"])
 
     @property
     def result_str(self) -> str:
@@ -773,6 +787,27 @@ class GuessPool(TimeStampedModel):
     def number_of_matches(self):
         return self.get_matches().count()
 
+    def get_ranking_for_world_cup_period(self, start_date: date, end_date: date):
+        """Retorna classificação para um período da Copa usando WorldCupRankingEntry."""
+        ranking_filter = Q(
+            world_cup_ranking_entries__pool=self,
+            world_cup_ranking_entries__start_date=start_date,
+            world_cup_ranking_entries__end_date=end_date,
+        )
+
+        return (
+            self.guessers.all()
+            .select_related("user")
+            .annotate(
+                score=Coalesce(
+                    Sum("world_cup_ranking_entries__score", filter=ranking_filter),
+                    0,
+                    output_field=models.IntegerField(),
+                )
+            )
+            .order_by("-score", "user__first_name")
+        )
+
     def get_ranking_for_period(self, year: int, month: int, week: int):
         """
         Retorna a classificação completa para um período, usando uma única query.
@@ -818,3 +853,20 @@ class RankingEntry(TimeStampedModel):
 
     def __str__(self):
         return f"Classificação {self.guesser} | bolão {self.pool} | ano {self.year}) | mês {self.month or '-'} | semana {self.week or '-'}"
+
+
+class WorldCupRankingEntry(TimeStampedModel):
+    pool = models.ForeignKey(GuessPool, on_delete=models.CASCADE, related_name="world_cup_ranking_entries")
+    guesser = models.ForeignKey(Guesser, on_delete=models.CASCADE, related_name="world_cup_ranking_entries")
+    start_date = models.DateField("Início do período")
+    end_date = models.DateField("Fim do período")
+    score = models.IntegerField("Pontuação", default=0)
+
+    class Meta:
+        verbose_name = "Registro de Classificação Copa"
+        verbose_name_plural = "Registros de Classificação Copa"
+        unique_together = [["pool", "guesser", "start_date", "end_date"]]
+        ordering = ["-score"]
+
+    def __str__(self):
+        return f"Copa {self.guesser} | bolão {self.pool} | {self.start_date}–{self.end_date}"

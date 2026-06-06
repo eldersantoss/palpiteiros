@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from core.constants import WORLD_CUP_PERIOD_CHOICES, WORLD_CUP_PERIOD_DATE_RANGES
 from core.models import Guesser
 
 
@@ -108,6 +109,20 @@ class RankingPeriodForm(forms.Form):
 
         # Default to geral
         return {"year": 0, "month": 0, "week": 0}
+
+
+class WorldCupRankingPeriodForm(forms.Form):
+    periodo = forms.ChoiceField(
+        label="Fase",
+        choices=WORLD_CUP_PERIOD_CHOICES,
+        required=False,
+    )
+
+    def get_period_dates(self) -> tuple:
+        """Returns (start_date, end_date) for the selected period."""
+        source = self.cleaned_data or self.initial or self.data
+        period = source.get("periodo") or "geral"
+        return WORLD_CUP_PERIOD_DATE_RANGES.get(period, WORLD_CUP_PERIOD_DATE_RANGES["geral"])
 
 
 class GuessesPeriodForm(forms.Form):

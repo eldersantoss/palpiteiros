@@ -128,6 +128,10 @@ h2, h3 {
 }
 
 h3 {
+  margin-top: 2vh;
+}
+
+h3 {
   font-size: 0.9rem;
   color: #1c57b7;
 }
@@ -466,12 +470,8 @@ input {
 }
 
 .period-form-container {
-  margin-top: 4vh;
+  margin-top: 2vh;
   width: 100%;
-}
-
-.period-form-container p {
-  font-size: 0.75rem;
 }
 
 .period-form {
@@ -800,3 +800,19 @@ footer address {
   margin: 1.5vh 0 0.5vh;
   font-size: 0.85rem;
 }
+
+.world-cup-ranking-form-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+
+.world-cup-ranking-form-group select {
+  height: 3vh;
+  font-size: 1rem;
+  flex: 1;
+}
+
+

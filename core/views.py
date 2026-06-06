@@ -21,6 +21,7 @@ from .forms import (
     GuessForm,
     RankingPeriodForm,
     UserEditForm,
+    WorldCupRankingPeriodForm,
 )
 from .models import CompetitionGroup, Guess, GuessPool, Match
 from .viewmixins import GuessPoolMembershipMixin
@@ -707,3 +708,50 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                 "groups_data": groups_data,
             },
         )
+
+
+class WorldCupRankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
+    template_name = "core/world_cup_ranking.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
+            return redirect_with_msg(
+                request,
+                "error",
+                "Esta funcionalidade não está disponível fora do período da Copa do Mundo ❌",
+                "short",
+                self.pool,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if context.get("no_guessers"):
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Nenhum palpiteiro cadastrado no bolão 😕",
+                "short",
+                self.pool,
+            )
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        default_period = {"periodo": "geral"}
+        form_data = self.request.GET if self.request.GET else default_period
+        form = WorldCupRankingPeriodForm(form_data)
+        form.is_valid()
+
+        start_date, end_date = form.get_period_dates()
+        ranking_entries = self.pool.get_ranking_for_world_cup_period(start_date, end_date)
+
+        context["period_form"] = form
+        context["ranking_entries"] = ranking_entries
+
+        if not self.pool.guessers.exists():
+            context["no_guessers"] = True
+
+        return context
