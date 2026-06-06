@@ -7,8 +7,8 @@ body {
   padding: 0;
   height: 95vh;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: #202124;
-  color: white;
+  background-color: #f4f4f4;
+  color: black;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -16,7 +16,7 @@ body {
 
 a {
   text-decoration: none;
-  color: yellowgreen;
+  color: #1c57b7;
 }
 
 .logout-form {
@@ -26,14 +26,14 @@ a {
 .logout-button {
   background: none;
   border: none;
-  color: yellowgreen;
+  color: #1c57b7;
   cursor: pointer;
   font: inherit;
   padding: 0;
 }
 
 .logout-button:hover {
-  color: greenyellow;
+  color: #1c57b7;
 }
 
 .exit-btn {
@@ -57,11 +57,11 @@ a {
 }
 
 .exit-confirmation a {
-  color: white;
+  color: black;
 }
 
 .confirmation-btn {
-  color: white;
+  color: black;
   width: 11vh;
   padding: 1vh 0;
   margin: 2vh 5vh;
@@ -76,7 +76,7 @@ a {
 }
 
 .stay-opt-btn:hover {
-  background-color: yellowgreen;
+  background-color: #1c57b7;
 }
 
 .exit-opt-btn {
@@ -88,7 +88,7 @@ a {
 }
 
 a:hover {
-  color: greenyellow;
+  color: #1c57b7;
 }
 
 
@@ -122,15 +122,14 @@ main {
 
 h2, h3 {
   align-self: flex-start;
-  color: white;
-  margin-bottom:0;
+  color: black;
+  margin: 0;
   font-size: 1.2rem;
-
 }
 
 h3 {
   font-size: 0.9rem;
-  color: yellowgreen;
+  color: #1c57b7;
 }
 
 article {
@@ -146,7 +145,7 @@ input {
   margin: 2vh 0;
   border: 0;
   height: 0.3vh;
-  background-image: linear-gradient(to right, transparent, #9acd32, transparent);
+  background-image: linear-gradient(to right, transparent, #083e93, transparent);
 }
 
 .action-menu {
@@ -171,7 +170,7 @@ input {
 }
 
 .profile summary::marker {
-  color:#9acd32;
+  color:#083e93;
 }
 
 .profile {
@@ -198,7 +197,6 @@ input {
 }
 
 .mobile {
-  width: 100%;
   text-align: right;
 }
 
@@ -279,7 +277,7 @@ input {
 }
 
 .main-form details {
-  border-bottom: 1px solid rgba(173, 255, 47, 0.2);
+  border-bottom: 1px solid rgba(47, 137, 255, 0.2);
   padding-bottom: 1vh;
 }
 
@@ -301,36 +299,31 @@ input {
 }
 
 .main-form summary::marker {
-  color: yellowgreen;
+  color: #1c57b7;
 }
 
 .main-form details input {
   margin: 0 0.75vh 0 0;
 }
 
-.main-form label {
-  font-size: 0.75rem;
-}
-
 .main-form input, .main-form select {
   margin-top: 1vh;
   padding: 1.5vh 1vh;
   border: none;
-  font-size: 0.75rem;
-  color: darkgreen;
-  font-weight: 600;
+  color: #083e93;
+  font-weight: bold;
 }
 
 .main-form input[type="submit"] {
   margin-top: 5vh;
-  background-color: yellowgreen;
-  color: darkgreen;
+  background-color: #083e93;
+  color: white;
   font-weight: bold;
   width: 100%;
 }
 
 .main-form input[type=submit]:hover {
-  background-color: greenyellow;
+  background-color: #1c57b7;
 }
 
 .main-form fieldset {
@@ -347,8 +340,41 @@ input {
   margin-top: 2vh;
 }
 
+.guesses-form {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 2.5vh;
+  font-size: 0.85rem;
+  width: 90%;
+}
+
+.guesses-form input, .guesses-form select {
+  margin-top: 1vh;
+  padding: 1.5vh 1vh;
+  border: none;
+  font-size: 1.5rem;
+  /* color: #083e93; */
+  font-weight: bold;
+}
+
+.guesses-form input[type="submit"] {
+  margin-top: 5vh;
+  background-color: #083e93;
+  color: white;
+  font-weight: bold;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.guesses-form input[type=submit]:hover {
+  background-color: #1c57b7;
+}
+
 .guesses-checkbox {
-  margin: 3vh 0 1vh;
+  margin: 1vh 0 0.5vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -375,12 +401,17 @@ input {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 2vh 0 0 0;
+  margin-top: 2vh !important;
+  padding: 0.5vh 0.5vh 2vh 0.5vh;
+  background-color: rgba(4, 0, 0, 0.125);
+  border-radius: 1vh;
 }
 
 .match-time {
   text-align: center;
-  font-size: 0.5rem;
+  /* font-size: 0.5rem; */
+  margin: 0;
+  padding: 0.25vh 0;
 }
 
 .guess-wrapper {
@@ -388,12 +419,14 @@ input {
   justify-content: center;
   align-items: center;
   font-size: 0.7rem;
-  margin-top: 2vh;
+  margin-top: 0.75vh;
 }
 
 .small-team-logo {
-  width: 5vh;
-  margin: 0 1vh;
+  width: 50px;
+  max-height: 35px;
+  object-fit: contain;
+  /* margin: 0 1vh; */
 }
 
 .team {
@@ -408,15 +441,13 @@ input {
 .team div {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 7vh;
 }
 
 .team label {
   margin-top: 0.5vh;
-  font-size: 0.5rem;
-  line-height: 1.5vh;
   text-align: center;
 }
 
@@ -424,14 +455,11 @@ input {
   text-align: center;
   margin: 0 0;
   height: 7vh;
-  width: 7vh;
-  color: darkgreen;
-  font-weight: bold;
-  font-size: 0.75rem;
+  width: 5vh;
 }
 
 .gols-palpite-encerrado {
-  color: yellowgreen;
+  color: #1c57b7;
   margin: 0 1.5vh;
   font-size: 1.1em;
   font-weight: bold;
@@ -460,10 +488,10 @@ input {
 }
 
 .period-form select {
-  background: #202124;
+  background: #f4f4f4;
   border: none;
-  border-bottom: 1px solid greenyellow;
-  color: greenyellow;
+  border-bottom: 1px solid #1c57b7;
+  color: #1c57b7;
   font-size: 0.65rem;
   font-weight: bold;
 }
@@ -509,7 +537,7 @@ input {
   margin: 0;
   font-size: 0.55rem;
   text-align: left;
-  color: white;
+  color: black;
 }
 
 .help-links {
@@ -524,7 +552,7 @@ input {
   font-size: 0.65rem;
   list-style-position: inside;
   padding: 0;
-  color: #9acd32;
+  color: #083e93;
 }
 
 .helptext li {
@@ -532,7 +560,7 @@ input {
 }
 
 .helptext li::marker {
-  color: white;
+  color: black;
 }
 
 .recommendations-list {
@@ -556,7 +584,7 @@ input {
 
 .recommendations-list li::marker, .recommendations-list strong {
   font-weight: bold;
-  color: yellowgreen
+  color: #1c57b7
 }
 
 .errorlist {
@@ -573,13 +601,13 @@ input {
   padding: 1.5vh;
   list-style: none;
   text-align: center;
-  font-size: 0.75rem;
-  color: white;
+  font-size: 1rem;
+  color: black;
   width: 100%;
 }
 
 .temp-msg {
-  padding: 1.5vh;
+  padding: 3vh;
   border-radius: 1vh;
   line-height: 2.75vh;
 }
@@ -612,7 +640,7 @@ input {
 
 #pool-url {
   margin-top: 0;
-  color: yellowgreen;
+  color: #1c57b7;
   padding: 2vh 3vh;
   border-radius: 3px;
   background-color: rgba(255, 255, 255, 0.15);
@@ -622,13 +650,17 @@ input {
   margin-top: 1vh;
   border: none;
   background-color: transparent;
-  color: yellowgreen;
+  color: #1c57b7;
+}
+
+.manage-pool-form {
+  margin-top: 5vh;
 }
 
 .manage-pool-form input[type="text"] {
   font-weight: bold;
   font-size: 0.75rem;
-  color: darkgreen;
+  color: #083e93;
 }
 
 .main-table {
@@ -661,7 +693,7 @@ input {
 
 .expand-icon {
   font-size: 0.5rem;
-  color: #9acd32;
+  color: #083e93;
 }
 
 .expand-icon:hover {
@@ -676,7 +708,7 @@ input {
   border-collapse: collapse;
   width: 100%;
   font-size: 0.7em;
-  color: white;
+  color: black;
 }
 
 .detail-table th {
@@ -689,7 +721,7 @@ input {
 }
 
 .detail-table tr {
-  border-bottom: 1px solid rgba(173, 255, 47, 0.2);
+  border-bottom: 1px solid rgba(47, 137, 255, 0.2);
 }
 
 .detail-table p {
@@ -712,7 +744,7 @@ footer address {
 }
 
 .guess-score {
-    font-size: 1.2em;
+    font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
     padding: 0.5em;
@@ -723,21 +755,48 @@ footer address {
 .group-standings {
   margin-top: 1vh;
   padding-top: 1vh;
-  border-top: 0.3vh solid rgba(154, 205, 50, 0.2);
   width: 100%;
+  margin-bottom: 3vh;
 }
 
 .standings-table {
-  margin-top: 2vh;
+  margin-top: 0.25vh;
   font-size: 0.65rem;
 }
 
 .standings-table thead th {
   font-size: 0.6rem;
-  color: #9acd32;
+  color: #083e93;
+  padding: 0;
 }
 
-.standings-team {
+.standings-table tr td {
+  padding: 0;
+  padding: 0 1vh;
+  height: 7vh;
+}
+
+.standings-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.125);
+}
+
+.standings-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.standings-team-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+}
+
+.standings-team-name {
   text-align: left;
-  white-space: nowrap;
+  font-weight: bold;
+}
+
+.group-title {
+  margin: 1.5vh 0 0.5vh;
+  font-size: 0.85rem;
 }

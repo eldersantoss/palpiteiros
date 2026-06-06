@@ -1,23 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %} Palpites por Grupo | Palpiteiros{% endblock title %}
 
 {% block content %}
+{% static 'core/img/team-placeholder.png' as placeholder_url %}
 
 {% if groups_data %}
-<h3>Palpites abertos</h3>
-
-<form action="{% url 'core:grouped_guesses' pool.slug %}" method="post" class="main-form">
+<form action="{% url 'core:grouped_guesses' pool.slug %}" method="post" class="guesses-form">
   {% csrf_token %}
 
-  <div>
+  {% comment %} <div>
     <div class="guesses-checkbox">
       <label for="id_for_all_pools">
         Aproveitar palpites em todos os bolões
       </label>
       <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
     </div>
-  </div>
+  </div> {% endcomment %}
 
   {% for group_data in groups_data %}
     <h4 class="group-title">{{ group_data.group.name|default:"Outras partidas" }}</h4>
@@ -26,7 +26,6 @@
       <div class="match-wrapper">
         <p class="match-time">
           {{ guess_form.match.date_time|date:"l d/m H:i" }}
-          {% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
           {% if guess_form.match.double_score %}
           <strong>(x2 🔥)</strong>
           {% endif %}
@@ -35,7 +34,7 @@
           <div class="team">
             <div>
               <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
-              {{ guess_form.home_goals.label_tag }}
+              <div>{{ guess_form.home_goals.label_tag }}</div>
             </div>
             {{ guess_form.home_goals }}
           </div>
@@ -44,7 +43,7 @@
             {{ guess_form.away_goals }}
             <div>
               <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
-              {{ guess_form.away_goals.label_tag }}
+              <div>{{ guess_form.away_goals.label_tag }}</div>
             </div>
           </div>
         </div>
@@ -55,7 +54,6 @@
       <div class="match-wrapper">
         <p class="match-time">
           {{ item.match.date_time|date:"l d/m H:i" }}
-          {% if item.match.competition %} - {{ item.match.competition }}{% endif %}
           {% if item.match.double_score %}
           <strong>(x2 🔥)</strong>
           {% endif %}
@@ -64,7 +62,7 @@
           <div class="team">
             <div>
               <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
-              {{ item.match.home_team.name }}
+              <div>{{ item.match.home_team.name }}</div>
             </div>
             <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
           </div>
@@ -73,7 +71,7 @@
             <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
             <div>
               <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
-              {{ item.match.away_team.name }}
+              <div>{{ item.match.away_team.name }}</div>
             </div>
           </div>
         </div>
@@ -86,6 +84,7 @@
         <thead>
           <tr>
             <th></th>
+            <th></th>
             <th title="Partidas jogadas">PJ</th>
             <th title="Pontos">PTS</th>
             <th title="Gols marcados">GM</th>
@@ -97,10 +96,12 @@
         <tbody>
           {% for entry in group_data.standings %}
           <tr>
-            <td class="standings-team">
-              <img src="{{ entry.team.logo_url }}" class="small-team-logo">
-              {{ entry.team.name }}
+            <td class="standings-team-logo">
+              <object data="{{ entry.team.logo_url }}" type="image/png" class="small-team-logo">
+                <img src="{{ placeholder_url }}" class="small-team-logo">
+              </object>
             </td>
+            <td class="standings-team-name">{{ entry.team.name }}</td>
             <td>{{ entry.pj }}</td>
             <td><strong>{{ entry.pts }}</strong></td>
             <td>{{ entry.gf }}</td>
