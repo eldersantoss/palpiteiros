@@ -152,6 +152,7 @@ class ManagePoolView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Updat
         "name",
         "minutes_before_start_match",
         "hours_before_open_to_guesses",
+        "hours_to_keep_closed_matches_in_ranking",
         "private",
         "competitions",
         "teams",

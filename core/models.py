@@ -557,6 +557,10 @@ class GuessPool(TimeStampedModel):
         "A partir de quantas horas antes do início de uma partida os palpites serão permitidos?",
         default=48,
     )
+    hours_to_keep_closed_matches_in_ranking = models.PositiveSmallIntegerField(
+        "Quantas horas manter partidas fechadas no ranking?",
+        default=36,
+    )
 
     class Meta:
         verbose_name = "bolão"
@@ -611,12 +615,12 @@ class GuessPool(TimeStampedModel):
         )
 
     def get_closed_recent_matches(self):
-        """Returns last closed for guesses matches that are not too old (until 36 hours after their date_time)"""
+        """Returns last closed for guesses matches that are still relevant for ranking"""
 
         return (
             self.get_matches()
             .filter(
-                date_time__gte=timezone.now() - timezone.timedelta(hours=36),
+                date_time__gte=timezone.now() - timezone.timedelta(hours=self.hours_to_keep_closed_matches_in_ranking),
                 date_time__lt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
             )
             .order_by("-date_time")

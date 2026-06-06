@@ -32,6 +32,11 @@
     {{ form.hours_before_open_to_guesses.label }}
     {{ form.hours_before_open_to_guesses }}
   </div>
+  <div class="manage-pool-form">
+    {{ form.errors }}
+    {{ form.hours_to_keep_closed_matches_in_ranking.label }}
+    {{ form.hours_to_keep_closed_matches_in_ranking }}
+  </div>
   <div>
     <div class="private-checkbox">
       {{ form.private.errors }}
