@@ -198,10 +198,6 @@ class Match(models.Model):
         (FINSHED_AFTER_PENALTYS, "Encerrada após penalidades"),
     )
 
-    MINUTES_BEFORE_START_MATCH = 5
-
-    HOURS_BEFORE_OPEN_TO_GUESSES = 48
-
     data_source_id = models.PositiveIntegerField(blank=True, null=True)
     sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     competition = models.ForeignKey(
@@ -284,15 +280,6 @@ class Match(models.Model):
             f"{self.home_goals} x {self.away_goals}"
             if self.home_goals is not None and self.away_goals is not None
             else None
-        )
-
-    @admin.display(
-        boolean=True,
-        description="Aberta para palpites?",
-    )
-    def open_to_guesses(self):
-        return (self.date_time > timezone.now() + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH)) and (
-            self.date_time <= timezone.now() + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
         )
 
     def get_pools(self):

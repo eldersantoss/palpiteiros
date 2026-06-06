@@ -44,7 +44,6 @@ class MatchAdmin(admin.ModelAdmin):
         "competition",
         "date_time",
         "status",
-        "open_to_guesses",
         "home_goals",
         "away_goals",
         "home_yellow_cards",
