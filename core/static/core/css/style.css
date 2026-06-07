@@ -108,9 +108,14 @@ header span a {
   font-weight: bold;
 }
 
+.small-logo-container {
+  align-self: center;
+}
+
 .small-logo {
   max-height: 10vh;
 }
+
 
 .large-logo {
   max-height: 18vh;
@@ -472,7 +477,7 @@ input {
   width: 100%;
 }
 
-.login-form {
+.larger-form {
   width: 90%;
 }
 

@@ -4,24 +4,28 @@
 
 {% block title %}Palpiteiros | Cadastrar{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<div>
-  <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
-    <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros"
-    class="small-logo">
-  </a>
+<div class="page-container">
+  <div class="small-logo-container">
+    <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+      <img src={% static 'core/img/palpiteiros.png' %} alt="Logotipo Palpiteiros" class="small-logo">
+    </a>
+  </div>
+  <div class="scrollable-content">
+    <form id="register-form" action="{% url 'register' %}" method="post" class="main-form larger-form">
+      {% csrf_token %}
+      {{ form.as_div }}
+      <input type="hidden" name="next" value="{{ next }}">
+    </form>
+  </div>
+
+  <div class="action-bar">
+    <a href="{% url 'login' %}" class="btn btn-secondary">Voltar</a>
+    <button type="submit" form="register-form" class="btn btn-primary">Criar conta</button>
+  </div>
 </div>
-
-<form action="{% url 'register' %}" method="post" class="main-form">
-  {% csrf_token %}
-  {{ form.as_div }}
-  <input type="hidden" name="next" value="{{ next }}">
-  <input type="submit" value="Criar conta">
-</form>
-
-<nav class="menu vertical">
-  <a href="{% url 'login' %}">Voltar para login</a>
-</nav>
 
 {% endblock content %}
