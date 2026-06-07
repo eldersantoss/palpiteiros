@@ -208,7 +208,7 @@ OUTSIDE_WINDOW = date(2026, 8, 1)
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_redirects_when_outside_date_window(mock_tz, client):
+def test_guesses_world_cup_redirects_when_outside_date_window(mock_tz, client):
     mock_tz.localdate.return_value = OUTSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -220,7 +220,7 @@ def test_grouped_guesses_redirects_when_outside_date_window(mock_tz, client):
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     # Outside the window, the view redirects to pool home (not guesses URL)
     assert response.status_code == 302
@@ -228,7 +228,7 @@ def test_grouped_guesses_redirects_when_outside_date_window(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_accessible_within_date_window(mock_tz, client):
+def test_guesses_world_cup_accessible_within_date_window(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -240,7 +240,7 @@ def test_grouped_guesses_accessible_within_date_window(mock_tz, client):
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     assert "groups_data" in response.context
@@ -248,7 +248,7 @@ def test_grouped_guesses_accessible_within_date_window(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_matches_grouped_by_competition_group(mock_tz, client):
+def test_guesses_world_cup_matches_grouped_by_competition_group(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -269,7 +269,7 @@ def test_grouped_guesses_matches_grouped_by_competition_group(mock_tz, client):
     _open_match(pool, competition, team_b1, team_b2)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     groups_data = response.context["groups_data"]
@@ -281,7 +281,7 @@ def test_grouped_guesses_matches_grouped_by_competition_group(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_ungrouped_matches_appear_last(mock_tz, client):
+def test_guesses_world_cup_ungrouped_matches_appear_last(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -300,7 +300,7 @@ def test_grouped_guesses_ungrouped_matches_appear_last(mock_tz, client):
     _open_match(pool, competition, ungrouped_home, ungrouped_away)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     groups_data = response.context["groups_data"]
@@ -311,7 +311,7 @@ def test_grouped_guesses_ungrouped_matches_appear_last(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_post_saves_guess(mock_tz, client):
+def test_guesses_world_cup_post_saves_guess(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -324,7 +324,7 @@ def test_grouped_guesses_post_saves_guess(mock_tz, client):
 
     client.force_login(guesser.user)
     response = client.post(
-        reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}),
+        reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}),
         {
             "csrfmiddlewaretoken": "dummy",
             f"home_goals_{match.id}": "1",
@@ -341,7 +341,7 @@ def test_grouped_guesses_post_saves_guess(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_context_has_standings_key(mock_tz, client):
+def test_guesses_world_cup_context_has_standings_key(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -355,7 +355,7 @@ def test_grouped_guesses_context_has_standings_key(mock_tz, client):
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     groups_data = response.context["groups_data"]
@@ -364,7 +364,7 @@ def test_grouped_guesses_context_has_standings_key(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_standings_reflects_closed_match_result(mock_tz, client):
+def test_guesses_world_cup_standings_reflects_closed_match_result(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -390,7 +390,7 @@ def test_grouped_guesses_standings_reflects_closed_match_result(mock_tz, client)
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     groups_data = response.context["groups_data"]
@@ -403,7 +403,7 @@ def test_grouped_guesses_standings_reflects_closed_match_result(mock_tz, client)
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_standings_empty_for_ungrouped_matches(mock_tz, client):
+def test_guesses_world_cup_standings_empty_for_ungrouped_matches(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -415,7 +415,7 @@ def test_grouped_guesses_standings_empty_for_ungrouped_matches(mock_tz, client):
     _open_match(pool, competition, ungrouped_home, ungrouped_away)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 200
     groups_data = response.context["groups_data"]
@@ -425,7 +425,7 @@ def test_grouped_guesses_standings_empty_for_ungrouped_matches(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_owner_without_guesser_redirects(mock_tz, client):
+def test_guesses_world_cup_owner_without_guesser_redirects(mock_tz, client):
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -441,7 +441,7 @@ def test_grouped_guesses_owner_without_guesser_redirects(mock_tz, client):
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)
-    response = client.get(reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}))
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
 
     assert response.status_code == 302
 
@@ -507,7 +507,7 @@ def test_guesses_view_post_saves_open_match_but_ignores_past_deadline(client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_post_does_not_save_guess_past_deadline(mock_tz, client):
+def test_guesses_world_cup_post_does_not_save_guess_past_deadline(mock_tz, client):
     """GroupedGuessesView POST ignores matches inside the deadline window."""
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
@@ -524,7 +524,7 @@ def test_grouped_guesses_post_does_not_save_guess_past_deadline(mock_tz, client)
 
     client.force_login(guesser.user)
     response = client.post(
-        reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}),
+        reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}),
         {
             "csrfmiddlewaretoken": "dummy",
             f"home_goals_{match.id}": "2",
@@ -538,7 +538,7 @@ def test_grouped_guesses_post_does_not_save_guess_past_deadline(mock_tz, client)
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_post_saves_open_match_but_ignores_past_deadline(mock_tz, client):
+def test_guesses_world_cup_post_saves_open_match_but_ignores_past_deadline(mock_tz, client):
     """GroupedGuessesView POST saves open matches and ignores deadline-expired ones."""
     mock_tz.localdate.return_value = INSIDE_WINDOW
     mock_tz.now = timezone.now
@@ -556,7 +556,7 @@ def test_grouped_guesses_post_saves_open_match_but_ignores_past_deadline(mock_tz
 
     client.force_login(guesser.user)
     response = client.post(
-        reverse("core:grouped_guesses", kwargs={"pool_slug": pool.slug}),
+        reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}),
         {
             "csrfmiddlewaretoken": "dummy",
             f"home_goals_{open_match.id}": "1",

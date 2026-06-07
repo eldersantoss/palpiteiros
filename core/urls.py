@@ -46,19 +46,19 @@ urlpatterns = [
         name="pool_management",
     ),
     path(
-        "boloes/<slug:pool_slug>/palpites/",
-        views.GuessesView.as_view(),
-        name="guesses",
-    ),
-    path(
         "boloes/<slug:pool_slug>/palpites-por-periodo/",
         views.GuessesByPeriodView.as_view(),
         name="guesses_by_period",
     ),
     path(
-        "boloes/<slug:pool_slug>/palpites-por-grupo/",
+        "boloes/<slug:pool_slug>/palpites-copa-do-mundo/",
         views.GroupedGuessesView.as_view(),
-        name="grouped_guesses",
+        name="guesses_world_cup",
+    ),
+    path(
+        "boloes/<slug:pool_slug>/palpites/",
+        views.GuessesView.as_view(),
+        name="guesses",
     ),
     path(
         "boloes/<slug:pool_slug>/classificacao/",
@@ -66,7 +66,7 @@ urlpatterns = [
         name="ranking",
     ),
     path(
-        "boloes/<slug:pool_slug>/classificacao-copa/",
+        "boloes/<slug:pool_slug>/classificacao-copa-do-mundo/",
         views.WorldCupRankingView.as_view(),
         name="world_cup_ranking",
     ),

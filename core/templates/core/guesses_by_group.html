@@ -11,7 +11,7 @@
 <div class="page-container">
   <div class="scrollable-content">
     {% if groups_data %}
-    <form id="grouped-guesses-form" action="{% url 'core:grouped_guesses' pool.slug %}" method="post" class="guesses-form">
+    <form id="grouped-guesses-form" action="{% url 'core:guesses_world_cup' pool.slug %}" method="post" class="guesses-form">
       {% csrf_token %}
 
       {% for group_data in groups_data %}
