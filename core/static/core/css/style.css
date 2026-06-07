@@ -419,6 +419,10 @@ input {
   width: 100%;
 }
 
+.login-form {
+  width: 90%;
+}
+
 .forget-password {
   font-size: 0.75rem;
   align-self: flex-end;
@@ -760,8 +764,12 @@ input {
   margin-top: 5vh;
 }
 
-.open-pools-table tr:nth-of-type(even) {
-  background-color: rgba(255, 255, 255, 0.1);
+.open-pools-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.125);
+}
+
+.open-pools-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .ranking-table tbody tr:nth-child(odd) {
