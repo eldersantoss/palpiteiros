@@ -1,4 +1,4 @@
-"""Management command: sync_matches_sfi.
+"""Management command: sync_sfi_matches.
 
 Fetches matches from the Soccer Football Info (SFI) API for a configurable
 date range and upserts them into the database.
@@ -76,14 +76,14 @@ class Command(BaseCommand):
         today = django_timezone.now().date()
         dates = self._build_date_list(options, today)
 
-        self.stdout.write(f"sync_matches_sfi: processing {len(dates)} date(s): {dates[0]} → {dates[-1]}")
+        self.stdout.write(f"sync_sfi_matches: processing {len(dates)} date(s): {dates[0]} → {dates[-1]}")
 
         service = SFIService(api_key=settings.SFI_API_KEY, api_host=settings.SFI_API_HOST)
 
         for target_date in dates:
             self._process_date(service, target_date, competitions_by_sfi_id, today)
 
-        self.stdout.write("sync_matches_sfi finished.")
+        self.stdout.write("sync_sfi_matches finished.")
 
     def _build_date_list(self, options: dict, today: date) -> list[date]:
         """Return the ordered list of dates to process based on CLI options.

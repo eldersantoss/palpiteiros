@@ -38,6 +38,6 @@ elif [ "$PROCESS_TYPE" = "worker_beat" ]; then
 elif [ "$PROCESS_TYPE" = "create_and_update_matches" ]; then
   python manage.py create_and_update_matches
 
-elif [ "$PROCESS_TYPE" = "sync_matches_sfi" ]; then
-  python manage.py sync_matches_sfi
+elif [ "$PROCESS_TYPE" = "sync_sfi_matches" ]; then
+  python manage.py sync_sfi_matches
 fi

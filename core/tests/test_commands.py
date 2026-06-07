@@ -77,10 +77,10 @@ def test_command_create_or_update_teams_for_competitions_successfully(
     assert all([team.competitions.filter(data_source_id=competition.data_source_id).exists() for team in teams])
 
 
-@patch("core.management.commands.sync_matches_sfi.sleep")
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.sleep")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_creates_not_started_match(
+def test_sync_sfi_matches_creates_not_started_match(
     mock_get,
     mock_tz,
     mock_sleep,
@@ -110,7 +110,7 @@ def test_sync_matches_sfi_creates_not_started_match(
 
     mock_get.side_effect = [page_1, page_2_response]
 
-    call_command("sync_matches_sfi", date=date(2026, 3, 3))
+    call_command("sync_sfi_matches", date=date(2026, 3, 3))
 
     assert Match.objects.filter(sfi_id="match-sfi-ns-001").exists()
     match = Match.objects.get(sfi_id="match-sfi-ns-001")
@@ -122,9 +122,9 @@ def test_sync_matches_sfi_creates_not_started_match(
     assert match.away_goals is None
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_updates_ended_match_when_exists(
+def test_sync_sfi_matches_updates_ended_match_when_exists(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -156,7 +156,7 @@ def test_sync_matches_sfi_updates_ended_match_when_exists(
     mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     existing_match.refresh_from_db()
 
@@ -169,9 +169,9 @@ def test_sync_matches_sfi_updates_ended_match_when_exists(
     assert existing_match.away_red_cards == 0
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_updates_ranking_entries_for_ended_match(
+def test_sync_sfi_matches_updates_ranking_entries_for_ended_match(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -216,7 +216,7 @@ def test_sync_matches_sfi_updates_ranking_entries_for_ended_match(
     mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     pool.refresh_from_db()
     guess.refresh_from_db()
@@ -243,9 +243,9 @@ def test_sync_matches_sfi_updates_ranking_entries_for_ended_match(
         ).exists()
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_does_not_create_ended_match_when_not_in_db(
+def test_sync_sfi_matches_does_not_create_ended_match_when_not_in_db(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -265,14 +265,14 @@ def test_sync_matches_sfi_does_not_create_ended_match_when_not_in_db(
     mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     assert not Match.objects.filter(sfi_id="match-sfi-ended-001").exists()
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_skips_untracked_competition(
+def test_sync_sfi_matches_skips_untracked_competition(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -288,15 +288,15 @@ def test_sync_matches_sfi_skips_untracked_competition(
     mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     assert not Match.objects.exists()
 
 
-@patch("core.management.commands.sync_matches_sfi.sleep")
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.sleep")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_registers_unknown_teams_and_processes_match(
+def test_sync_sfi_matches_registers_unknown_teams_and_processes_match(
     mock_get,
     mock_tz,
     mock_sleep,
@@ -325,7 +325,7 @@ def test_sync_matches_sfi_registers_unknown_teams_and_processes_match(
 
     mock_get.side_effect = [page_1, page_2_response]
 
-    call_command("sync_matches_sfi", date=date(2026, 3, 3))
+    call_command("sync_sfi_matches", date=date(2026, 3, 3))
 
     output = capsys.readouterr().out
 
@@ -341,10 +341,10 @@ def test_sync_matches_sfi_registers_unknown_teams_and_processes_match(
     assert "2 teams registered" in output
 
 
-@patch("core.management.commands.sync_matches_sfi.sleep")
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.sleep")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_paginated_future_date_calls_multiple_pages(
+def test_sync_sfi_matches_paginated_future_date_calls_multiple_pages(
     mock_get,
     mock_tz,
     mock_sleep,
@@ -373,26 +373,26 @@ def test_sync_matches_sfi_paginated_future_date_calls_multiple_pages(
 
     mock_get.side_effect = [page_1, page_2_response]
 
-    call_command("sync_matches_sfi", date=date(2026, 3, 3))
+    call_command("sync_sfi_matches", date=date(2026, 3, 3))
 
     # One call per page (26 items / 25 per page = 2 pages).
     assert mock_get.call_count == 2
 
 
 @patch("requests.get")
-def test_sync_matches_sfi_with_no_competitions(mock_get):
+def test_sync_sfi_matches_with_no_competitions(mock_get):
     """When no competitions have an SFI ID, the command exits early without calling the API."""
     # Competition exists but has no sfi_id — should trigger the early-return path.
     baker.make("core.Competition", sfi_id=None)
 
-    call_command("sync_matches_sfi")
+    call_command("sync_sfi_matches")
 
     mock_get.assert_not_called()
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_skips_competition_not_in_progress(
+def test_sync_sfi_matches_skips_competition_not_in_progress(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -409,15 +409,15 @@ def test_sync_matches_sfi_skips_competition_not_in_progress(
     baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     mock_get.assert_not_called()
     assert not Match.objects.exists()
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_updates_card_counts_for_ended_match(
+def test_sync_sfi_matches_updates_card_counts_for_ended_match(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -452,7 +452,7 @@ def test_sync_matches_sfi_updates_card_counts_for_ended_match(
     mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     existing_match.refresh_from_db()
     assert existing_match.home_yellow_cards == 2
@@ -461,9 +461,9 @@ def test_sync_matches_sfi_updates_card_counts_for_ended_match(
     assert existing_match.away_red_cards == 0
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
-def test_sync_matches_sfi_handles_null_card_stats(
+def test_sync_sfi_matches_handles_null_card_stats(
     mock_get,
     mock_tz,
     mock_success_response,
@@ -544,7 +544,7 @@ def test_sync_matches_sfi_handles_null_card_stats(
     mock_success_response.json.return_value = null_cards_response
     mock_get.return_value = mock_success_response
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     match = Match.objects.get(sfi_id="match-sfi-null-cards")
     assert match.home_yellow_cards is None

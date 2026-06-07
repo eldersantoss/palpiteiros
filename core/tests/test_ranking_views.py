@@ -13,7 +13,7 @@ pytestmark = pytest.mark.django_db
 
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
 def test_ranking_view_shows_updated_score_after_sync(
     mock_get,
@@ -62,7 +62,7 @@ def test_ranking_view_shows_updated_score_after_sync(
 
     from django.core.management import call_command
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     client.force_login(guesser.user)
     response = client.get(
