@@ -64,7 +64,9 @@ class Command(BaseCommand):
         # Load competitions first so we can exit early if none are registered,
         # avoiding unnecessary date computation and API calls.
         competitions_by_sfi_id = {
-            comp.sfi_id: comp for comp in Competition.objects.filter(sfi_id__isnull=False) if comp.sfi_id is not None
+            comp.sfi_id: comp
+            for comp in Competition.objects.filter(sfi_id__isnull=False, in_progress=True)
+            if comp.sfi_id is not None
         }
 
         if not competitions_by_sfi_id:
@@ -284,10 +286,24 @@ class Command(BaseCommand):
 
         home_goals = match["teamA"]["score"]["2h"]
         away_goals = match["teamB"]["score"]["2h"]
+
+        home_fouls = match["teamA"]["stats"]["fouls"]
+        away_fouls = match["teamB"]["stats"]["fouls"]
+        _hyc, _ayc = home_fouls["y_c"], away_fouls["y_c"]
+        _hrc, _arc = home_fouls["r_c"], away_fouls["r_c"]
+        home_yellow_cards = int(_hyc) if _hyc is not None else None
+        away_yellow_cards = int(_ayc) if _ayc is not None else None
+        home_red_cards = int(_hrc) if _hrc is not None else None
+        away_red_cards = int(_arc) if _arc is not None else None
+
         has_changes = (
             match_instance.status != Match.FINSHED
             or match_instance.home_goals != home_goals
             or match_instance.away_goals != away_goals
+            or match_instance.home_yellow_cards != home_yellow_cards
+            or match_instance.away_yellow_cards != away_yellow_cards
+            or match_instance.home_red_cards != home_red_cards
+            or match_instance.away_red_cards != away_red_cards
         )
         needs_consolidation = match_instance.guesses.filter(consolidated=False).exists()
 
@@ -295,7 +311,21 @@ class Command(BaseCommand):
             match_instance.status = Match.FINSHED  # "FT"
             match_instance.home_goals = home_goals
             match_instance.away_goals = away_goals
-            match_instance.save(update_fields=["status", "home_goals", "away_goals"])
+            match_instance.home_yellow_cards = home_yellow_cards
+            match_instance.away_yellow_cards = away_yellow_cards
+            match_instance.home_red_cards = home_red_cards
+            match_instance.away_red_cards = away_red_cards
+            match_instance.save(
+                update_fields=[
+                    "status",
+                    "home_goals",
+                    "away_goals",
+                    "home_yellow_cards",
+                    "away_yellow_cards",
+                    "home_red_cards",
+                    "away_red_cards",
+                ]
+            )
 
         return ProcessMatchResult.updated
 

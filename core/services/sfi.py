@@ -35,12 +35,38 @@ SFIScore = TypedDict(
 )
 
 
+class SFIFouls(TypedDict):
+    """Foul statistics for one team in a match."""
+
+    t: str | None
+    y_c: str | None
+    y_t_r_c: str | None
+    r_c: str | None
+
+
+class SFIStats(TypedDict):
+    """In-match statistics for one team."""
+
+    possession: Any
+    attacks: Any
+    shoots: Any
+    penalties: Any
+    corners: Any
+    fouls: SFIFouls
+    substitutions: Any
+    throwins: Any
+    injuries: Any
+    dominance_avg_2_5: Any
+    xG: Any
+
+
 class SFITeamRef(TypedDict):
     """Lightweight team descriptor embedded inside a match payload."""
 
     id: str
     name: str
     score: SFIScore
+    stats: SFIStats
 
 
 class SFIChampionshipRef(TypedDict):

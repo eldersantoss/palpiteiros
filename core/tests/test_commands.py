@@ -95,7 +95,7 @@ def test_sync_matches_sfi_creates_not_started_match(
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
     home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
 
@@ -137,7 +137,7 @@ def test_sync_matches_sfi_updates_ended_match_when_exists(
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
     home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
 
@@ -163,6 +163,10 @@ def test_sync_matches_sfi_updates_ended_match_when_exists(
     assert existing_match.status == Match.FINSHED
     assert existing_match.home_goals == 2
     assert existing_match.away_goals == 1
+    assert existing_match.home_yellow_cards == 2
+    assert existing_match.away_yellow_cards == 3
+    assert existing_match.home_red_cards == 1
+    assert existing_match.away_red_cards == 0
 
 
 @patch("core.management.commands.sync_matches_sfi.django_timezone")
@@ -180,7 +184,7 @@ def test_sync_matches_sfi_updates_ranking_entries_for_ended_match(
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
     home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
     guesser = baker.make("core.Guesser")
@@ -254,7 +258,7 @@ def test_sync_matches_sfi_does_not_create_ended_match_when_not_in_db(
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
     baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
 
@@ -309,7 +313,7 @@ def test_sync_matches_sfi_registers_unknown_teams_and_processes_match(
     mock_tz.timedelta = timezone.timedelta
 
     # Competition exists but no teams are pre-registered.
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
 
     page_1 = mock_success_response
     page_1.json.return_value = get_sfi_matches_by_day_future_response_page_1
@@ -355,7 +359,7 @@ def test_sync_matches_sfi_paginated_future_date_calls_multiple_pages(
     mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
     mock_tz.timedelta = timezone.timedelta
 
-    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
     baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
     baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
 
@@ -384,6 +388,169 @@ def test_sync_matches_sfi_with_no_competitions(mock_get):
     call_command("sync_matches_sfi")
 
     mock_get.assert_not_called()
+
+
+@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("requests.get")
+def test_sync_matches_sfi_skips_competition_not_in_progress(
+    mock_get,
+    mock_tz,
+    mock_success_response,
+    get_sfi_matches_by_day_past_response,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """A competition with in_progress=False is excluded from the sync — no API call is made."""
+    mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=False)
+    baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+
+    mock_get.assert_not_called()
+    assert not Match.objects.exists()
+
+
+@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("requests.get")
+def test_sync_matches_sfi_updates_card_counts_for_ended_match(
+    mock_get,
+    mock_tz,
+    mock_success_response,
+    get_sfi_matches_by_day_past_response,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """Card counts are updated even when goals did not change."""
+    mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-sfi-ended-001",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.FINSHED,
+        home_goals=2,
+        away_goals=1,
+        home_yellow_cards=None,
+        away_yellow_cards=None,
+        home_red_cards=None,
+        away_red_cards=None,
+    )
+
+    mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+
+    existing_match.refresh_from_db()
+    assert existing_match.home_yellow_cards == 2
+    assert existing_match.away_yellow_cards == 3
+    assert existing_match.home_red_cards == 1
+    assert existing_match.away_red_cards == 0
+
+
+@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@patch("requests.get")
+def test_sync_matches_sfi_handles_null_card_stats(
+    mock_get,
+    mock_tz,
+    mock_success_response,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """When fouls stats are null the card fields are stored as None, not 0."""
+    mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    baker.make(
+        "core.Match",
+        sfi_id="match-sfi-null-cards",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+    )
+
+    null_cards_response = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "match-sfi-null-cards",
+                "date": "2026-02-26 20:00:00",
+                "status": "ENDED",
+                "timer": "90:00",
+                "championship": {"id": sfi_competition_id, "name": "Test League", "s_name": None},
+                "teamA": {
+                    "id": sfi_home_team_id,
+                    "name": "Home FC",
+                    "score": {"f": 1, "1h": 1, "2h": 1, "o": None, "p": None},
+                    "stats": {
+                        "possession": None,
+                        "attacks": {"n": None, "d": None, "o_s": None},
+                        "shoots": {"t": None, "off": None, "on": None, "g_a": None},
+                        "penalties": None,
+                        "corners": {"t": None, "f": None, "h": None},
+                        "fouls": {"t": None, "y_c": None, "y_t_r_c": None, "r_c": None},
+                        "substitutions": None,
+                        "throwins": None,
+                        "injuries": None,
+                        "dominance_avg_2_5": None,
+                        "xG": {"kickoff": None, "live": None},
+                    },
+                },
+                "teamB": {
+                    "id": sfi_away_team_id,
+                    "name": "Away FC",
+                    "score": {"f": 0, "1h": 0, "2h": 0, "o": None, "p": None},
+                    "stats": {
+                        "possession": None,
+                        "attacks": {"n": None, "d": None, "o_s": None},
+                        "shoots": {"t": None, "off": None, "on": None, "g_a": None},
+                        "penalties": None,
+                        "corners": {"t": None, "f": None, "h": None},
+                        "fouls": {"t": None, "y_c": None, "y_t_r_c": None, "r_c": None},
+                        "substitutions": None,
+                        "throwins": None,
+                        "injuries": None,
+                        "dominance_avg_2_5": None,
+                        "xG": {"kickoff": None, "live": None},
+                    },
+                },
+            }
+        ],
+    }
+
+    mock_success_response.json.return_value = null_cards_response
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+
+    match = Match.objects.get(sfi_id="match-sfi-null-cards")
+    assert match.home_yellow_cards is None
+    assert match.away_yellow_cards is None
+    assert match.home_red_cards is None
+    assert match.away_red_cards is None
 
 
 @patch("core.management.commands.create_and_update_matches.sleep")
