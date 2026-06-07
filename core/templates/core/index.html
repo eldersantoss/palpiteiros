@@ -7,21 +7,22 @@
 {% block content %}
 
 <div class="page-container">
+  <h2>Selecione o bolão</h2>
+
   <div class="scrollable-content">
     {% if pools %}
-      <h2>Bolões cadastrados</h2>
-
-      <nav class="menu vertical">
-        {% for pool in pools %}
-        <a href={% url 'core:pool_home' pool.slug %}>{{ pool }} {% if pool.is_pending %}🔔{% endif %}</a>
-        {% endfor %}
-      </nav>
       {% if display_subtitle %}
         <p class="subtitle-msg">
           🔔: possui partidas abertas que você ainda não palpitou
         </p>
       {% endif %}
-
+      <div class="pools-grid">
+        {% for pool in pools %}
+          <div></div>
+          <a href="{% url 'core:pool_home' pool.slug %}">{{ pool }}</a>
+          <span class="pool-bell">{% if pool.is_pending %}🔔{% endif %}</span>
+        {% endfor %}
+      </div>
     {% else %}
 
       <div class="main-msg home-msg">

@@ -4,17 +4,18 @@
 
 {% block content %}
 
-<nav class="menu vertical">
-  {% comment %} TODO: descomentar pós copa do mundo {% endcomment %}
-  {% comment %} {% if pool.user_is_guesser%}<a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>{% endif %} {% endcomment %}
-  {% comment %} <a href="{% url 'core:ranking' pool.slug %}">Classificação</a> {% endcomment %}
-  {% comment %} <a href="{% url 'core:guesses_by_period' pool.slug %}">Palpites por período</a> {% endcomment %}
-  {% if pool.user_is_guesser and show_grouped_guesses %}<a href="{% url 'core:guesses_world_cup' pool.slug %}">Palpitar</a>{% endif %}
-  {% if show_grouped_guesses %}<a href="{% url 'core:world_cup_ranking' pool.slug %}">Classificação</a>{% endif %}
-  {% if pool.user_is_owner%}<a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>{% endif %}
-</nav>
-
-<button class="exit-btn" onclick="showPoolLeavingConfirmation()">Sair do bolão ❌</button>
+<div class="menu-container">
+  <div class="pools-grid">
+    {% comment %} TODO: descomentar pós copa do mundo {% endcomment %}
+    {% comment %} {% if pool.user_is_guesser%}<div></div><a href="{% url 'core:guesses' pool.slug %}">Palpitar</a><div></div>{% endif %} {% endcomment %}
+    {% comment %} <div></div><a href="{% url 'core:ranking' pool.slug %}">Classificação</a><div></div> {% endcomment %}
+    {% comment %} <div></div><a href="{% url 'core:guesses_by_period' pool.slug %}">Palpites por período</a><div></div> {% endcomment %}
+    {% if pool.user_is_guesser and show_grouped_guesses %}<div></div><a href="{% url 'core:guesses_world_cup' pool.slug %}">Palpitar</a><div></div>{% endif %}
+    {% if show_grouped_guesses %}<div></div><a href="{% url 'core:world_cup_ranking' pool.slug %}">Classificação</a><div></div>{% endif %}
+    {% if pool.user_is_owner %}<div></div><a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a><div></div>{% endif %}
+  </div>
+  <button class="exit-btn" onclick="showPoolLeavingConfirmation()">Sair do bolão ❌</button>
+</div>
 
 <div class="exit-confirmation">
   <p>
