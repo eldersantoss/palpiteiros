@@ -1,38 +1,47 @@
 {% extends 'base.html' %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<h2>Editar perfil</h2>
+<div class="page-container">
+  <div class="scrollable-content">
+    <h2>Editar perfil</h2>
 
-<form method="post" class="main-form">
+    <form id="profile-form" method="post" class="main-form">
 
-  {% csrf_token %}
+      {% csrf_token %}
 
-  {{ user_edit_form.as_div }}
+      {{ user_edit_form.as_div }}
 
-  {{ guesser_edit_form.non_field_errors }}
+      {{ guesser_edit_form.non_field_errors }}
 
-  <div>
-    {{ guesser_edit_form.errors }}
-    {{ guesser_edit_form.supported_team.label_tag }}
-    {{ guesser_edit_form.supported_team }}
+      <div>
+        {{ guesser_edit_form.errors }}
+        {{ guesser_edit_form.supported_team.label_tag }}
+        {{ guesser_edit_form.supported_team }}
+      </div>
+
+      <div>
+        <div class="private-checkbox">
+          {{ guesser_edit_form.receive_notifications.errors }}
+          <label for={{ guesser_edit_form.receive_notifications.auto_id }}>
+            Receber notificações
+          </label>
+          {{ guesser_edit_form.receive_notifications }}
+        </div>
+        <div class="help-msg">
+          <p>Você será notificado por e-mail quando houverem novas partidas disponíveis para palpite e quando os resultados das partidas forem atualizados.</p>
+        </div>
+      </div>
+
+    </form>
   </div>
 
-  <div>
-    <div class="private-checkbox">
-      {{ guesser_edit_form.receive_notifications.errors }}
-      <label for={{ guesser_edit_form.receive_notifications.auto_id }}>
-        Receber notificações
-      </label>
-      {{ guesser_edit_form.receive_notifications }}
-    </div>
-    <div class="help-msg">
-      <p>Você será notificado por e-mail quando houverem novas partidas disponíveis para palpite e quando os resultados das partidas forem atualizados.</p>
-    </div>
+  <div class="action-bar">
+    <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+    <button type="submit" form="profile-form" class="btn btn-primary">Salvar alterações</button>
   </div>
-
-  <div><input type="submit" value="Salvar alterações"></div>
-
-</form>
+</div>
 
 {% endblock content %}

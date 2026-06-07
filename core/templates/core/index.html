@@ -2,39 +2,49 @@
 
 {% block title %}Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-{% if pools %}
-  <h2>Bolões cadastrados</h2>
+<div class="page-container">
+  <div class="scrollable-content">
+    {% if pools %}
+      <h2>Bolões cadastrados</h2>
 
-  <nav class="menu vertical">
-    {% for pool in pools %}
-    <a href={% url 'core:pool_home' pool.slug %}>{{ pool }} {% if pool.is_pending %}🔔{% endif %}</a>
-    {% endfor %}
-  </nav>
-  {% if display_subtitle %}
-    <p class="subtitle-msg">
-      🔔: possui partidas abertas que você ainda não palpitou
-    </p>
-  {% endif %}
+      <nav class="menu vertical">
+        {% for pool in pools %}
+        <a href={% url 'core:pool_home' pool.slug %}>{{ pool }} {% if pool.is_pending %}🔔{% endif %}</a>
+        {% endfor %}
+      </nav>
+      {% if display_subtitle %}
+        <p class="subtitle-msg">
+          🔔: possui partidas abertas que você ainda não palpitou
+        </p>
+      {% endif %}
 
-{% else %}
+    {% else %}
 
+      <div class="main-msg home-msg">
+        <h2>Faaala, <strong>{{ request.user.first_name }}</strong>! ⚽😎</br></h2>
 
-  <div class="main-msg home-msg">
-    <h2>Faaala, <strong>{{ request.user.first_name }}</strong>! ⚽😎</br></h2>
-
-    <p>
-      Você ainda não está cadastrado em nenhum bolão. Toma aqui algumas opções pra resolver esse problema:
-    </p>
-    <ol class="recommendations-list">
-      <li>
-        Clicando em <strong>Buscar bolão</strong>, você encontrará uma lista de bolões públicos em que pode se cadastrar.
-      </li>
-      <li>
-        Clicando em <strong>Criar bolão</strong>, você pode criar seu próprio bolão com as equipes e competições que quiser palpitar. Você pode escolher criar um bolão público, que será acessível a todos através do <strong>Buscar bolão</strong>, ou um bolão privado, que terá um link de acesso exclusivo disponível apenas para você, dono da parada, em <strong>Gerenciar bolão</strong>. Para convidar alguém pra participar do seu bolão, basta fornecer o link de acesso. Quando o outro palpiteiro entrar no link, automaticamente estará fazendo parte do bolão.
-      </li>
-    </ol>
+        <p>
+          Você ainda não está cadastrado em nenhum bolão. Toma aqui algumas opções pra resolver esse problema:
+        </p>
+        <ol class="recommendations-list">
+          <li>
+            Clicando em <strong>Buscar bolão</strong>, você encontrará uma lista de bolões públicos em que pode se cadastrar.
+          </li>
+          <li>
+            Clicando em <strong>Criar bolão</strong>, você pode criar seu próprio bolão com as equipes e competições que quiser palpitar. Você pode escolher criar um bolão público, que será acessível a todos através do <strong>Buscar bolão</strong>, ou um bolão privado, que terá um link de acesso exclusivo disponível apenas para você, dono da parada, em <strong>Gerenciar bolão</strong>. Para convidar alguém pra participar do seu bolão, basta fornecer o link de acesso. Quando o outro palpiteiro entrar no link, automaticamente estará fazendo parte do bolão.
+          </li>
+        </ol>
+      </div>
+    {% endif %}
   </div>
-{% endif %}
+
+  <div class="action-bar">
+    <a href="javascript:history.back()" class="btn btn-primary">Voltar</a>
+  </div>
+</div>
+
 {% endblock content %}

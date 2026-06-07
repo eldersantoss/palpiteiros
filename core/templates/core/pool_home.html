@@ -8,9 +8,9 @@
   {% if pool.user_is_guesser%}<a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>{% endif %}
   <a href="{% url 'core:ranking' pool.slug %}">Classificação</a>
   <a href="{% url 'core:guesses_by_period' pool.slug %}">Palpites por período</a>
-  {% if pool.user_is_owner%}<a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>{% endif %}
   {% if pool.user_is_guesser and show_grouped_guesses %}<a href="{% url 'core:grouped_guesses' pool.slug %}">Palpitar Copa do Mundo</a>{% endif %}
   {% if show_grouped_guesses %}<a href="{% url 'core:world_cup_ranking' pool.slug %}">Classificação Copa do Mundo</a>{% endif %}
+  {% if pool.user_is_owner%}<a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>{% endif %}
 </nav>
 
 <button class="exit-btn" onclick="showPoolLeavingConfirmation()">Sair do bolão ❌</button>

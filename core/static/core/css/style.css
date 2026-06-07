@@ -19,6 +19,9 @@ a {
   color: #1c57b7;
 }
 
+p {
+  line-height: 3.5vh;
+}
 .logout-form {
   margin: 0;
 }
@@ -131,7 +134,7 @@ h3 {
   align-self: flex-start;
   color: black;
   margin: 1vh 0;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #1c57b7;
 }
 
@@ -235,7 +238,7 @@ input {
 }
 
 .sidebar a {
-  margin-top: 3vh;
+  margin: 2vh;
   font-size: 0.9rem;
 }
 
@@ -329,7 +332,7 @@ input {
 }
 
 .vertical a {
-  margin-top: 4vh;
+  margin: 3vh 0;
 }
 
 .horizontal {
@@ -750,7 +753,7 @@ input {
 }
 
 .ranking-table th, td {
-  padding: 2vh 1vh;
+  padding: 1.5vh 0.75vh;
 }
 
 .open-pools-table {
@@ -761,8 +764,12 @@ input {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.clickable-row:nth-child(2n + 1) {
-  background-color: rgba(255, 255, 255, 0.1);
+.ranking-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.125);
+}
+
+.ranking-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .expand-icon {
@@ -908,11 +915,6 @@ body.fixed-layout main {
   min-height: 0;
   overflow-y: auto;
   padding-bottom: 2vh;
-  scrollbar-width: none;
-}
-
-.scrollable-content::-webkit-scrollbar {
-  display: none;
 }
 
 .action-bar {

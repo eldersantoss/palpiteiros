@@ -19,18 +19,16 @@
     {% if request.user.is_authenticated %}
       <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
 
-      <a class="logo-link" href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+      <a class="logo-link" href={% url 'core:index' %}>
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
 
       {% if request.user.is_authenticated %}
         <div class="action-menu top-action-menu">
           <nav class="menu horizontal">
-            {% if pool %}
-              <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-            {% endif %}
-            <a href="{% url 'core:index' %}">🍀 Bolões</a>
-            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+            <a href="{% url 'core:index' %}">🏠 Início</a>
+            <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
             <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
             <details class="profile">
               <summary>
@@ -69,14 +67,12 @@
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
     <nav class="sidebar" id="sidebar">
       <button class="sidebar-close" onclick="closeSidebar()">✕</button>
-      <a class="sidebar-logo" href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+      <a class="sidebar-logo" href={% url 'core:index' %}>
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
-      {% if pool %}
-        <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-      {% endif %}
-      <a href="{% url 'core:index' %}">🍀 Bolões</a>
-      <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+      <a href="{% url 'core:index' %}">🏠 Início</a>
+      <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+      <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
       <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
       <address class="sidebar-address">
         Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
@@ -108,11 +104,9 @@
       <div class="action-menu bottom-action-menu">
         <hr class="spacer">
         <nav class="menu horizontal">
-          {% if pool %}
-            <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-          {% endif %}
-          <a href="{% url 'core:index' %}">🍀 Bolões</a>
-          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
+          <a href="{% url 'core:index' %}">🏠 Início</a>
+          <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
           <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
         </nav>
       </div>
