@@ -286,6 +286,7 @@ class Command(BaseCommand):
 
         home_goals = match["teamA"]["score"]["2h"]
         away_goals = match["teamB"]["score"]["2h"]
+        date_time = self._parse_match_datetime(match["date"])
 
         home_fouls = match["teamA"]["stats"]["fouls"]
         away_fouls = match["teamB"]["stats"]["fouls"]
@@ -300,6 +301,7 @@ class Command(BaseCommand):
             match_instance.status != Match.FINSHED
             or match_instance.home_goals != home_goals
             or match_instance.away_goals != away_goals
+            or match_instance.date_time != date_time
             or match_instance.home_yellow_cards != home_yellow_cards
             or match_instance.away_yellow_cards != away_yellow_cards
             or match_instance.home_red_cards != home_red_cards
@@ -311,6 +313,7 @@ class Command(BaseCommand):
             match_instance.status = Match.FINSHED  # "FT"
             match_instance.home_goals = home_goals
             match_instance.away_goals = away_goals
+            match_instance.date_time = date_time
             match_instance.home_yellow_cards = home_yellow_cards
             match_instance.away_yellow_cards = away_yellow_cards
             match_instance.home_red_cards = home_red_cards
@@ -320,6 +323,7 @@ class Command(BaseCommand):
                     "status",
                     "home_goals",
                     "away_goals",
+                    "date_time",
                     "home_yellow_cards",
                     "away_yellow_cards",
                     "home_red_cards",

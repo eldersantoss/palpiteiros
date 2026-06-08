@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timezone as dt_timezone
 from unittest.mock import patch
 
 import pytest
@@ -463,6 +463,47 @@ def test_sync_sfi_matches_updates_card_counts_for_ended_match(
 
 @patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
+def test_sync_sfi_matches_updates_date_time_for_ended_match(
+    mock_get,
+    mock_tz,
+    mock_success_response,
+    get_sfi_matches_by_day_past_response,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """An ENDED match gets its date_time updated when the API returns a different value."""
+    mock_tz.now.return_value.date.return_value = date(2026, 3, 3)
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id, in_progress=True)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    old_date_time = datetime(2026, 2, 25, 18, 0, 0, tzinfo=dt_timezone.utc)
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-sfi-ended-001",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+        date_time=old_date_time,
+    )
+
+    mock_success_response.json.return_value = get_sfi_matches_by_day_past_response
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
+
+    existing_match.refresh_from_db()
+    assert existing_match.date_time == datetime(2026, 2, 26, 20, 0, 0, tzinfo=dt_timezone.utc)
+
+
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
+@patch("requests.get")
 def test_sync_sfi_matches_handles_null_card_stats(
     mock_get,
     mock_tz,
@@ -902,3 +943,118 @@ def test_get_teams_of_championships_sfi_continues_after_request_failure(
     assert saved_data[0]["id"] == "champ-ok"
     assert saved_data[0]["teams"] == [{"id": "team-2025", "name": "Team 2025"}]
     assert mock_get.call_count == 2
+
+
+def test_sync_sfi_matches_from_json_updates_ended_match(
+    tmp_path,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """sync_sfi_matches_from_json updates goals and date_time of an ENDED match."""
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    old_date_time = datetime(2026, 2, 25, 18, 0, 0, tzinfo=dt_timezone.utc)
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-json-ended-001",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+        date_time=old_date_time,
+    )
+
+    json_file = tmp_path / "matches.json"
+    json_file.write_text(
+        json.dumps({
+            "result": [
+                {
+                    "id": "match-json-ended-001",
+                    "date": "2026-02-26 20:00:00",
+                    "status": "ENDED",
+                    "timer": "90:00",
+                    "championship": {"id": sfi_competition_id, "name": "Test League", "s_name": None},
+                    "teamA": {
+                        "id": sfi_home_team_id,
+                        "name": "Home FC",
+                        "score": {"f": 2, "1h": 1, "2h": 2, "o": None, "p": None},
+                    },
+                    "teamB": {
+                        "id": sfi_away_team_id,
+                        "name": "Away FC",
+                        "score": {"f": 1, "1h": 0, "2h": 1, "o": None, "p": None},
+                    },
+                }
+            ]
+        }),
+        encoding="utf-8",
+    )
+
+    call_command("sync_sfi_matches_from_json", str(json_file))
+
+    existing_match.refresh_from_db()
+    assert existing_match.status == Match.FINSHED
+    assert existing_match.home_goals == 2
+    assert existing_match.away_goals == 1
+    assert existing_match.date_time == datetime(2026, 2, 26, 20, 0, 0, tzinfo=dt_timezone.utc)
+
+
+def test_sync_sfi_matches_from_json_updates_date_time_without_goal_change(
+    tmp_path,
+    sfi_competition_id,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """date_time is updated even when goals and status are already correct."""
+    competition = baker.make("core.Competition", sfi_id=sfi_competition_id)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    old_date_time = datetime(2026, 2, 25, 18, 0, 0, tzinfo=dt_timezone.utc)
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-json-date-change",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.FINSHED,
+        home_goals=2,
+        away_goals=1,
+        date_time=old_date_time,
+    )
+
+    json_file = tmp_path / "matches.json"
+    json_file.write_text(
+        json.dumps({
+            "result": [
+                {
+                    "id": "match-json-date-change",
+                    "date": "2026-02-26 20:00:00",
+                    "status": "ENDED",
+                    "timer": "90:00",
+                    "championship": {"id": sfi_competition_id, "name": "Test League", "s_name": None},
+                    "teamA": {
+                        "id": sfi_home_team_id,
+                        "name": "Home FC",
+                        "score": {"f": 2, "1h": 1, "2h": 2, "o": None, "p": None},
+                    },
+                    "teamB": {
+                        "id": sfi_away_team_id,
+                        "name": "Away FC",
+                        "score": {"f": 1, "1h": 0, "2h": 1, "o": None, "p": None},
+                    },
+                }
+            ]
+        }),
+        encoding="utf-8",
+    )
+
+    call_command("sync_sfi_matches_from_json", str(json_file))
+
+    existing_match.refresh_from_db()
+    assert existing_match.date_time == datetime(2026, 2, 26, 20, 0, 0, tzinfo=dt_timezone.utc)

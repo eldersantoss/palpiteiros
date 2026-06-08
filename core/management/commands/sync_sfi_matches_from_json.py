@@ -181,10 +181,12 @@ class Command(BaseCommand):
 
         home_goals = match["teamA"]["score"]["2h"]
         away_goals = match["teamB"]["score"]["2h"]
+        date_time = self._parse_match_datetime(match["date"])
         has_changes = (
             match_instance.status != Match.FINSHED
             or match_instance.home_goals != home_goals
             or match_instance.away_goals != away_goals
+            or match_instance.date_time != date_time
         )
         needs_consolidation = match_instance.guesses.filter(consolidated=False).exists()
 
@@ -192,7 +194,8 @@ class Command(BaseCommand):
             match_instance.status = Match.FINSHED
             match_instance.home_goals = home_goals
             match_instance.away_goals = away_goals
-            match_instance.save(update_fields=["status", "home_goals", "away_goals"])
+            match_instance.date_time = date_time
+            match_instance.save(update_fields=["status", "home_goals", "away_goals", "date_time"])
 
         return ProcessMatchResult.updated
 
