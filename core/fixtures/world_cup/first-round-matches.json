@@ -5,1148 +5,10 @@
     {
       "page": 1,
       "per_page": 25,
-      "items": 25
+      "items": 24
     }
   ],
   "result": [
-    {
-      "id": "207c2c07165e3bd0",
-      "date": "2023-04-27 14:11:12",
-      "status": "ENDED",
-      "timer": "90:00",
-      "championship": {
-        "id": "5085a3cde16c822b",
-        "name": "World Cup 2026",
-        "s_name": null
-      },
-      "teamA": {
-        "id": "1c2725ea075ff4f6",
-        "name": "England",
-        "score": {
-          "f": 2,
-          "1h": null,
-          "2h": 2,
-          "o": null,
-          "p": null
-        },
-        "stats": {
-          "possession": null,
-          "attacks": {
-            "n": null,
-            "d": null,
-            "o_s": null
-          },
-          "shoots": {
-            "t": "0",
-            "off": null,
-            "on": null,
-            "g_a": null
-          },
-          "penalties": "0",
-          "corners": {
-            "t": "0",
-            "f": null,
-            "h": null
-          },
-          "fouls": {
-            "t": null,
-            "y_c": "0",
-            "y_t_r_c": null,
-            "r_c": "0"
-          },
-          "substitutions": null,
-          "throwins": "0",
-          "injuries": null,
-          "dominance_avg_2_5": "0.00",
-          "xG": {
-            "kickoff": null,
-            "live": null
-          }
-        },
-        "manager": null
-      },
-      "teamB": {
-        "id": "2e092e81543720e3",
-        "name": "France",
-        "score": {
-          "f": 0,
-          "1h": null,
-          "2h": 0,
-          "o": null,
-          "p": null
-        },
-        "stats": {
-          "possession": null,
-          "attacks": {
-            "n": null,
-            "d": null,
-            "o_s": null
-          },
-          "shoots": {
-            "t": "0",
-            "off": null,
-            "on": null,
-            "g_a": null
-          },
-          "penalties": "0",
-          "corners": {
-            "t": "0",
-            "f": null,
-            "h": null
-          },
-          "fouls": {
-            "t": null,
-            "y_c": "3",
-            "y_t_r_c": null,
-            "r_c": "0"
-          },
-          "substitutions": null,
-          "throwins": "0",
-          "injuries": null,
-          "dominance_avg_2_5": "0.00",
-          "xG": {
-            "kickoff": null,
-            "live": null
-          }
-        },
-        "manager": null
-      },
-      "events": [
-        {
-          "type": "goal",
-          "timer": 74,
-          "team": "B"
-        },
-        {
-          "type": "yellow_card",
-          "timer": 66,
-          "team": "B"
-        },
-        {
-          "type": "yellow_card",
-          "timer": 55,
-          "team": "B"
-        },
-        {
-          "type": "yellow_card",
-          "timer": "45+7",
-          "team": "B"
-        },
-        {
-          "type": "goal",
-          "timer": "45+7",
-          "team": "A"
-        },
-        {
-          "type": "goal",
-          "timer": 26,
-          "team": "A"
-        },
-        {
-          "type": "yellow_card",
-          "timer": 20,
-          "team": "B"
-        },
-        {
-          "type": "yellow_card",
-          "timer": 6,
-          "team": "A"
-        },
-        {
-          "type": "goal",
-          "timer": 4,
-          "team": "A"
-        },
-        {
-          "type": "goal",
-          "timer": 1,
-          "team": "A"
-        }
-      ],
-      "dominance_index": [
-        {
-          "timer": "02:00",
-          "teamA": "10.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "02:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "03:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "03:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "04:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "17:00",
-          "teamA": "",
-          "teamB": ""
-        },
-        {
-          "timer": "17:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "18:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "18:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "19:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "19:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "20:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "20:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "21:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "21:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "22:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "22:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "23:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "23:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "24:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "24:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "25:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "25:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "26:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "27:00",
-          "teamA": "10.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "27:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "28:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "28:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "29:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "29:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "30:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "30:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "31:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "31:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "32:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "32:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "33:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "34:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "34:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "35:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "35:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "36:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "36:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "37:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "37:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "38:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "38:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "39:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "39:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "40:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "40:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "41:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "41:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "42:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "42:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "43:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "43:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "44:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "44:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+00:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+00:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+01:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+01:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+02:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+02:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+03:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+03:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+04:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+04:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+06:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+06:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+07:00",
-          "teamA": "",
-          "teamB": ""
-        },
-        {
-          "timer": "45:00+08:30",
-          "teamA": "20.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+09:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "45:00+09:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "46:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "46:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "47:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "47:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "48:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "48:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "49:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "49:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "50:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "50:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "51:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "51:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "52:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "52:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "53:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "53:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "54:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "54:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "55:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "55:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "56:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "56:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "57:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "57:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "58:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "58:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "59:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "59:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "60:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "60:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "61:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "61:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "62:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "62:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "63:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "63:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "64:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "64:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "65:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "65:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "66:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "67:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "67:30",
-          "teamA": "",
-          "teamB": ""
-        },
-        {
-          "timer": "68:00",
-          "teamA": "20.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "68:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "69:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "69:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "70:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "70:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "71:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "71:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "72:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "72:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "73:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "73:30",
-          "teamA": "0.00",
-          "teamB": "10.00"
-        },
-        {
-          "timer": "74:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "74:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "75:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "75:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "76:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "76:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "77:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "77:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "78:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "78:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "79:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "79:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "89:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "90:00+00:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        }
-      ],
-      "referee": null,
-      "stadium": null,
-      "odds": {
-        "starting": {
-          "1X2": {
-            "bet365": {
-              "1": "1.500",
-              "X": "4.333",
-              "2": "6.000"
-            }
-          },
-          "over_under": {
-            "bet365": {
-              "o": "2.030",
-              "u": "1.870",
-              "v": "2.75"
-            }
-          },
-          "asian_handicap": {
-            "bet365": {
-              "1": "1.840",
-              "2": "2.060",
-              "v": "-1"
-            }
-          }
-        },
-        "kickoff": {
-          "1X2": {
-            "bet365": {
-              "1": "1.181",
-              "X": "6.500",
-              "2": "15.000"
-            }
-          },
-          "asian_handicap": {
-            "bet365": {
-              "1": "2.050",
-              "2": "1.850",
-              "v": "-1"
-            }
-          },
-          "over_under": {
-            "bet365": {
-              "o": "2.040",
-              "u": "1.860",
-              "v": "3.75"
-            }
-          },
-          "1h_asian_handicap": {
-            "bet365": {
-              "1": "1.780",
-              "2": "2.125",
-              "v": "-0.25"
-            }
-          },
-          "1h_goalline": {
-            "bet365": {
-              "o": "1.790",
-              "u": "2.110",
-              "v": "2"
-            }
-          },
-          "1h_result": {
-            "bet365": {
-              "1": "1.142",
-              "X": "6.000",
-              "2": "23.000"
-            }
-          }
-        }
-      },
-      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E136816160\/F3\/I0\/"
-    },
-    {
-      "id": "d5291986550b2c7e",
-      "date": "2026-06-05 10:59:21",
-      "status": "ENDED",
-      "timer": "90:00",
-      "championship": {
-        "id": "5085a3cde16c822b",
-        "name": "World Cup 2026",
-        "s_name": null
-      },
-      "teamA": {
-        "id": "1c2725ea075ff4f6",
-        "name": "England",
-        "score": {
-          "f": 0,
-          "1h": 0,
-          "2h": 0,
-          "o": null,
-          "p": null
-        },
-        "stats": {
-          "possession": null,
-          "attacks": {
-            "n": null,
-            "d": null,
-            "o_s": null
-          },
-          "shoots": {
-            "t": "0",
-            "off": null,
-            "on": null,
-            "g_a": null
-          },
-          "penalties": "0",
-          "corners": {
-            "t": "0",
-            "f": null,
-            "h": null
-          },
-          "fouls": {
-            "t": null,
-            "y_c": "0",
-            "y_t_r_c": null,
-            "r_c": "0"
-          },
-          "substitutions": null,
-          "throwins": "0",
-          "injuries": null,
-          "dominance_avg_2_5": "0.00",
-          "xG": {
-            "kickoff": null,
-            "live": null
-          }
-        },
-        "manager": null
-      },
-      "teamB": {
-        "id": "ed4f17bb5f58a226",
-        "name": "Brazil",
-        "score": {
-          "f": 0,
-          "1h": 0,
-          "2h": 0,
-          "o": null,
-          "p": null
-        },
-        "stats": {
-          "possession": null,
-          "attacks": {
-            "n": null,
-            "d": null,
-            "o_s": null
-          },
-          "shoots": {
-            "t": "0",
-            "off": null,
-            "on": null,
-            "g_a": null
-          },
-          "penalties": "0",
-          "corners": {
-            "t": "0",
-            "f": null,
-            "h": null
-          },
-          "fouls": {
-            "t": null,
-            "y_c": "0",
-            "y_t_r_c": null,
-            "r_c": "0"
-          },
-          "substitutions": null,
-          "throwins": "0",
-          "injuries": null,
-          "dominance_avg_2_5": "0.00",
-          "xG": {
-            "kickoff": null,
-            "live": null
-          }
-        },
-        "manager": null
-      },
-      "events": [],
-      "dominance_index": [
-        {
-          "timer": "120:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "120:00+00:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "90:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "90:00+00:30",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        },
-        {
-          "timer": "90:00+01:00",
-          "teamA": "0.00",
-          "teamB": "0.00"
-        }
-      ],
-      "referee": null,
-      "stadium": null,
-      "odds": {
-        "starting": {
-          "1X2": {
-            "bet365": {
-              "1": "1.700",
-              "X": "3.750",
-              "2": "4.750"
-            }
-          },
-          "over_under": {
-            "bet365": {
-              "o": "1.850",
-              "u": "2.000",
-              "v": "2.25"
-            }
-          },
-          "asian_handicap": {
-            "bet365": {
-              "1": "1.950",
-              "2": "1.900",
-              "v": "-0.75"
-            }
-          }
-        },
-        "kickoff": {
-          "1X2": {
-            "bet365": {
-              "1": "8.000",
-              "X": "1.125",
-              "2": "19.000"
-            }
-          },
-          "asian_handicap": {
-            "bet365": {
-              "1": "1.350",
-              "2": "3.250",
-              "v": "0"
-            }
-          },
-          "over_under": {
-            "bet365": {
-              "o": "5.600",
-              "u": "1.150",
-              "v": "0.5"
-            }
-          },
-          "asian_corner": {
-            "bet365": {
-              "o": "2.250",
-              "u": "1.625",
-              "v": "0.5"
-            }
-          }
-        }
-      },
-      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E195812808\/F3\/I0\/"
-    },
     {
       "id": "e0b4f5a05670d921",
       "date": "2026-06-11 19:00:00",
@@ -1231,15 +93,15 @@
         "live": {
           "1X2": {
             "bet365": {
-              "1": "1.400",
+              "1": "1.444",
               "X": "4.333",
-              "2": "8.000"
+              "2": "7.500"
             }
           },
           "asian_handicap": {
             "bet365": {
-              "1": "2.025",
-              "2": "1.825",
+              "1": "2.050",
+              "2": "1.800",
               "v": "-1.25"
             }
           },
@@ -1359,9 +221,9 @@
         "live": {
           "1X2": {
             "bet365": {
-              "1": "2.625",
+              "1": "2.600",
               "X": "3.100",
-              "2": "2.700"
+              "2": "2.750"
             }
           },
           "asian_handicap": {
@@ -1629,8 +491,8 @@
           },
           "over_under": {
             "bet365": {
-              "o": "2.025",
-              "u": "1.825",
+              "o": "2.050",
+              "u": "1.800",
               "v": "2.0,2.5"
             }
           },
@@ -1871,15 +733,15 @@
         "live": {
           "1X2": {
             "bet365": {
-              "1": "1.615",
-              "X": "3.800",
-              "2": "5.750"
+              "1": "1.650",
+              "X": "3.750",
+              "2": "5.500"
             }
           },
           "asian_handicap": {
             "bet365": {
-              "1": "1.800",
-              "2": "2.050",
+              "1": "1.825",
+              "2": "2.025",
               "v": "-0.75"
             }
           },
@@ -1941,7 +803,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e95e028fe3",
+          "name": "Sebastien Migne"
+        }
       },
       "teamB": {
         "id": "a08b64c3a0c10288",
@@ -1959,7 +824,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e7864d3ae3",
+          "name": "Steve Clarke"
+        }
       },
       "referee": null,
       "stadium": {
@@ -2063,7 +931,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e4ab39ed9e",
+          "name": "Tony Popovic"
+        }
       },
       "teamB": {
         "id": "1bd5f3ba4a71016d",
@@ -2081,7 +952,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e4c9e17f28",
+          "name": "Vincenzo Montella"
+        }
       },
       "referee": null,
       "stadium": {
@@ -2122,8 +996,8 @@
           },
           "asian_handicap": {
             "bet365": {
-              "1": "1.850",
-              "2": "2.000",
+              "1": "1.875",
+              "2": "1.975",
               "v": "0.75"
             }
           },
@@ -2185,7 +1059,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e4e142145b",
+          "name": "Julian Nagelsmann"
+        }
       },
       "teamB": {
         "id": "bcd1b3d609435a96",
@@ -2203,7 +1080,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e4d888b067",
+          "name": "Dick Advocaat"
+        }
       },
       "referee": null,
       "stadium": {
@@ -2244,8 +1124,8 @@
           },
           "asian_handicap": {
             "bet365": {
-              "1": "1.950",
-              "2": "1.900",
+              "1": "1.925",
+              "2": "1.925",
               "v": "-3.5"
             }
           },
@@ -2307,7 +1187,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e4b3b79e74",
+          "name": "Ronald Koeman"
+        }
       },
       "teamB": {
         "id": "13d2ad640332aa86",
@@ -2325,7 +1208,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e54c6dad6d",
+          "name": "Hajime Moriyasu"
+        }
       },
       "referee": null,
       "stadium": {
@@ -2429,7 +1315,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "348053b6b605b90b",
+          "name": "Emerse Fae"
+        }
       },
       "teamB": {
         "id": "30ff617439afd7",
@@ -2447,7 +1336,10 @@
             "live": null
           }
         },
-        "manager": null
+        "manager": {
+          "id": "5fb962e56b0a047e",
+          "name": "Sebastian Beccacece"
+        }
       },
       "referee": null,
       "stadium": {
@@ -2739,8 +1631,8 @@
           },
           "over_under": {
             "bet365": {
-              "o": "1.950",
-              "u": "1.900",
+              "o": "1.925",
+              "u": "1.925",
               "v": "3.5"
             }
           },
@@ -2861,8 +1753,8 @@
           },
           "over_under": {
             "bet365": {
-              "o": "2.000",
-              "u": "1.850",
+              "o": "2.025",
+              "u": "1.825",
               "v": "2.5"
             }
           },
@@ -3098,8 +1990,8 @@
           },
           "asian_handicap": {
             "bet365": {
-              "1": "1.925",
-              "2": "1.925",
+              "1": "1.900",
+              "2": "1.950",
               "v": "-0.5"
             }
           },
@@ -3214,7 +2106,7 @@
           "1X2": {
             "bet365": {
               "1": "1.450",
-              "X": "4.500",
+              "X": "4.333",
               "2": "6.250"
             }
           },
@@ -3227,8 +2119,8 @@
           },
           "over_under": {
             "bet365": {
-              "o": "1.925",
-              "u": "1.925",
+              "o": "1.975",
+              "u": "1.875",
               "v": "2.5"
             }
           },
@@ -3830,8 +2722,8 @@
           },
           "asian_handicap": {
             "bet365": {
-              "1": "1.975",
-              "2": "1.875",
+              "1": "1.950",
+              "2": "1.900",
               "v": "-0.75"
             }
           },
@@ -3988,6 +2880,128 @@
         }
       },
       "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942641\/F3\/I0\/"
+    },
+    {
+      "id": "7037beb805859880",
+      "date": "2026-06-18 02:00:15",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "d864bf205514500b",
+        "name": "Uzbekistan",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "1c272439cc6a4f0e",
+        "name": "Colombia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e8b6b6fbc98bcf5e",
+        "name": "Estadio Azteca"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.500",
+              "X": "4.500",
+              "2": "1.380"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "7.500",
+              "X": "4.500",
+              "2": "1.400"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "8.000",
+              "X": "2.400",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942633\/F3\/I0\/"
     }
   ]
 }
