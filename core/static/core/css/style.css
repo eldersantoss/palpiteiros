@@ -127,6 +127,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 0;
 }
 
 h2 {
@@ -988,7 +989,7 @@ body.fixed-layout main {
   flex-shrink: 0;
   display: flex;
   gap: 2vw;
-  padding: 2vh 0 1vh;
+  padding: 2vh 0 max(1vh, env(safe-area-inset-bottom));
   background-color: #f4f4f4;
 }
 
