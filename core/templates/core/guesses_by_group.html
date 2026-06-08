@@ -70,6 +70,14 @@
                 </div>
               </div>
             </div>
+            <span class="guess-points">
+              Pontos ganhos:
+              {% if item.guess and item.guess.score %}
+                <span class="guess-points-score">{{ item.guess.score }}</span>
+              {% else %}
+                -
+              {% endif %}
+            </span>
           </div>
         {% endfor %}
 

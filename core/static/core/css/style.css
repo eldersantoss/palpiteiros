@@ -544,7 +544,6 @@ input {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 17vh;
   margin-bottom: 1vh;
   padding: 1vh;
   background-color: rgba(4, 0, 0, 0.125);
@@ -895,6 +894,16 @@ footer address {
     padding: 0.5em;
     text-align: center;
     min-width: 2em;
+}
+
+.guess-points {
+  font-size: 0.65rem;
+  align-self: center;
+  font-weight: bold;
+}
+
+.guess-points-score{
+  color: #1c71b7;
 }
 
 .group-standings {

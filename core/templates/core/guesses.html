@@ -79,6 +79,9 @@
                 </div>
               </div>
             </div>
+            {% if item.guess and item.guess.score %}
+            <p class="guess-points">Pontos ganhos: {{ item.guess.score }}</p>
+            {% endif %}
           </div>
         {% endfor %}
       {% endif %}
