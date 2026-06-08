@@ -74,6 +74,9 @@
       <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
       <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
       <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+      {% if pool.user_is_guesser %}<a href="{% url 'core:guesses_world_cup' pool.slug %}">⚽️ Palpitar</a>{% endif %}
+      {% if pool.user_is_guesser %}<a href="{% url 'core:world_cup_ranking' pool.slug %}">🏆 Classificação</a>{% endif %}
+      {% if pool.user_is_owner %}<a href="{% url 'core:pool_management' pool.slug %}">🛠️ Gerenciar bolão</a><div></div>{% endif %}
       <address class="sidebar-address">
         Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
       </address>
@@ -100,18 +103,6 @@
   </main>
 
   <footer>
-    {% if request.user.is_authenticated %}
-      <div class="action-menu bottom-action-menu">
-        <hr class="spacer">
-        <nav class="menu horizontal">
-          <a href="{% url 'core:index' %}">🏠 Início</a>
-          <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
-          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
-          <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
-        </nav>
-      </div>
-    {% endif %}
-
     <address class="footer-address">
       Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
     </address>

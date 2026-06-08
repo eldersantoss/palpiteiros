@@ -90,7 +90,7 @@
   </div>
 
   <div class="action-bar">
-    <a href="{% url 'core:pool_home' pool.slug %}" class="btn {% if guess_forms %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
+    <a href="javascript:history.back()" class="btn {% if guess_forms %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
     {% if guess_forms %}
     <button type="submit" form="guesses-form" class="btn btn-primary">Salvar palpites</button>
     {% endif %}

@@ -124,7 +124,7 @@
   </div>
 
   <div class="action-bar">
-    <a href="{% url 'core:pool_home' pool.slug %}" class="btn {% if groups_data %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
+    <a href="javascript:history.back()" class="btn {% if groups_data %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
     {% if groups_data %}
     <button type="submit" form="grouped-guesses-form" class="btn btn-primary">Salvar palpites</button>
     {% endif %}
