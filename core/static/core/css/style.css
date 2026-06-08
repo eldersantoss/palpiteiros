@@ -5,7 +5,7 @@
 body {
   margin: 0;
   padding: 0;
-  height: 95vh;
+  height: 90vh;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background-color: #f4f4f4;
   color: black;
@@ -318,10 +318,6 @@ input {
 }
 
 @media screen and (max-width: 480px) {
-  /* body {
-    height: 85vh;
-  } */
-
   header {
     display: flex;
     justify-content: space-between;
