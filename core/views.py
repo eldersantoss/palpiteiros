@@ -21,6 +21,7 @@ from .forms import (
     GuessForm,
     RankingPeriodForm,
     UserEditForm,
+    WorldCupGuessesPeriodForm,
     WorldCupRankingPeriodForm,
 )
 from .models import CompetitionGroup, Guess, GuessPool, Match
@@ -729,6 +730,50 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                 "groups_data": groups_data,
             },
         )
+
+
+class WorldCupGuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+    template_name = "core/world_cup_guesses_by_period.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
+            return redirect_with_msg(
+                request,
+                "error",
+                "Esta funcionalidade não está disponível fora do período da Copa do Mundo ❌",
+                "short",
+                self.pool,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        default = {"periodo": "geral", "palpiteiro": self.guesser.id}
+        form = WorldCupGuessesPeriodForm(request.GET or default, pool=self.pool)
+        form.is_valid()
+        start_date, end_date = form.get_period_dates()
+        guesser = form.get_guesser()
+        guesses = self.get_queryset(guesser, start_date, end_date)
+        total_score = guesses.aggregate(total=Sum("score"))["total"] or 0
+        return render(
+            request,
+            self.template_name,
+            {
+                "pool": self.pool,
+                "form": form,
+                "guesses": guesses,
+                "total_score": total_score,
+            },
+        )
+
+    def get_queryset(self, guesser, start_date, end_date):
+        filters = Q(guesser=guesser) & Q(match__date_time__lt=timezone.localtime())
+        if start_date and end_date:
+            filters &= Q(
+                match__date_time__date__gte=start_date,
+                match__date_time__date__lte=end_date,
+            )
+        return self.pool.guesses.filter(filters).order_by("-match__date_time")
 
 
 class WorldCupRankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):

@@ -205,3 +205,30 @@ class GuessesPeriodForm(forms.Form):
             query.update({"year": year, "month": 0, "week": week})
 
         return query
+
+
+class WorldCupGuessesPeriodForm(forms.Form):
+    periodo = forms.ChoiceField(
+        label="Fase",
+        choices=WORLD_CUP_PERIOD_CHOICES,
+        required=False,
+    )
+    palpiteiro = forms.ChoiceField(label="Palpiteiro", required=False)
+
+    def __init__(self, *args, **kwargs):
+        pool = kwargs.pop("pool", None)
+        super().__init__(*args, **kwargs)
+        if pool:
+            guessers = pool.guessers.all().order_by("user__first_name", "user__username")
+            self.fields["palpiteiro"].choices = [
+                (g.id, g.user.get_full_name() or g.user.username) for g in guessers
+            ]
+
+    def get_period_dates(self) -> tuple:
+        source = self.cleaned_data or self.initial or self.data
+        period = source.get("periodo") or "geral"
+        return WORLD_CUP_PERIOD_DATE_RANGES.get(period, WORLD_CUP_PERIOD_DATE_RANGES["geral"])
+
+    def get_guesser(self):
+        source = self.cleaned_data or self.initial or self.data
+        return source.get("palpiteiro")

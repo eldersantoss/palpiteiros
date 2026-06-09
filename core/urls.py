@@ -70,4 +70,9 @@ urlpatterns = [
         views.WorldCupRankingView.as_view(),
         name="world_cup_ranking",
     ),
+    path(
+        "boloes/<slug:pool_slug>/todos-palpites/",
+        views.WorldCupGuessesByPeriodView.as_view(),
+        name="world_cup_guesses_by_period",
+    ),
 ]
