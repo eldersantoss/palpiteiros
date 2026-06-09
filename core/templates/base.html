@@ -26,10 +26,13 @@
       {% if request.user.is_authenticated %}
         <div class="action-menu top-action-menu">
           <nav class="menu horizontal">
-            <a href="{% url 'core:index' %}">🏠 Início</a>
+            {% if pool.user_is_guesser %}<a href="{% url 'core:guesses_world_cup' pool.slug %}">⚽️ Palpitar</a>{% endif %}
+            {% if pool.user_is_guesser %}<a href="{% url 'core:world_cup_ranking' pool.slug %}">🏆 Classificação</a>{% endif %}
+            {% if pool.user_is_guesser %}<a href="{% url 'core:world_cup_guesses_by_period' pool.slug %}">📋 Todos os palpites</a>{% endif %}
             <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
-            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
-            <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+            {% comment %} <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a> {% endcomment %}
+            {% comment %} <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a> {% endcomment %}
+            {% if pool.user_is_owner %}<a href="{% url 'core:pool_management' pool.slug %}">🛠️ Gerenciar bolão</a><div></div>{% endif %}
             <details class="profile">
               <summary>
                 {{ request.user.first_name|default:request.user.username }}
@@ -71,13 +74,12 @@
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
       <div class="sidebar-links-container">
-        <a href="{% url 'core:index' %}">🏠 Início</a>
-        <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
-        <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a>
-        <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
         {% if pool.user_is_guesser %}<a href="{% url 'core:guesses_world_cup' pool.slug %}">⚽️ Palpitar</a>{% endif %}
         {% if pool.user_is_guesser %}<a href="{% url 'core:world_cup_ranking' pool.slug %}">🏆 Classificação</a>{% endif %}
         {% if pool.user_is_guesser %}<a href="{% url 'core:world_cup_guesses_by_period' pool.slug %}">📋 Todos os palpites</a>{% endif %}
+        <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+        {% comment %} <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a> {% endcomment %}
+        {% comment %} <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a> {% endcomment %}
         {% if pool.user_is_owner %}<a href="{% url 'core:pool_management' pool.slug %}">🛠️ Gerenciar bolão</a><div></div>{% endif %}
       </div>
       <address class="sidebar-address">
