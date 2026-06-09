@@ -22,8 +22,8 @@ class GuesserEditForm(forms.ModelForm):
 
 
 class GuessForm(forms.Form):
-    home_goals = forms.IntegerField(min_value=0)
-    away_goals = forms.IntegerField(min_value=0)
+    home_goals = forms.IntegerField(min_value=0, required=False)
+    away_goals = forms.IntegerField(min_value=0, required=False)
 
     def __init__(self, *args, **kwargs):
         self.match = kwargs.pop("match")
@@ -33,6 +33,21 @@ class GuessForm(forms.Form):
         self["home_goals"].html_name += f"_{self.match.id}"
         self["away_goals"].label = self.match.away_team.name
         self["away_goals"].html_name += f"_{self.match.id}"
+
+    def clean(self):
+        cleaned = super().clean()
+        home = cleaned.get("home_goals")
+        away = cleaned.get("away_goals")
+        if (home is None) != (away is None):
+            raise forms.ValidationError("Preencha os dois placares ou deixe os dois em branco.")
+        return cleaned
+
+    def has_valid_guess_data(self) -> bool:
+        return (
+            self.is_valid()
+            and self.cleaned_data.get("home_goals") is not None
+            and self.cleaned_data.get("away_goals") is not None
+        )
 
 
 class RankingPeriodForm(forms.Form):
@@ -55,11 +70,7 @@ class RankingPeriodForm(forms.Form):
         # Populate year choices
         if pool:
             years = sorted(
-                set(
-                    pool.guesses.all()
-                    .values_list("match__date_time__year", flat=True)
-                    .distinct()
-                ),
+                set(pool.guesses.all().values_list("match__date_time__year", flat=True).distinct()),
                 reverse=True,
             )
         else:
@@ -68,15 +79,11 @@ class RankingPeriodForm(forms.Form):
         self.fields["ano"].choices = [(y, str(y)) for y in years]
 
         # Populate month choices
-        self.fields["mes"].choices = [
-            (str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)
-        ]
+        self.fields["mes"].choices = [(str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)]
 
         # Populate week choices
         current_week = timezone.localdate().isocalendar().week
-        self.fields["semana"].choices = [
-            (str(w), f"Semana #{w}") for w in range(current_week, 0, -1)
-        ]
+        self.fields["semana"].choices = [(str(w), f"Semana #{w}") for w in range(current_week, 0, -1)]
 
     def get_period_for_query(self) -> dict:
         """
@@ -144,31 +151,19 @@ class GuessesPeriodForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         if pool:
-            guessers = pool.guessers.all().order_by(
-                "user__first_name", "user__username"
-            )
-            self.fields["palpiteiro"].choices = [
-                (g.id, g.user.get_full_name() or g.user.username) for g in guessers
-            ]
+            guessers = pool.guessers.all().order_by("user__first_name", "user__username")
+            self.fields["palpiteiro"].choices = [(g.id, g.user.get_full_name() or g.user.username) for g in guessers]
 
             years = sorted(
-                set(
-                    pool.guesses.all()
-                    .values_list("match__date_time__year", flat=True)
-                    .distinct()
-                ),
+                set(pool.guesses.all().values_list("match__date_time__year", flat=True).distinct()),
                 reverse=True,
             )
             self.fields["ano"].choices = [(y, str(y)) for y in years]
 
-        self.fields["mes"].choices = [
-            (str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)
-        ]
+        self.fields["mes"].choices = [(str(m), _(date(2000, m, 1).strftime("%B"))) for m in range(1, 13)]
 
         current_week = timezone.localdate().isocalendar().week
-        self.fields["semana"].choices = [
-            (str(w), f"Semana #{w}") for w in range(current_week, 0, -1)
-        ]
+        self.fields["semana"].choices = [(str(w), f"Semana #{w}") for w in range(current_week, 0, -1)]
 
     def get_period_for_query(self) -> dict:
         """
@@ -220,9 +215,7 @@ class WorldCupGuessesPeriodForm(forms.Form):
         super().__init__(*args, **kwargs)
         if pool:
             guessers = pool.guessers.all().order_by("user__first_name", "user__username")
-            self.fields["palpiteiro"].choices = [
-                (g.id, g.user.get_full_name() or g.user.username) for g in guessers
-            ]
+            self.fields["palpiteiro"].choices = [(g.id, g.user.get_full_name() or g.user.username) for g in guessers]
 
     def get_period_dates(self) -> tuple:
         source = self.cleaned_data or self.initial or self.data

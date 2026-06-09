@@ -569,3 +569,173 @@ def test_guesses_world_cup_post_saves_open_match_but_ignores_past_deadline(mock_
     assert response.status_code == 200
     assert pool.guesses.filter(guesser=guesser, match=open_match).exists()
     assert not pool.guesses.filter(guesser=guesser, match=expired_match).exists()
+
+
+# ---------------------------------------------------------------------------
+# GuessForm partial-submission unit tests
+# ---------------------------------------------------------------------------
+
+
+def _make_match():
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    return baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        date_time=timezone.now() + timezone.timedelta(hours=1),
+        status="NS",
+        home_goals=None,
+        away_goals=None,
+    )
+
+
+def test_guess_form_valid_when_both_fields_filled():
+    from core.forms import GuessForm
+
+    match = _make_match()
+    form = GuessForm(
+        {f"home_goals_{match.id}": "2", f"away_goals_{match.id}": "1"},
+        match=match,
+    )
+    assert form.is_valid()
+    assert form.has_valid_guess_data()
+
+
+def test_guess_form_valid_when_both_fields_empty():
+    from core.forms import GuessForm
+
+    match = _make_match()
+    form = GuessForm({}, match=match)
+    assert form.is_valid()
+    assert not form.has_valid_guess_data()
+
+
+def test_guess_form_invalid_when_only_home_filled():
+    from core.forms import GuessForm
+
+    match = _make_match()
+    form = GuessForm({f"home_goals_{match.id}": "2"}, match=match)
+    assert not form.is_valid()
+
+
+def test_guess_form_invalid_when_only_away_filled():
+    from core.forms import GuessForm
+
+    match = _make_match()
+    form = GuessForm({f"away_goals_{match.id}": "1"}, match=match)
+    assert not form.is_valid()
+
+
+# ---------------------------------------------------------------------------
+# GuessesView partial-submission integration tests
+# ---------------------------------------------------------------------------
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_partial_saves_only_filled_guess(client):
+    """POST with data for only one of two open matches saves only that match."""
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    match1 = _open_match(pool, competition, home_team, away_team)
+    match2 = _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match1.id}": "2",
+            f"away_goals_{match1.id}": "1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert pool.guesses.filter(guesser=guesser, match=match1).exists()
+    assert not pool.guesses.filter(guesser=guesser, match=match2).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_empty_submission_saves_nothing(client):
+    """POST with all fields empty creates no guesses and returns 200."""
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {"csrfmiddlewaretoken": "dummy"},
+    )
+
+    assert response.status_code == 200
+    assert not pool.guesses.filter(guesser=guesser).exists()
+
+
+# ---------------------------------------------------------------------------
+# GroupedGuessesView partial-submission integration tests
+# ---------------------------------------------------------------------------
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_guesses_world_cup_post_partial_saves_only_filled_guess(mock_tz, client):
+    """GroupedGuessesView POST with data for only one of two open matches saves only that match."""
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    match1 = _open_match(pool, competition, home_team, away_team)
+    match2 = _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match1.id}": "3",
+            f"away_goals_{match1.id}": "0",
+        },
+    )
+
+    assert response.status_code == 200
+    assert pool.guesses.filter(guesser=guesser, match=match1).exists()
+    assert not pool.guesses.filter(guesser=guesser, match=match2).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_guesses_world_cup_post_empty_submission_saves_nothing(mock_tz, client):
+    """GroupedGuessesView POST with all fields empty creates no guesses and returns 200."""
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.post(
+        reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}),
+        {"csrfmiddlewaretoken": "dummy"},
+    )
+
+    assert response.status_code == 200
+    assert not pool.guesses.filter(guesser=guesser).exists()

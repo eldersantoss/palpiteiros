@@ -357,7 +357,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
 
-            if guess_form.is_valid():
+            if guess_form.has_valid_guess_data():
                 """
                 Quando o palpite é aproveitado em todos os bolões, a mesma
                 instância de palpite é adicionada no relacionamento guesses
@@ -598,7 +598,7 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
             if post_data is not None:
                 guess_form = GuessForm(post_data, match=match)
-                if not guess_form.is_valid():
+                if not guess_form.has_valid_guess_data():
                     try:
                         existing = self.pool.guesses.get(match=match, guesser=self.guesser)
                         initial = {
@@ -697,7 +697,7 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
-            if guess_form.is_valid():
+            if guess_form.has_valid_guess_data():
                 guess = Guess.objects.create(
                     match=match,
                     guesser=self.guesser,
