@@ -72,7 +72,7 @@
             </div>
             <span class="guess-points">
               Pontos ganhos:
-              {% if item.guess and item.guess.score %}
+              {% if item.guess%}
                 <span class="guess-points-score">{{ item.guess.score }}</span>
               {% else %}
                 -
