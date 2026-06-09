@@ -253,6 +253,13 @@ input {
   transform: translateX(0);
 }
 
+.sidebar-links-container {
+  display: flex;
+  flex-direction: column;
+  height: 60vh;
+  overflow-y: auto;
+}
+
 .sidebar a {
   margin: 1vh 0;
   padding: 2vh 1.5vh;
@@ -277,8 +284,7 @@ input {
 }
 
 .sidebar-address {
-  margin-top: auto;
-  padding-top: 3vh;
+  margin-top: 5vh;
   font-size: 0.75rem;
   text-align: center;
   font-style: normal;
