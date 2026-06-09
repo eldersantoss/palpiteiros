@@ -678,7 +678,7 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
         guesses_data.pop("csrfmiddlewaretoken")
         logger.info(f"{timezone.now()}: user {self.request.user} submitted grouped guesses: {guesses_data}")
 
-        for_all_pools = bool(self.request.POST.get("for_all_pools"))
+        for_all_pools = False  # Grouped guesses can only be submitted for the current pool, never for all pools
 
         open_matches = self.pool.get_open_matches()
         closed_matches = self.pool.get_closed_recent_matches()
