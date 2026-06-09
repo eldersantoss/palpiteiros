@@ -18,9 +18,9 @@ if [ "$PROCESS_TYPE" = "web" ]; then
     python manage.py collectstatic --noinput
     gunicorn \
     --bind 0.0.0.0:$PORT \
-    --workers 2 \
+    --workers $NUM_WORKERS \
     --worker-class gevent \
-    --log-level DEBUG \
+    --log-level $LOG_LEVEL \
     --access-logfile "-" \
     --error-logfile "-" \
     palpiteiros.wsgi
