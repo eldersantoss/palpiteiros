@@ -239,8 +239,9 @@ input {
   top: 0;
   left: 0;
   width: 70vw;
+  height: 100vh;
+  overflow: hidden;
   max-width: 280px;
-  height: 100%;
   background-color: #f4f4f4;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
   transform: translateX(-100%);
@@ -1032,7 +1033,7 @@ body.fixed-layout main {
   gap: 2vw;
   padding: 2vh 0 max(1vh, env(safe-area-inset-bottom));
   background-color: #f4f4f4;
-  padding-bottom: 10vh;
+  padding-bottom: 2vh;
 }
 
 .btn {
