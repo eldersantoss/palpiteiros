@@ -6,7 +6,6 @@ body {
   margin: 0;
   padding: 0;
   height: 100svh;
-  overflow: hidden;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background-color: #f4f4f4;
   color: black;
@@ -240,7 +239,6 @@ input {
   left: 0;
   width: 70vw;
   height: 100svh;
-  overflow-y: hidden;
   max-width: 280px;
   background-color: #f4f4f4;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
@@ -260,7 +258,7 @@ input {
   display: flex;
   flex-direction: column;
   height: 65svh;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .sidebar a {
