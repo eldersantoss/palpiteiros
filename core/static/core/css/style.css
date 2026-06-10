@@ -5,7 +5,7 @@
 body {
   margin: 0;
   padding: 0;
-  height: 88vh;
+  height: 85vh;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background-color: #f4f4f4;
   color: black;
@@ -22,6 +22,7 @@ a {
 p {
   line-height: 3.5vh;
 }
+
 .logout-form {
   margin: 0;
 }
@@ -192,7 +193,7 @@ input {
 }
 
 .profile summary::marker {
-  color:#083e93;
+  color: #083e93;
 }
 
 .profile {
@@ -225,7 +226,7 @@ input {
 .hamburger-btn {
   background: none;
   border: none;
-  font-size: 1.4rem;
+  font-size: 2rem;
   cursor: pointer;
   color: #083e93;
   padding: 0;
@@ -278,7 +279,7 @@ input {
 
 .sidebar-logo {
   align-self: center;
-  margin: 0 0 4vh 0!important;
+  margin: 0 0 4vh 0 !important;
   padding: 0 !important;
   background-color: transparent !important;
 }
@@ -415,7 +416,7 @@ input {
   text-align: center;
 }
 
-.main-form > div {
+.main-form>div {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -452,7 +453,8 @@ input {
   margin: 0 0.75vh 0 0;
 }
 
-.main-form input, .main-form select {
+.main-form input,
+.main-form select {
   margin-top: 1vh;
   padding: 1.5vh 1vh;
   border: none;
@@ -500,7 +502,8 @@ input {
   font-size: 0.85rem;
 }
 
-.guesses-form input, .guesses-form select {
+.guesses-form input,
+.guesses-form select {
   margin-top: 1vh;
   padding: 1.5vh 1vh;
   border: none;
@@ -725,7 +728,8 @@ input {
   margin-top: 2vh;
 }
 
-.recommendations-list li::marker, .recommendations-list strong {
+.recommendations-list li::marker,
+.recommendations-list strong {
   font-weight: bold;
   color: #1c57b7
 }
@@ -813,12 +817,14 @@ input {
   font-size: 0.75rem;
 }
 
-.main-table th, td {
+.main-table th,
+td {
   padding: 1.5vh 0.35vh;
   text-align: center;
 }
 
-.ranking-table th, td {
+.ranking-table th,
+td {
   padding: 1.5vh 0.75vh;
 }
 
@@ -894,12 +900,12 @@ footer address {
 }
 
 .guess-score {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-    padding: 0.5em;
-    text-align: center;
-    min-width: 2em;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0.5em;
+  text-align: center;
+  min-width: 2em;
 }
 
 .guess-points {
@@ -908,7 +914,7 @@ footer address {
   font-weight: bold;
 }
 
-.guess-points-score{
+.guess-points-score {
   color: #1c71b7;
 }
 
