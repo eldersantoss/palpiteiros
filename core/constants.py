@@ -19,8 +19,8 @@ WORLD_CUP_PERIOD_CHOICES = [
 ]
 
 WORLD_CUP_PERIOD_DATE_RANGES = {
-    "geral": (date(2026, 6, 5), date(2026, 7, 20)),
-    "rodada_1": (date(2026, 6, 5), date(2026, 6, 17)),
+    "geral": (date(2026, 6, 10), date(2026, 7, 20)),
+    "rodada_1": (date(2026, 6, 10), date(2026, 6, 17)),
     "rodada_2": (date(2026, 6, 18), date(2026, 6, 23)),
     "rodada_3": (date(2026, 6, 24), date(2026, 6, 27)),
     "rodada_32": (date(2026, 6, 28), date(2026, 7, 3)),
