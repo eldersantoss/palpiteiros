@@ -387,6 +387,7 @@ def test_guesses_world_cup_standings_reflects_closed_match_result(mock_tz, clien
         home_goals=2,
         away_goals=0,
     )
+    group.recalculate_standings()
     _open_match(pool, competition, home_team, away_team)
 
     client.force_login(guesser.user)

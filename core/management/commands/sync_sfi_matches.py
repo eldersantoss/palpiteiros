@@ -80,8 +80,18 @@ class Command(BaseCommand):
 
         service = SFIService(api_key=settings.SFI_API_KEY, api_host=settings.SFI_API_HOST)
 
+        updated_comp_ids = set()
         for target_date in dates:
-            self._process_date(service, target_date, competitions_by_sfi_id, today)
+            updated_comp_ids.update(
+                self._process_date(service, target_date, competitions_by_sfi_id, today)
+            )
+
+        if updated_comp_ids:
+            self.stdout.write(f"Recalculating standings for updated competitions: {updated_comp_ids}")
+            from core.models import CompetitionGroup
+            for group in CompetitionGroup.objects.filter(competition_id__in=updated_comp_ids):
+                self.stdout.write(f"  Recalculating standings for group {group}...")
+                group.recalculate_standings()
 
         self.stdout.write("sync_sfi_matches finished.")
 
@@ -107,16 +117,18 @@ class Command(BaseCommand):
         target_date: date,
         competitions_by_sfi_id: dict[str, Competition],
         today: date,
-    ) -> None:
+    ) -> set[int]:
         """Fetch and process all SFI matches for a single calendar day."""
         self.stdout.write(f"  Fetching matches for {target_date}...")
+
+        updated_competition_ids = set()
 
         try:
             matches = self._fetch_all_matches_for_date(service, target_date, today)
         except Exception:
             logger.exception("Failed to fetch SFI matches for %s.", target_date)
             self.stderr.write(f"  ERROR: could not fetch matches for {target_date}, skipping.")
-            return
+            return updated_competition_ids
 
         created, updated, skipped, teams_created = 0, 0, 0, 0
 
@@ -126,8 +138,14 @@ class Command(BaseCommand):
 
             if outcome == ProcessMatchResult.created:
                 created += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_competition_ids.add(comp.id)
             elif outcome == ProcessMatchResult.updated:
                 updated += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_competition_ids.add(comp.id)
             else:
                 skipped += 1
 
@@ -135,6 +153,7 @@ class Command(BaseCommand):
             f"  {target_date}: {created} created, {updated} updated, {skipped} skipped, "
             f"{teams_created} teams registered."
         )
+        return updated_competition_ids
 
     def _fetch_all_matches_for_date(self, service: SFIService, target_date: date, today: date) -> list[SFIMatch]:
         """Return every SFI match for *target_date*, handling pagination transparently.

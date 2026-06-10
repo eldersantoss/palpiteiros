@@ -125,9 +125,29 @@ class CompetitionGroup(models.Model):
         return f"{self.competition} – {self.name}"
 
     def get_standings(self):
+        standings = list(self.standings.select_related("team"))
+        if not standings and self.teams.exists():
+            self.recalculate_standings()
+            standings = list(self.standings.select_related("team"))
+
+        return [
+            {
+                "team": s.team,
+                "pts": s.pts,
+                "pj": s.pj,
+                "gf": s.gf,
+                "ga": s.ga,
+                "yc": s.yc,
+                "rc": s.rc,
+            }
+            for s in standings
+        ]
+
+    def recalculate_standings(self):
         teams = list(self.teams.all())
         if not teams:
-            return []
+            self.standings.all().delete()
+            return
 
         finished_matches = (
             Match.objects.filter(
@@ -138,118 +158,112 @@ class CompetitionGroup(models.Model):
             .select_related("home_team", "away_team")
         )
 
-        standings = {team.id: {"team": team, "pts": 0, "pj": 0, "gf": 0, "ga": 0, "yc": 0, "rc": 0} for team in teams}
+        standings_dict = {
+            team.id: {
+                "pts": 0,
+                "pj": 0,
+                "gf": 0,
+                "ga": 0,
+                "gd": 0,
+                "yc": 0,
+                "rc": 0,
+            }
+            for team in teams
+        }
 
         for match in finished_matches:
             hg = match.home_goals or 0
             ag = match.away_goals or 0
             home_team_id, away_team_id = match.home_team_id, match.away_team_id
 
-            if home_team_id in standings:
-                standings[home_team_id]["pj"] += 1
-                standings[home_team_id]["gf"] += hg
-                standings[home_team_id]["ga"] += ag
-                standings[home_team_id]["yc"] += match.home_yellow_cards or 0
-                standings[home_team_id]["rc"] += match.home_red_cards or 0
+            if home_team_id in standings_dict:
+                standings_dict[home_team_id]["pj"] += 1
+                standings_dict[home_team_id]["gf"] += hg
+                standings_dict[home_team_id]["ga"] += ag
+                standings_dict[home_team_id]["yc"] += match.home_yellow_cards or 0
+                standings_dict[home_team_id]["rc"] += match.home_red_cards or 0
                 if hg > ag:
-                    standings[home_team_id]["pts"] += 3
+                    standings_dict[home_team_id]["pts"] += 3
                 elif hg == ag:
-                    standings[home_team_id]["pts"] += 1
+                    standings_dict[home_team_id]["pts"] += 1
 
-            if away_team_id in standings:
-                standings[away_team_id]["pj"] += 1
-                standings[away_team_id]["gf"] += ag
-                standings[away_team_id]["ga"] += hg
-                standings[away_team_id]["yc"] += match.away_yellow_cards or 0
-                standings[away_team_id]["rc"] += match.away_red_cards or 0
+            if away_team_id in standings_dict:
+                standings_dict[away_team_id]["pj"] += 1
+                standings_dict[away_team_id]["gf"] += ag
+                standings_dict[away_team_id]["ga"] += hg
+                standings_dict[away_team_id]["yc"] += match.away_yellow_cards or 0
+                standings_dict[away_team_id]["rc"] += match.away_red_cards or 0
                 if ag > hg:
-                    standings[away_team_id]["pts"] += 3
+                    standings_dict[away_team_id]["pts"] += 3
                 elif ag == hg:
-                    standings[away_team_id]["pts"] += 1
+                    standings_dict[away_team_id]["pts"] += 1
 
-        return sorted(
-            standings.values(),
-            key=lambda x: (-x["pts"], -(x["gf"] - x["ga"]), -x["gf"], x["yc"], x["rc"]),
-        )
+        with transaction.atomic():
+            # Delete entries for teams no longer in the group
+            team_ids = [t.id for t in teams]
+            self.standings.exclude(team_id__in=team_ids).delete()
+
+            for team in teams:
+                stats = standings_dict[team.id]
+                stats["gd"] = stats["gf"] - stats["ga"]
+
+                GroupStanding.objects.update_or_create(
+                    group=self,
+                    team=team,
+                    defaults=stats,
+                )
 
     @classmethod
     def get_standings_batch(cls, groups):
-        """Calcula standings para uma lista de grupos em uma única query de partidas finalizadas,
-        ao invés de executar uma query por grupo."""
+        """Calcula/retorna standings para uma lista de grupos a partir de GroupStanding,
+        garantindo retrocompatibilidade."""
         if not groups:
             return {}
 
-        group_teams = {}
-        all_team_ids = set()
-        competition_ids = set()
+        group_ids = [g.id for g in groups]
+
+        # Fallback: Se algum grupo com times não possuir nenhum registro de standings no banco, recalculamos.
         for group in groups:
-            teams = list(group.teams.all())
-            group_teams[group.id] = teams
-            all_team_ids.update(t.id for t in teams)
-            competition_ids.add(group.competition_id)
+            if group.teams.exists() and not GroupStanding.objects.filter(group=group).exists():
+                group.recalculate_standings()
 
-        if not all_team_ids:
-            return {g.id: [] for g in groups}
+        standings_qs = GroupStanding.objects.filter(group_id__in=group_ids).select_related("team")
 
-        # Uma única query para todas as partidas finalizadas de todas as competições
-        finished_matches = list(
-            Match.objects.filter(
-                competition_id__in=competition_ids,
-                status__in=Match.FINISHED_STATUS,
+        results = {g.id: [] for g in groups}
+        for s in standings_qs:
+            results[s.group_id].append(
+                {
+                    "team": s.team,
+                    "pts": s.pts,
+                    "pj": s.pj,
+                    "gf": s.gf,
+                    "ga": s.ga,
+                    "yc": s.yc,
+                    "rc": s.rc,
+                }
             )
-            .filter(Q(home_team_id__in=all_team_ids) | Q(away_team_id__in=all_team_ids))
-            .select_related("home_team", "away_team")
-        )
-
-        results = {}
-        for group in groups:
-            teams = group_teams[group.id]
-            if not teams:
-                results[group.id] = []
-                continue
-
-            team_ids = {t.id for t in teams}
-            standings = {
-                t.id: {"team": t, "pts": 0, "pj": 0, "gf": 0, "ga": 0, "yc": 0, "rc": 0}
-                for t in teams
-            }
-
-            for match in finished_matches:
-                if match.competition_id != group.competition_id:
-                    continue
-
-                hg = match.home_goals or 0
-                ag = match.away_goals or 0
-                home_team_id, away_team_id = match.home_team_id, match.away_team_id
-
-                if home_team_id in standings:
-                    standings[home_team_id]["pj"] += 1
-                    standings[home_team_id]["gf"] += hg
-                    standings[home_team_id]["ga"] += ag
-                    standings[home_team_id]["yc"] += match.home_yellow_cards or 0
-                    standings[home_team_id]["rc"] += match.home_red_cards or 0
-                    if hg > ag:
-                        standings[home_team_id]["pts"] += 3
-                    elif hg == ag:
-                        standings[home_team_id]["pts"] += 1
-
-                if away_team_id in standings:
-                    standings[away_team_id]["pj"] += 1
-                    standings[away_team_id]["gf"] += ag
-                    standings[away_team_id]["ga"] += hg
-                    standings[away_team_id]["yc"] += match.away_yellow_cards or 0
-                    standings[away_team_id]["rc"] += match.away_red_cards or 0
-                    if ag > hg:
-                        standings[away_team_id]["pts"] += 3
-                    elif ag == hg:
-                        standings[away_team_id]["pts"] += 1
-
-            results[group.id] = sorted(
-                standings.values(),
-                key=lambda x: (-x["pts"], -(x["gf"] - x["ga"]), -x["gf"], x["yc"], x["rc"]),
-            )
-
         return results
+
+
+class GroupStanding(models.Model):
+    group = models.ForeignKey(CompetitionGroup, on_delete=models.CASCADE, related_name="standings")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="group_standings")
+    pts = models.PositiveIntegerField("PTS", default=0)
+    pj = models.PositiveIntegerField("PJ", default=0)
+    gf = models.PositiveIntegerField("GF", default=0)
+    ga = models.PositiveIntegerField("GA", default=0)
+    gd = models.IntegerField("GD", default=0)
+    yc = models.PositiveIntegerField("YC", default=0)
+    rc = models.PositiveIntegerField("RC", default=0)
+
+    class Meta:
+        verbose_name = "classificação de grupo"
+        verbose_name_plural = "classificações de grupo"
+        unique_together = [["group", "team"]]
+        ordering = ["-pts", "-gd", "-gf", "yc", "rc", "team_id"]
+
+    def __str__(self) -> str:
+        return f"{self.group} - {self.team.name}: {self.pts} PTS"
 
 
 class Match(models.Model):
@@ -699,9 +713,7 @@ class GuessPool(TimeStampedModel):
         upper_bound = now + timezone.timedelta(hours=self.hours_before_open_to_guesses)
 
         all_matches = list(
-            self.get_matches()
-            .filter(date_time__gte=lower_bound, date_time__lte=upper_bound)
-            .order_by("date_time")
+            self.get_matches().filter(date_time__gte=lower_bound, date_time__lte=upper_bound).order_by("date_time")
         )
 
         open_matches = [m for m in all_matches if m.date_time > cutoff]

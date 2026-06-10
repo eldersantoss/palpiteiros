@@ -66,6 +66,7 @@ class Command(BaseCommand):
         self.stdout.write(f"sync_sfi_matches_from_json: processing {len(matches)} match(es) from '{file_path}'")
 
         created, updated, skipped, teams_created = 0, 0, 0, 0
+        updated_comp_ids = set()
 
         for match in matches:
             outcome, created_teams_for_match = self._process_match(match, competitions_by_sfi_id)
@@ -73,8 +74,14 @@ class Command(BaseCommand):
 
             if outcome == ProcessMatchResult.created:
                 created += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_comp_ids.add(comp.id)
             elif outcome == ProcessMatchResult.updated:
                 updated += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_comp_ids.add(comp.id)
             else:
                 skipped += 1
 
@@ -82,6 +89,13 @@ class Command(BaseCommand):
             f"Done: {created} created, {updated} updated, {skipped} skipped, "
             f"{teams_created} teams registered."
         )
+
+        if updated_comp_ids:
+            self.stdout.write(f"Recalculating standings for updated competitions: {updated_comp_ids}")
+            from core.models import CompetitionGroup
+            for group in CompetitionGroup.objects.filter(competition_id__in=updated_comp_ids):
+                self.stdout.write(f"  Recalculating standings for group {group}...")
+                group.recalculate_standings()
 
     def _load_matches(self, file_path: Path) -> list[SFIMatch]:
         with file_path.open(encoding="utf-8") as f:
