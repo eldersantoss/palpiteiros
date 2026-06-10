@@ -19,12 +19,23 @@ class CompetitionGroupInline(admin.TabularInline):
     filter_horizontal = ["teams"]
 
 
+@admin.action(description="Desativar competições selecionadas")
+def deactivate_competitions(modeladmin, request, queryset):
+    queryset.update(in_progress=False)
+
+
+@admin.action(description="Ativar competições selecionadas")
+def activate_competitions(modeladmin, request, queryset):
+    queryset.update(in_progress=True)
+
+
 @admin.register(models.Competition)
 class CompetitionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "in_progress", "created", "modified")
     search_fields = ("name", "season")
     filter_horizontal = ["teams"]
     inlines = [CompetitionGroupInline]
+    actions = [deactivate_competitions, activate_competitions]
 
 
 @admin.register(models.Guesser)
