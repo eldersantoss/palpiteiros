@@ -239,8 +239,8 @@ input {
   top: 0;
   left: 0;
   width: 70vw;
-  height: 100vh;
-  overflow: hidden;
+  height: 100svh;
+  overflow-y: hidden;
   max-width: 280px;
   background-color: #f4f4f4;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25);
@@ -259,7 +259,7 @@ input {
 .sidebar-links-container {
   display: flex;
   flex-direction: column;
-  height: 60vh;
+  height: 65svh;
   overflow-y: auto;
 }
 
@@ -287,7 +287,6 @@ input {
 }
 
 .sidebar-address {
-  margin-top: 5vh;
   font-size: 0.75rem;
   text-align: center;
   font-style: normal;
@@ -1033,7 +1032,6 @@ body.fixed-layout main {
   gap: 2vw;
   padding: 2vh 0 max(1vh, env(safe-area-inset-bottom));
   background-color: #f4f4f4;
-  padding-bottom: 2vh;
 }
 
 .btn {
