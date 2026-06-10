@@ -739,3 +739,136 @@ def test_guesses_world_cup_post_empty_submission_saves_nothing(mock_tz, client):
 
     assert response.status_code == 200
     assert not pool.guesses.filter(guesser=guesser).exists()
+
+
+# ---------------------------------------------------------------------------
+# Pre-refactoring coverage gap tests
+# ---------------------------------------------------------------------------
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_get_with_existing_guess_preloads_initial_data(client):
+    """GET with an existing guess pre-fills the form with that guess's data."""
+    from core.models import Guess
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    match = _open_match(pool, competition, home_team, away_team)
+    guess = Guess.objects.create(guesser=guesser, match=match, home_goals=2, away_goals=1)
+    pool.guesses.add(guess)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    guess_form = response.context["guess_forms"][0]
+    assert guess_form.data[f"home_goals_{match.id}"] == 2
+    assert guess_form.data[f"away_goals_{match.id}"] == 1
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_get_closed_match_with_existing_guess_shows_guess(client):
+    """GET shows the existing guess for a closed match in closed_matches_and_guesses."""
+    from core.models import Guess
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    _open_match(pool, competition, home_team, away_team)
+    closed = _closed_match(pool, competition, home_team, away_team)
+    guess = Guess.objects.create(guesser=guesser, match=closed, home_goals=3, away_goals=0)
+    pool.guesses.add(guess)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    closed_entries = response.context["closed_matches_and_guesses"]
+    closed_guess = next(e["guess"] for e in closed_entries if e["match"].id == closed.id)
+    assert closed_guess.home_goals == 3
+    assert closed_guess.away_goals == 0
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_get_closed_match_without_guess_shows_none(client):
+    """GET with a closed match and no guess shows guess=None in context."""
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    _open_match(pool, competition, home_team, away_team)
+    closed = _closed_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:guesses", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    closed_entries = response.context["closed_matches_and_guesses"]
+    assert len(closed_entries) == 1
+    assert closed_entries[0]["guess"] is None
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_replaces_existing_guess(client):
+    """POST with new values replaces the previous guess in the pool."""
+    from core.models import Guess
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    match = _open_match(pool, competition, home_team, away_team)
+    old_guess = Guess.objects.create(guesser=guesser, match=match, home_goals=2, away_goals=1)
+    pool.guesses.add(old_guess)
+
+    client.force_login(guesser.user)
+    client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match.id}": "3",
+            f"away_goals_{match.id}": "0",
+        },
+    )
+
+    new_guess = pool.guesses.get(guesser=guesser, match=match)
+    assert new_guess.home_goals == 3
+    assert new_guess.away_goals == 0
+    assert not pool.guesses.filter(pk=old_guess.pk).exists()
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+def test_guesses_view_post_multiple_matches_no_orphan_guesses(client):
+    """POST guesses for two matches creates no orphan Guess objects."""
+    from core.models import Guess, GuessPool
+
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team", competitions=[competition])
+    away_team = baker.make("core.Team", competitions=[competition])
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    match1 = _open_match(pool, competition, home_team, away_team)
+    match2 = _open_match(pool, competition, home_team, away_team)
+
+    client.force_login(guesser.user)
+    client.post(
+        reverse("core:guesses", kwargs={"pool_slug": pool.slug}),
+        {
+            "csrfmiddlewaretoken": "dummy",
+            f"home_goals_{match1.id}": "1",
+            f"away_goals_{match1.id}": "0",
+            f"home_goals_{match2.id}": "2",
+            f"away_goals_{match2.id}": "2",
+        },
+    )
+
+    assert pool.guesses.filter(guesser=guesser, match=match1).exists()
+    assert pool.guesses.filter(guesser=guesser, match=match2).exists()
+    assert Guess.objects.exclude(pools__in=GuessPool.objects.all()).count() == 0

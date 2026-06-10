@@ -280,10 +280,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def get(self, *args, **kwargs):
         logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
 
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        has_matches = open_matches.exists() or closed_matches.exists()
+        has_matches = bool(open_matches or closed_matches)
         if not has_matches:
             return redirect_with_msg(
                 self.request,
@@ -293,33 +292,33 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 self.pool,
             )
 
+        # Batch query for all user guesses for these matches
+        all_match_ids = [m.id for m in open_matches] + [m.id for m in closed_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
         guess_forms = []
         for match in open_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
-                )
+            guess = existing_guesses.get(match.id)
+            if guess:
                 initial_data = {
                     f"home_goals_{match.id}": guess.home_goals,
                     f"away_goals_{match.id}": guess.away_goals,
                 }
-            except Guess.DoesNotExist:
+            else:
                 initial_data = None
 
             guess_forms.append(GuessForm(initial_data, match=match))
 
-        closed_matches_and_guesses = []
-        for match in closed_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
-                )
-            except Guess.DoesNotExist:
-                guess = None
-
-            closed_matches_and_guesses.append({"match": match, "guess": guess})
+        closed_matches_and_guesses = [
+            {"match": match, "guess": existing_guesses.get(match.id)}
+            for match in closed_matches
+        ]
 
         return render(
             self.request,
@@ -338,10 +337,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
 
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        if not open_matches.exists():
+        if not open_matches:
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -351,9 +349,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             )
 
         submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
-        open_match_ids = set(open_matches.values_list("id", flat=True))
+        open_match_ids = {m.id for m in open_matches}
 
-        guess_forms = []
+        has_new_guesses = False
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
 
@@ -377,38 +375,43 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                     away_goals=guess_form.cleaned_data["away_goals"],
                 )
                 self.pool.add_guess_to_pools(guess, for_all_pools)
-                self.pool.delete_orphans_guesses()
+                has_new_guesses = True
 
+        if has_new_guesses:
+            self.pool.delete_orphans_guesses()
+
+        # Re-fetch the updated/current guesses for all matches to construct the forms/context
+        all_match_ids = [m.id for m in open_matches] + [m.id for m in closed_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
+        guess_forms = []
+        for match in open_matches:
+            guess_form = GuessForm(self.request.POST, match=match)
+
+            if guess_form.has_valid_guess_data():
                 guess_forms.append(guess_form)
-
             else:
-                try:
-                    guess = self.pool.guesses.get(
-                        match=match,
-                        guesser=self.guesser,
-                    )
+                guess = existing_guesses.get(match.id)
+                if guess:
                     initial_data = {
                         f"home_goals_{match.id}": guess.home_goals,
                         f"away_goals_{match.id}": guess.away_goals,
                     }
-
-                except Guess.DoesNotExist:
+                else:
                     initial_data = None
 
                 guess_forms.append(GuessForm(initial_data, match=match))
 
-        closed_matches_and_guesses = []
-        for match in closed_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
-                )
-
-            except Guess.DoesNotExist:
-                guess = None
-
-            closed_matches_and_guesses.append({"match": match, "guess": guess})
+        closed_matches_and_guesses = [
+            {"match": match, "guess": existing_guesses.get(match.id)}
+            for match in closed_matches
+        ]
 
         messages.success(
             self.request,
@@ -580,9 +583,27 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
         all_matches = list(open_matches) + list(closed_matches)
         group_by_team_id_map = self._get_group_by_team_id_map(all_matches)
 
-        groups_dict: dict[int | None, dict[str, Any]] = (
-            {}
-        )  # group.id (or None) -> {"group": ..., "open_forms": [], "closed": []}
+        # Batch query for all user guesses for these matches
+        all_match_ids = [m.id for m in all_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
+        # Collect unique groups
+        unique_groups = set()
+        for match in all_matches:
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)
+            if group:
+                unique_groups.add(group)
+
+        # Batch query for standings of all unique groups
+        standings_batch = CompetitionGroup.get_standings_batch(list(unique_groups))
+
+        groups_dict: dict[int | None, dict[str, Any]] = {}
 
         for match in open_matches:
             group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)  # type: ignore
@@ -593,29 +614,29 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                     "group": group,
                     "open_forms": [],
                     "closed": [],
-                    "standings": group.get_standings() if group else [],
+                    "standings": standings_batch.get(group_id, []) if group_id else [],
                 }
 
             if post_data is not None:
                 guess_form = GuessForm(post_data, match=match)
                 if not guess_form.has_valid_guess_data():
-                    try:
-                        existing = self.pool.guesses.get(match=match, guesser=self.guesser)
+                    existing = existing_guesses.get(match.id)
+                    if existing:
                         initial = {
                             f"home_goals_{match.id}": existing.home_goals,
                             f"away_goals_{match.id}": existing.away_goals,
                         }
-                    except Guess.DoesNotExist:
+                    else:
                         initial = None
                     guess_form = GuessForm(initial, match=match)
             else:
-                try:
-                    existing = self.pool.guesses.get(match=match, guesser=self.guesser)
+                existing = existing_guesses.get(match.id)
+                if existing:
                     initial = {
                         f"home_goals_{match.id}": existing.home_goals,
                         f"away_goals_{match.id}": existing.away_goals,
                     }
-                except Guess.DoesNotExist:
+                else:
                     initial = None
                 guess_form = GuessForm(initial, match=match)
 
@@ -630,14 +651,10 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                     "group": group,
                     "open_forms": [],
                     "closed": [],
-                    "standings": group.get_standings() if group else [],
+                    "standings": standings_batch.get(group_id, []) if group_id else [],
                 }
 
-            try:
-                guess = self.pool.guesses.get(match=match, guesser=self.guesser)
-            except Guess.DoesNotExist:
-                guess = None
-
+            guess = existing_guesses.get(match.id)
             groups_dict[group_id]["closed"].append({"match": match, "guess": guess})
 
         # Sort: named groups alphabetically, ungrouped (None) last
@@ -649,10 +666,9 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
         return named + ungrouped
 
     def get(self, *args, **kwargs):
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        has_matches = open_matches.exists() or closed_matches.exists()
+        has_matches = bool(open_matches or closed_matches)
         if not has_matches:
             return redirect_with_msg(
                 self.request,
@@ -680,10 +696,9 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
         for_all_pools = True  # Grouped guesses are always applied to all pools they belong to
 
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        if not open_matches.exists():
+        if not open_matches:
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -693,8 +708,9 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
             )
 
         submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
-        open_match_ids = set(open_matches.values_list("id", flat=True))
+        open_match_ids = {m.id for m in open_matches}
 
+        has_new_guesses = False
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
             if guess_form.has_valid_guess_data():
@@ -705,7 +721,10 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
                     away_goals=guess_form.cleaned_data["away_goals"],
                 )
                 self.pool.add_guess_to_pools(guess, for_all_pools)
-                self.pool.delete_orphans_guesses()
+                has_new_guesses = True
+
+        if has_new_guesses:
+            self.pool.delete_orphans_guesses()
 
         groups_data = self._build_groups_data(open_matches, closed_matches, post_data=self.request.POST)
 

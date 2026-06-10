@@ -216,3 +216,60 @@ def test_get_standings_ignores_matches_of_other_competitions():
     standings = group.get_standings()
     assert all(entry["pts"] == 0 for entry in standings)
     assert all(entry["pj"] == 0 for entry in standings)
+
+
+def test_get_standings_batch_equals_individual():
+    """get_standings_batch() must produce the same results as calling
+    get_standings() individually for each group."""
+    from core.models import CompetitionGroup
+
+    competition = baker.make("core.Competition")
+    team_a1 = baker.make("core.Team")
+    team_a2 = baker.make("core.Team")
+    team_b1 = baker.make("core.Team")
+    team_b2 = baker.make("core.Team")
+
+    group_a = baker.make("core.CompetitionGroup", competition=competition, name="Grupo A")
+    group_a.teams.set([team_a1, team_a2])
+    group_b = baker.make("core.CompetitionGroup", competition=competition, name="Grupo B")
+    group_b.teams.set([team_b1, team_b2])
+
+    _make_finished_match(competition, team_a1, team_a2, hg=2, ag=1)
+    _make_finished_match(competition, team_b1, team_b2, hg=0, ag=0)
+
+    # Individual results
+    individual_a = group_a.get_standings()
+    individual_b = group_b.get_standings()
+
+    # Batch results
+    batch_results = CompetitionGroup.get_standings_batch([group_a, group_b])
+
+    # Compare group A
+    batch_a = batch_results[group_a.id]
+    assert len(batch_a) == len(individual_a)
+    for ind, bat in zip(individual_a, batch_a):
+        assert ind["team"] == bat["team"]
+        assert ind["pts"] == bat["pts"]
+        assert ind["pj"] == bat["pj"]
+        assert ind["gf"] == bat["gf"]
+        assert ind["ga"] == bat["ga"]
+        assert ind["yc"] == bat["yc"]
+        assert ind["rc"] == bat["rc"]
+
+    # Compare group B
+    batch_b = batch_results[group_b.id]
+    assert len(batch_b) == len(individual_b)
+    for ind, bat in zip(individual_b, batch_b):
+        assert ind["team"] == bat["team"]
+        assert ind["pts"] == bat["pts"]
+
+
+def test_get_standings_batch_empty_group():
+    """get_standings_batch() with a group that has no teams returns an empty list."""
+    from core.models import CompetitionGroup
+
+    competition = baker.make("core.Competition")
+    empty_group = baker.make("core.CompetitionGroup", competition=competition, name="Empty")
+
+    results = CompetitionGroup.get_standings_batch([empty_group])
+    assert results[empty_group.id] == []

@@ -172,6 +172,85 @@ class CompetitionGroup(models.Model):
             key=lambda x: (-x["pts"], -(x["gf"] - x["ga"]), -x["gf"], x["yc"], x["rc"]),
         )
 
+    @classmethod
+    def get_standings_batch(cls, groups):
+        """Calcula standings para uma lista de grupos em uma única query de partidas finalizadas,
+        ao invés de executar uma query por grupo."""
+        if not groups:
+            return {}
+
+        group_teams = {}
+        all_team_ids = set()
+        competition_ids = set()
+        for group in groups:
+            teams = list(group.teams.all())
+            group_teams[group.id] = teams
+            all_team_ids.update(t.id for t in teams)
+            competition_ids.add(group.competition_id)
+
+        if not all_team_ids:
+            return {g.id: [] for g in groups}
+
+        # Uma única query para todas as partidas finalizadas de todas as competições
+        finished_matches = list(
+            Match.objects.filter(
+                competition_id__in=competition_ids,
+                status__in=Match.FINISHED_STATUS,
+            )
+            .filter(Q(home_team_id__in=all_team_ids) | Q(away_team_id__in=all_team_ids))
+            .select_related("home_team", "away_team")
+        )
+
+        results = {}
+        for group in groups:
+            teams = group_teams[group.id]
+            if not teams:
+                results[group.id] = []
+                continue
+
+            team_ids = {t.id for t in teams}
+            standings = {
+                t.id: {"team": t, "pts": 0, "pj": 0, "gf": 0, "ga": 0, "yc": 0, "rc": 0}
+                for t in teams
+            }
+
+            for match in finished_matches:
+                if match.competition_id != group.competition_id:
+                    continue
+
+                hg = match.home_goals or 0
+                ag = match.away_goals or 0
+                home_team_id, away_team_id = match.home_team_id, match.away_team_id
+
+                if home_team_id in standings:
+                    standings[home_team_id]["pj"] += 1
+                    standings[home_team_id]["gf"] += hg
+                    standings[home_team_id]["ga"] += ag
+                    standings[home_team_id]["yc"] += match.home_yellow_cards or 0
+                    standings[home_team_id]["rc"] += match.home_red_cards or 0
+                    if hg > ag:
+                        standings[home_team_id]["pts"] += 3
+                    elif hg == ag:
+                        standings[home_team_id]["pts"] += 1
+
+                if away_team_id in standings:
+                    standings[away_team_id]["pj"] += 1
+                    standings[away_team_id]["gf"] += ag
+                    standings[away_team_id]["ga"] += hg
+                    standings[away_team_id]["yc"] += match.away_yellow_cards or 0
+                    standings[away_team_id]["rc"] += match.away_red_cards or 0
+                    if ag > hg:
+                        standings[away_team_id]["pts"] += 3
+                    elif ag == hg:
+                        standings[away_team_id]["pts"] += 1
+
+            results[group.id] = sorted(
+                standings.values(),
+                key=lambda x: (-x["pts"], -(x["gf"] - x["ga"]), -x["gf"], x["yc"], x["rc"]),
+            )
+
+        return results
+
 
 class Match(models.Model):
     NOT_STARTED = "NS"
@@ -612,6 +691,24 @@ class GuessPool(TimeStampedModel):
             )
             .order_by("-date_time")
         )
+
+    def get_relevant_matches(self):
+        now = timezone.now()
+        cutoff = now + timezone.timedelta(minutes=self.minutes_before_start_match)
+        lower_bound = now - timezone.timedelta(hours=self.hours_to_keep_closed_matches_in_ranking)
+        upper_bound = now + timezone.timedelta(hours=self.hours_before_open_to_guesses)
+
+        all_matches = list(
+            self.get_matches()
+            .filter(date_time__gte=lower_bound, date_time__lte=upper_bound)
+            .order_by("date_time")
+        )
+
+        open_matches = [m for m in all_matches if m.date_time > cutoff]
+        closed_matches = [m for m in all_matches if m.date_time < cutoff]
+        closed_matches.reverse()
+
+        return open_matches, closed_matches
 
     @classmethod
     def toggle_flag_value(

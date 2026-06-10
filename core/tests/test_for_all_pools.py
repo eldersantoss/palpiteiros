@@ -319,10 +319,9 @@ def test_grouped_guesses_view_saves_in_originating_pool(mock_tz, client):
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_view_never_propagates_without_checkbox(mock_tz, client):
-    """GroupedGuessesView must NEVER propagate guesses to other pools because the
-    template does not render the checkbox — so `for_all_pools` is always absent
-    in the POST body and therefore always False."""
+def test_grouped_guesses_view_always_propagates(mock_tz, client):
+    """GroupedGuessesView must always propagate guesses to other pools because
+    for_all_pools is hardcoded to True for grouped guesses."""
     mock_tz.localdate.return_value = INSIDE_WC_WINDOW
     mock_tz.now = timezone.now
     mock_tz.timedelta = timezone.timedelta
@@ -346,19 +345,14 @@ def test_grouped_guesses_view_never_propagates_without_checkbox(mock_tz, client)
     )
 
     assert pool1.guesses.filter(guesser=guesser, match=match).exists()
-    assert not pool2.guesses.filter(guesser=guesser, match=match).exists()
+    assert pool2.guesses.filter(guesser=guesser, match=match).exists()
 
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 @patch("core.views.timezone")
-def test_grouped_guesses_view_does_not_propagate_even_if_for_all_pools_injected(mock_tz, client):
-    """Even if a malicious/curious user manually injects for_all_pools=on in the POST
-    to GroupedGuessesView, the guess must NOT be propagated to other pools.
-
-    NOTE: This test documents that the view code DOES read and honour the injected
-    `for_all_pools` parameter. If this test FAILS it means the view currently
-    propagates guesses when the parameter is injected — which is a bug that must
-    be fixed by ignoring `for_all_pools` in GroupedGuessesView.
+def test_grouped_guesses_view_propagates_regardless_of_injected_for_all_pools(mock_tz, client):
+    """GroupedGuessesView propagates guesses to other pools regardless of the injected
+    value of for_all_pools, since it is hardcoded to True.
     """
     mock_tz.localdate.return_value = INSIDE_WC_WINDOW
     mock_tz.now = timezone.now
@@ -372,19 +366,14 @@ def test_grouped_guesses_view_does_not_propagate_even_if_for_all_pools_injected(
     match = _open_match(competition, home, away)
 
     client.force_login(guesser.user)
-    # Manually inject for_all_pools=on — the template does NOT send this
     _post_guess(
         client,
         reverse("core:guesses_world_cup", kwargs={"pool_slug": pool1.slug}),
         match,
         2,
         2,
-        for_all_pools=True,  # injected by "attacker"
+        for_all_pools=True,
     )
 
     assert pool1.guesses.filter(guesser=guesser, match=match).exists()
-    # Must NOT propagate — if this fails, GroupedGuessesView ignores for_all_pools correctly
-    assert not pool2.guesses.filter(guesser=guesser, match=match).exists(), (
-        "BUG: GroupedGuessesView propagated guess to pool2 when for_all_pools was "
-        "injected via POST. The view must ignore for_all_pools entirely."
-    )
+    assert pool2.guesses.filter(guesser=guesser, match=match).exists()

@@ -158,3 +158,62 @@ def test_get_closed_recent_matches_ordered_by_most_recent_first(mock_tz):
     result = list(pool.get_closed_recent_matches())
     assert result[0] == match_5h_ago
     assert result[1] == match_20h_ago
+
+
+@patch("core.models.timezone")
+def test_get_relevant_matches_equals_separate_calls(mock_tz):
+    """get_relevant_matches() must return the same match sets as
+    get_open_matches() + get_closed_recent_matches() called separately."""
+    mock_tz.now.return_value = timezone.make_aware(timezone.datetime(2026, 6, 6, 12, 0, 0))
+    mock_tz.timedelta = timezone.timedelta
+
+    pool = _make_pool_with_old_created(
+        hours_to_keep_closed_matches_in_ranking=36,
+        minutes_before_start_match=5,
+        hours_before_open_to_guesses=48,
+    )
+    competition = baker.make("core.Competition")
+    pool.competitions.add(competition)
+    teams = baker.make("core.Team", 6)
+    competition.teams.set(teams)
+
+    now = mock_tz.now.return_value
+
+    # Open match (starts in 1 hour — within the open window)
+    open_match = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=teams[0],
+        away_team=teams[1],
+        date_time=now + timezone.timedelta(hours=1),
+    )
+    # Closed recent match (started 2 hours ago — within the closed window)
+    closed_recent = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=teams[2],
+        away_team=teams[3],
+        date_time=now - timezone.timedelta(hours=2),
+    )
+    # Match outside window (started 40 hours ago — outside closed window)
+    baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=teams[4],
+        away_team=teams[5],
+        date_time=now - timezone.timedelta(hours=40),
+    )
+
+    # Results from separate calls
+    expected_open_ids = set(pool.get_open_matches().values_list("id", flat=True))
+    expected_closed_ids = set(pool.get_closed_recent_matches().values_list("id", flat=True))
+
+    # Results from unified call
+    open_matches, closed_matches = pool.get_relevant_matches()
+    actual_open_ids = {m.id for m in open_matches}
+    actual_closed_ids = {m.id for m in closed_matches}
+
+    assert actual_open_ids == expected_open_ids
+    assert actual_closed_ids == expected_closed_ids
+    assert open_match.id in actual_open_ids
+    assert closed_recent.id in actual_closed_ids
