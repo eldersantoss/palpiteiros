@@ -11,112 +11,126 @@
 <div class="page-container">
   <div class="scrollable-content">
     {% if groups_data %}
-    <form id="grouped-guesses-form" action="{% url 'core:guesses_world_cup' pool.slug %}" method="post" class="guesses-form">
+    <form id="grouped-guesses-form" action="{% url 'core:guesses_world_cup' pool.slug %}" method="post"
+      class="guesses-form">
       {% csrf_token %}
 
       {% for group_data in groups_data %}
-        <h4 class="group-title">{{ group_data.group.name|default:"Outras partidas" }}</h4>
+      <h4 class="group-title">{{ group_data.group.name|default:"Outras partidas" }}</h4>
 
-        {% for guess_form in group_data.open_forms %}
-          <div class="match-wrapper">
-            <p class="match-time">
-              {{ guess_form.match.date_time|date:"l d/m H:i" }}
-              {% if guess_form.match.double_score %}
-              <strong>(x2 🔥)</strong>
-              {% endif %}
-            </p>
-            <div class="guess-wrapper">
-              <div class="team">
-                <div>
-                  <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
-                  <div>{{ guess_form.home_goals.label_tag }}</div>
-                </div>
-                {{ guess_form.home_goals }}
-              </div>
-              <div class="separador-equipes">x</div>
-              <div class="team">
-                {{ guess_form.away_goals }}
-                <div>
-                  <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
-                  <div>{{ guess_form.away_goals.label_tag }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-
-        {% for item in group_data.closed %}
-          <div class="match-wrapper">
-            <p class="match-time">
-              {{ item.match.date_time|date:"l d/m H:i" }}
-              {% if item.match.double_score %}
-              <strong>(x2 🔥)</strong>
-              {% endif %}
-            </p>
-            <div class="guess-wrapper">
-              <div class="team">
-                <div>
-                  <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
-                  <div>{{ item.match.home_team.name }}</div>
-                </div>
-                <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
-              </div>
-              <div class="separador-equipes">x</div>
-              <div class="team">
-                <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
-                <div>
-                  <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
-                  <div>{{ item.match.away_team.name }}</div>
-                </div>
-              </div>
-            </div>
-            <span class="guess-points">
-              Pontos ganhos:
-              {% if item.guess%}
-                <span class="guess-points-score">{{ item.guess.score }}</span>
-              {% else %}
-                -
-              {% endif %}
-            </span>
-          </div>
-        {% endfor %}
-
-        {% if group_data.standings %}
-        <div class="group-standings">
-          <table class="main-table standings-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th></th>
-                <th title="Partidas jogadas">PJ</th>
-                <th title="Pontos">PTS</th>
-                <th title="Gols marcados">GM</th>
-                <th title="Gols sofridos">GS</th>
-                <th title="Cartões amarelos">🟨</th>
-                <th title="Cartões vermelhos">🟥</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for entry in group_data.standings %}
-              <tr>
-                <td class="standings-team-logo">
-                  <object data="{{ entry.team.logo_url }}" type="image/png" class="small-team-logo">
-                    <img src="{{ placeholder_url }}" class="small-team-logo">
-                  </object>
-                </td>
-                <td class="standings-team-name">{{ entry.team.name }}</td>
-                <td>{{ entry.pj }}</td>
-                <td><strong>{{ entry.pts }}</strong></td>
-                <td>{{ entry.gf }}</td>
-                <td>{{ entry.ga }}</td>
-                <td>{{ entry.yc }}</td>
-                <td>{{ entry.rc }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      {% for guess_form in group_data.open_forms %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ guess_form.match.date_time|date:"l d/m H:i" }}
+          {% if guess_form.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        {% if guess_form.errors or guess_form.non_field_errors %}
+        <div class="form-errors alert alert-danger"
+          style="color: var(--error-color, #dc3545); font-size: 0.7rem; margin-bottom: 0.5rem; text-align: center;">
+          {% for error in guess_form.non_field_errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+          {% for field in guess_form %}
+          {% for error in field.errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+          {% endfor %}
         </div>
         {% endif %}
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
+              <div>{{ guess_form.home_goals.label_tag }}</div>
+            </div>
+            {{ guess_form.home_goals }}
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            {{ guess_form.away_goals }}
+            <div>
+              <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
+              <div>{{ guess_form.away_goals.label_tag }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% for item in group_data.closed %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ item.match.date_time|date:"l d/m H:i" }}
+          {% if item.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
+              <div>{{ item.match.home_team.name }}</div>
+            </div>
+            <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
+            <div>
+              <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
+              <div>{{ item.match.away_team.name }}</div>
+            </div>
+          </div>
+        </div>
+        <span class="guess-points">
+          Pontos ganhos:
+          {% if item.guess%}
+          <span class="guess-points-score">{{ item.guess.score }}</span>
+          {% else %}
+          -
+          {% endif %}
+        </span>
+      </div>
+      {% endfor %}
+
+      {% if group_data.standings %}
+      <div class="group-standings">
+        <table class="main-table standings-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th title="Partidas jogadas">PJ</th>
+              <th title="Pontos">PTS</th>
+              <th title="Gols marcados">GM</th>
+              <th title="Gols sofridos">GS</th>
+              <th title="Cartões amarelos">🟨</th>
+              <th title="Cartões vermelhos">🟥</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in group_data.standings %}
+            <tr>
+              <td class="standings-team-logo">
+                <object data="{{ entry.team.logo_url }}" type="image/png" class="small-team-logo">
+                  <img src="{{ placeholder_url }}" class="small-team-logo">
+                </object>
+              </td>
+              <td class="standings-team-name">{{ entry.team.name }}</td>
+              <td>{{ entry.pj }}</td>
+              <td><strong>{{ entry.pts }}</strong></td>
+              <td>{{ entry.gf }}</td>
+              <td>{{ entry.ga }}</td>
+              <td>{{ entry.yc }}</td>
+              <td>{{ entry.rc }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
 
       {% endfor %}
     </form>
@@ -124,7 +138,8 @@
   </div>
 
   <div class="action-bar">
-    <a href="javascript:history.back()" class="btn {% if groups_data %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
+    <a href="javascript:history.back()"
+      class="btn {% if groups_data %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
     {% if groups_data %}
     <button type="submit" form="grouped-guesses-form" class="btn btn-primary">Salvar palpites</button>
     {% endif %}

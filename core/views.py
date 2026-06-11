@@ -13,7 +13,8 @@ from django.utils.text import slugify
 from django.views import generic
 
 from core.constants import WORLD_CUP_END_DATE, WORLD_CUP_START_DATE
-from core.helpers import redirect_with_msg
+from core.helpers import extract_and_parse_guesses_for_log, redirect_with_msg
+from core.loggers import log_guess_submission
 
 from .forms import (
     GuesserEditForm,
@@ -316,8 +317,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             guess_forms.append(GuessForm(initial_data, match=match))
 
         closed_matches_and_guesses = [
-            {"match": match, "guess": existing_guesses.get(match.id)}
-            for match in closed_matches
+            {"match": match, "guess": existing_guesses.get(match.id)} for match in closed_matches
         ]
 
         return render(
@@ -332,14 +332,31 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
 
     def post(self, *args, **kwargs):
         guesses_data = dict(**self.request.POST)
-        guesses_data.pop("csrfmiddlewaretoken")
+        guesses_data.pop("csrfmiddlewaretoken", None)
         logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
 
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
         open_matches, closed_matches = self.pool.get_relevant_matches()
 
+        # Parse submitted guesses for logging
+        guesses_submitted = extract_and_parse_guesses_for_log(self.request.POST)
+
+        open_match_ids = {m.id for m in open_matches}
+        results = {"success": [], "validation_errors": {}, "match_closed": []}
+
         if not open_matches:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error="Não existem partidas abertas neste momento",
+                request=self.request,
+            )
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -349,36 +366,56 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
             )
 
         submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
-        open_match_ids = {m.id for m in open_matches}
 
         has_new_guesses = False
-        for match in open_matches:
-            guess_form = GuessForm(self.request.POST, match=match)
+        has_validation_errors = False
+        error_occurred = None
 
-            if guess_form.has_valid_guess_data():
-                """
-                Quando o palpite é aproveitado em todos os bolões, a mesma
-                instância de palpite é adicionada no relacionamento guesses
-                de todos os bolões nos quais ele é aproveitado. Então, quando
-                essa instância for modificada, todos os bolões terão seus
-                palpites afetados. Por isso, só se deve ATUALIZAR um palpite
-                se ele for aproveitado em todos os bolões (for_all_pools). Caso
-                contrário, quando o palpite for exclusivo de um único bolão,
-                deve-se sempre criar um novo palpite e substituir o antigo pelo
-                novo na relação guesses.
-                """
+        try:
+            for match in open_matches:
+                guess_form = GuessForm(self.request.POST, match=match)
 
-                guess = Guess.objects.create(
-                    match=match,
-                    guesser=self.guesser,
-                    home_goals=guess_form.cleaned_data["home_goals"],
-                    away_goals=guess_form.cleaned_data["away_goals"],
-                )
-                self.pool.add_guess_to_pools(guess, for_all_pools)
-                has_new_guesses = True
+                if guess_form.has_valid_guess_data():
+                    guess = Guess.objects.create(
+                        match=match,
+                        guesser=self.guesser,
+                        home_goals=guess_form.cleaned_data["home_goals"],
+                        away_goals=guess_form.cleaned_data["away_goals"],
+                    )
+                    self.pool.add_guess_to_pools(guess, for_all_pools)
+                    has_new_guesses = True
+                    results["success"].append(match.id)
+                else:
+                    if not guess_form.is_valid():
+                        has_validation_errors = True
+                        errors_dict = {f: e[0] for f, e in guess_form.errors.items() if e}
+                        errors_str = "; ".join(f"{f}: {e}" for f, e in errors_dict.items()) or "Erro de validação"
+                        results["validation_errors"][str(match.id)] = errors_str
 
-        if has_new_guesses:
-            self.pool.delete_orphans_guesses()
+            if has_new_guesses:
+                self.pool.delete_orphans_guesses()
+
+            # Identify if any submitted match was closed
+            for m_id in submitted_match_ids:
+                if m_id not in open_match_ids:
+                    results["match_closed"].append(m_id)
+
+        except Exception as e:
+            error_occurred = e
+            raise e
+
+        finally:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error=error_occurred,
+                request=self.request,
+            )
 
         # Re-fetch the updated/current guesses for all matches to construct the forms/context
         all_match_ids = [m.id for m in open_matches] + [m.id for m in closed_matches]
@@ -394,9 +431,7 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
 
-            if guess_form.has_valid_guess_data():
-                guess_forms.append(guess_form)
-            else:
+            if guess_form.is_valid():
                 guess = existing_guesses.get(match.id)
                 if guess:
                     initial_data = {
@@ -407,17 +442,33 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                     initial_data = None
 
                 guess_forms.append(GuessForm(initial_data, match=match))
+            else:
+                guess_forms.append(guess_form)
 
         closed_matches_and_guesses = [
-            {"match": match, "guess": existing_guesses.get(match.id)}
-            for match in closed_matches
+            {"match": match, "guess": existing_guesses.get(match.id)} for match in closed_matches
         ]
 
-        messages.success(
-            self.request,
-            "Palpites salvos ✅",
-            "temp-msg short-time-msg",
-        )
+        if has_validation_errors:
+            if has_new_guesses:
+                messages.warning(
+                    self.request,
+                    "Alguns palpites foram salvos, mas outros contêm erros e foram ignorados. Verifique os campos destacados abaixo. ⚠️",
+                    "temp-msg mid-time-msg",
+                )
+            else:
+                messages.error(
+                    self.request,
+                    "Nenhum palpite foi salvo. Por favor, corrija os erros nos campos destacados abaixo. ❌",
+                    "temp-msg mid-time-msg",
+                )
+
+        elif has_new_guesses:
+            messages.success(
+                self.request,
+                "Palpites salvos ✅",
+                "temp-msg short-time-msg",
+            )
 
         if submitted_match_ids - open_match_ids:
             messages.warning(
@@ -619,7 +670,7 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
             if post_data is not None:
                 guess_form = GuessForm(post_data, match=match)
-                if not guess_form.has_valid_guess_data():
+                if guess_form.is_valid():
                     existing = existing_guesses.get(match.id)
                     if existing:
                         initial = {
@@ -691,14 +742,31 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
 
     def post(self, *args, **kwargs):
         guesses_data = dict(**self.request.POST)
-        guesses_data.pop("csrfmiddlewaretoken")
-        logger.info(f"{timezone.now()}: user {self.request.user} submitted grouped guesses: {guesses_data}")
+        guesses_data.pop("csrfmiddlewaretoken", None)
+        logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
 
         for_all_pools = True  # Grouped guesses are always applied to all pools they belong to
 
         open_matches, closed_matches = self.pool.get_relevant_matches()
 
+        # Parse submitted guesses for logging
+        guesses_submitted = extract_and_parse_guesses_for_log(self.request.POST)
+
+        open_match_ids = {m.id for m in open_matches}
+        results = {"success": [], "validation_errors": {}, "match_closed": []}
+
         if not open_matches:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_grouped_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error="Não existem partidas abertas neste momento",
+                request=self.request,
+            )
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -708,31 +776,78 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
             )
 
         submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
-        open_match_ids = {m.id for m in open_matches}
 
         has_new_guesses = False
-        for match in open_matches:
-            guess_form = GuessForm(self.request.POST, match=match)
-            if guess_form.has_valid_guess_data():
-                guess = Guess.objects.create(
-                    match=match,
-                    guesser=self.guesser,
-                    home_goals=guess_form.cleaned_data["home_goals"],
-                    away_goals=guess_form.cleaned_data["away_goals"],
-                )
-                self.pool.add_guess_to_pools(guess, for_all_pools)
-                has_new_guesses = True
+        has_validation_errors = False
+        error_occurred = None
 
-        if has_new_guesses:
-            self.pool.delete_orphans_guesses()
+        try:
+            for match in open_matches:
+                guess_form = GuessForm(self.request.POST, match=match)
+                if guess_form.has_valid_guess_data():
+                    guess = Guess.objects.create(
+                        match=match,
+                        guesser=self.guesser,
+                        home_goals=guess_form.cleaned_data["home_goals"],
+                        away_goals=guess_form.cleaned_data["away_goals"],
+                    )
+                    self.pool.add_guess_to_pools(guess, for_all_pools)
+                    has_new_guesses = True
+                    results["success"].append(match.id)
+                else:
+                    if not guess_form.is_valid():
+                        has_validation_errors = True
+                        errors_dict = {f: e[0] for f, e in guess_form.errors.items() if e}
+                        errors_str = "; ".join(f"{f}: {e}" for f, e in errors_dict.items()) or "Erro de validação"
+                        results["validation_errors"][str(match.id)] = errors_str
+
+            if has_new_guesses:
+                self.pool.delete_orphans_guesses()
+
+            # Identify if any submitted match was closed
+            for m_id in submitted_match_ids:
+                if m_id not in open_match_ids:
+                    results["match_closed"].append(m_id)
+
+        except Exception as e:
+            error_occurred = e
+            raise e
+
+        finally:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_grouped_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error=error_occurred,
+                request=self.request,
+            )
 
         groups_data = self._build_groups_data(open_matches, closed_matches, post_data=self.request.POST)
 
-        messages.success(
-            self.request,
-            "Palpites salvos ✅",
-            "temp-msg short-time-msg",
-        )
+        if has_validation_errors:
+            if has_new_guesses:
+                messages.warning(
+                    self.request,
+                    "Alguns palpites foram salvos, mas outros contêm erros e foram ignorados. Verifique os campos destacados abaixo. ⚠️",
+                    "temp-msg mid-time-msg",
+                )
+            else:
+                messages.error(
+                    self.request,
+                    "Nenhum palpite foi salvo. Por favor, corrija os erros nos campos destacados abaixo. ❌",
+                    "temp-msg mid-time-msg",
+                )
+
+        elif has_new_guesses:
+            messages.success(
+                self.request,
+                "Palpites salvos ✅",
+                "temp-msg short-time-msg",
+            )
 
         if submitted_match_ids - open_match_ids:
             messages.warning(
