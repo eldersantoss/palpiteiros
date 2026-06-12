@@ -197,6 +197,7 @@ class SFIService:
 
     _BASE_URL = "https://{host}"
     _MATCHES_BY_DAY_PATH = "/matches/day/basic/"
+    _MATCHES_BY_CHAMPIONSHIP_PATH = "/matches/by/basic/"
     _CHAMPIONSHIPS_VIEW_PATH = "/championships/view/"
 
     SFI_NOT_STARTED_STATUS = "NOT_STARTED"
@@ -240,6 +241,38 @@ class SFIService:
 
         response = requests.get(
             self._base_url + self._MATCHES_BY_DAY_PATH,
+            headers=self._headers,
+            params=params,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_matches_by_championship(self, championship_id: str, page: int = 1) -> SFIMatchesResponse:
+        """Fetch matches for a specific championship.
+
+        The response is paginated (25 matches per page); iterate pages until all
+        items are consumed.
+
+        Args:
+            championship_id: The SFI championship ID.
+            page: 1-based page number.
+
+        Returns:
+            The raw JSON response parsed into an ``SFIMatchesResponse`` dict.
+
+        Raises:
+            requests.HTTPError: If the HTTP response status is 4xx or 5xx.
+            requests.RequestException: On network-level errors.
+        """
+        params = {
+            "c": championship_id,
+            "p": page,
+        }
+
+        logger.debug("SFI request: GET %s%s params=%s", self._base_url, self._MATCHES_BY_CHAMPIONSHIP_PATH, params)
+
+        response = requests.get(
+            self._base_url + self._MATCHES_BY_CHAMPIONSHIP_PATH,
             headers=self._headers,
             params=params,
         )

@@ -1058,3 +1058,235 @@ def test_sync_sfi_matches_from_json_updates_date_time_without_goal_change(
 
     existing_match.refresh_from_db()
     assert existing_match.date_time == datetime(2026, 2, 26, 20, 0, 0, tzinfo=dt_timezone.utc)
+
+
+@patch("requests.get")
+def test_sync_sfi_world_cup_matches_with_no_competition(mock_get):
+    """When the World Cup competition is not registered, the command exits early."""
+    Competition.objects.filter(sfi_id="5085a3cde16c822b").delete()
+
+    call_command("sync_sfi_world_cup_matches")
+
+    mock_get.assert_not_called()
+
+
+@patch("core.management.commands.sync_sfi_world_cup_matches.sleep")
+@patch("requests.get")
+def test_sync_sfi_world_cup_matches_creates_not_started_match(
+    mock_get,
+    mock_sleep,
+    mock_success_response,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """A NOT_STARTED match is created in the DB when it does not yet exist."""
+    wc_id = "5085a3cde16c822b"
+    competition = baker.make("core.Competition", sfi_id=wc_id, in_progress=True)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    response_data = {
+        "status": 200,
+        "errors": [],
+        "pagination": [{"page": 1, "per_page": 25, "items": 1}],
+        "result": [
+            {
+                "id": "match-wc-ns-001",
+                "date": "2026-06-12 20:00:00",
+                "status": "NOT_STARTED",
+                "timer": "00:00",
+                "championship": {
+                    "id": wc_id,
+                    "name": "World Cup",
+                    "s_name": "World Cup 2026",
+                },
+                "teamA": {
+                    "id": sfi_home_team_id,
+                    "name": "Home FC",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+                "teamB": {
+                    "id": sfi_away_team_id,
+                    "name": "Away FC",
+                    "score": {"f": 0, "1h": None, "2h": None, "o": None, "p": None},
+                },
+            }
+        ],
+    }
+    mock_success_response.json.return_value = response_data
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_sfi_world_cup_matches")
+
+    assert Match.objects.filter(sfi_id="match-wc-ns-001").exists()
+    match = Match.objects.get(sfi_id="match-wc-ns-001")
+    assert match.status == Match.NOT_STARTED
+    assert match.home_team == home_team
+    assert match.away_team == away_team
+    assert match.competition == competition
+
+
+@patch("requests.get")
+def test_sync_sfi_world_cup_matches_updates_ended_match_when_exists(
+    mock_get,
+    mock_success_response,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """An ENDED match that exists in the DB gets its goals updated."""
+    wc_id = "5085a3cde16c822b"
+    competition = baker.make("core.Competition", sfi_id=wc_id, in_progress=True)
+    home_team = baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    away_team = baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    existing_match = baker.make(
+        "core.Match",
+        sfi_id="match-wc-ended-001",
+        competition=competition,
+        home_team=home_team,
+        away_team=away_team,
+        status=Match.NOT_STARTED,
+        home_goals=None,
+        away_goals=None,
+    )
+
+    response_data = {
+        "status": 200,
+        "errors": [],
+        "pagination": [],
+        "result": [
+            {
+                "id": "match-wc-ended-001",
+                "date": "2026-06-12 20:00:00",
+                "status": "ENDED",
+                "timer": "90:00",
+                "championship": {
+                    "id": wc_id,
+                    "name": "World Cup",
+                    "s_name": "World Cup 2026",
+                },
+                "teamA": {
+                    "id": sfi_home_team_id,
+                    "name": "Home FC",
+                    "score": {"f": 3, "1h": 1, "2h": 3, "o": None, "p": None},
+                    "stats": {
+                        "possession": None,
+                        "attacks": {"n": None, "d": None, "o_s": None},
+                        "shoots": {"t": "0", "off": None, "on": None, "g_a": None},
+                        "penalties": "0",
+                        "corners": {"t": "0", "f": None, "h": None},
+                        "fouls": {"t": None, "y_c": "1", "y_t_r_c": None, "r_c": "0"},
+                        "substitutions": None,
+                        "throwins": "0",
+                        "injuries": None,
+                        "dominance_avg_2_5": "0.00",
+                        "xG": {"kickoff": None, "live": None},
+                    },
+                },
+                "teamB": {
+                    "id": sfi_away_team_id,
+                    "name": "Away FC",
+                    "score": {"f": 2, "1h": 1, "2h": 2, "o": None, "p": None},
+                    "stats": {
+                        "possession": None,
+                        "attacks": {"n": None, "d": None, "o_s": None},
+                        "shoots": {"t": "0", "off": None, "on": None, "g_a": None},
+                        "penalties": "0",
+                        "corners": {"t": "0", "f": None, "h": None},
+                        "fouls": {"t": None, "y_c": "2", "y_t_r_c": None, "r_c": "0"},
+                        "substitutions": None,
+                        "throwins": "0",
+                        "injuries": None,
+                        "dominance_avg_2_5": "0.00",
+                        "xG": {"kickoff": None, "live": None},
+                    },
+                },
+            }
+        ],
+    }
+
+    mock_success_response.json.return_value = response_data
+    mock_get.return_value = mock_success_response
+
+    call_command("sync_sfi_world_cup_matches")
+
+    existing_match.refresh_from_db()
+    assert existing_match.status == Match.FINSHED
+    assert existing_match.home_goals == 3
+    assert existing_match.away_goals == 2
+    assert existing_match.home_yellow_cards == 1
+    assert existing_match.away_yellow_cards == 2
+
+
+@patch("core.management.commands.sync_sfi_world_cup_matches.sleep")
+@patch("requests.get")
+def test_sync_sfi_world_cup_matches_paginated_calls_multiple_pages(
+    mock_get,
+    mock_sleep,
+    mock_success_response,
+    sfi_home_team_id,
+    sfi_away_team_id,
+):
+    """Requests.get is called once per page when result count exceeds per_page limit."""
+    wc_id = "5085a3cde16c822b"
+    competition = baker.make("core.Competition", sfi_id=wc_id, in_progress=True)
+    baker.make("core.Team", sfi_id=sfi_home_team_id, competitions=[competition])
+    baker.make("core.Team", sfi_id=sfi_away_team_id, competitions=[competition])
+
+    page_1_data = {
+        "status": 200,
+        "errors": [],
+        "pagination": [{"page": 1, "per_page": 25, "items": 26}],
+        "result": [
+            {
+                "id": "match-wc-ns-page1",
+                "date": "2026-06-12 20:00:00",
+                "status": "NOT_STARTED",
+                "timer": "00:00",
+                "championship": {
+                    "id": wc_id,
+                    "name": "World Cup",
+                    "s_name": "World Cup 2026",
+                },
+                "teamA": {"id": sfi_home_team_id, "name": "Home FC", "score": {}},
+                "teamB": {"id": sfi_away_team_id, "name": "Away FC", "score": {}},
+            }
+        ],
+    }
+
+    page_2_data = {
+        "status": 200,
+        "errors": [],
+        "pagination": [{"page": 2, "per_page": 25, "items": 26}],
+        "result": [
+            {
+                "id": "match-wc-ns-page2",
+                "date": "2026-06-12 21:00:00",
+                "status": "NOT_STARTED",
+                "timer": "00:00",
+                "championship": {
+                    "id": wc_id,
+                    "name": "World Cup",
+                    "s_name": "World Cup 2026",
+                },
+                "teamA": {"id": sfi_home_team_id, "name": "Home FC", "score": {}},
+                "teamB": {"id": sfi_away_team_id, "name": "Away FC", "score": {}},
+            }
+        ],
+    }
+
+    page_1_resp = mock_success_response
+    page_1_resp.json.return_value = page_1_data
+
+    page_2_resp = type(mock_success_response)()
+    page_2_resp.status_code = 200
+    page_2_resp.raise_for_status = lambda: None
+    page_2_resp.json.return_value = page_2_data
+
+    mock_get.side_effect = [page_1_resp, page_2_resp]
+
+    call_command("sync_sfi_world_cup_matches")
+
+    assert mock_get.call_count == 2
+    assert Match.objects.filter(sfi_id="match-wc-ns-page1").exists()
+    assert Match.objects.filter(sfi_id="match-wc-ns-page2").exists()

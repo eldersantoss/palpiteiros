@@ -40,4 +40,7 @@ elif [ "$PROCESS_TYPE" = "create_and_update_matches" ]; then
 
 elif [ "$PROCESS_TYPE" = "sync_sfi_matches" ]; then
   python manage.py sync_sfi_matches
+
+elif [ "$PROCESS_TYPE" = "sync_sfi_world_cup_matches" ]; then
+  python manage.py sync_sfi_world_cup_matches
 fi
