@@ -708,11 +708,32 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
             guess = existing_guesses.get(match.id)
             groups_dict[group_id]["closed"].append({"match": match, "guess": guess})
 
-        # Sort: named groups alphabetically, ungrouped (None) last
-        named = sorted(
-            (v for k, v in groups_dict.items() if k is not None),
+        # Separate named active and inactive groups
+        active_groups = []
+        inactive_groups = []
+
+        for k, v in groups_dict.items():
+            if k is not None:
+                if v["open_forms"]:
+                    active_groups.append(v)
+                else:
+                    # Sort closed matches chronologically (oldest first) inside inactive groups
+                    v["closed"].sort(key=lambda item: item["match"].date_time)
+                    inactive_groups.append(v)
+
+        # Sort active groups: earliest open match first (ascending)
+        active_sorted = sorted(
+            active_groups,
+            key=lambda d: min(f.match.date_time for f in d["open_forms"]),
+        )
+
+        # Sort inactive groups: alphabetically (ascending)
+        inactive_sorted = sorted(
+            inactive_groups,
             key=lambda d: d["group"].name,
         )
+
+        named = active_sorted + inactive_sorted
         ungrouped = [v for k, v in groups_dict.items() if k is None]
         return named + ungrouped
 

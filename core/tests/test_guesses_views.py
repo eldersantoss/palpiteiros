@@ -873,3 +873,113 @@ def test_guesses_view_post_multiple_matches_no_orphan_guesses(client):
     assert pool.guesses.filter(guesser=guesser, match=match1).exists()
     assert pool.guesses.filter(guesser=guesser, match=match2).exists()
     assert Guess.objects.exclude(pools__in=GuessPool.objects.all()).count() == 0
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_guesses_world_cup_groups_sorting(mock_tz, client):
+    """Verify that groups are sorted correctly.
+    - Active groups (with open matches) come first, sorted by the earliest open match.
+    - Inactive groups (only closed matches) come next, sorted alphabetically by group name.
+    - Inside inactive groups, closed matches are ordered chronologically (oldest first).
+    """
+    mock_tz.localdate.return_value = INSIDE_WINDOW
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
+    competition = baker.make("core.Competition")
+
+    # 3 groups
+    group_a = baker.make("core.CompetitionGroup", competition=competition, name="Grupo A")
+    group_b = baker.make("core.CompetitionGroup", competition=competition, name="Grupo B")
+    group_c = baker.make("core.CompetitionGroup", competition=competition, name="Grupo C")
+
+    # Teams
+    team_a1 = baker.make("core.Team", competitions=[competition])
+    team_a2 = baker.make("core.Team", competitions=[competition])
+    team_b1 = baker.make("core.Team", competitions=[competition])
+    team_b2 = baker.make("core.Team", competitions=[competition])
+    team_c1 = baker.make("core.Team", competitions=[competition])
+    team_c2 = baker.make("core.Team", competitions=[competition])
+
+    group_a.teams.set([team_a1, team_a2])
+    group_b.teams.set([team_b1, team_b2])
+    group_c.teams.set([team_c1, team_c2])
+
+    pool, guesser = _make_pool_with_guesser(competition)
+
+    # Let's set the time references
+    now = timezone.now()
+
+    # Grupo A: only closed matches (oldest one: 6 hours ago; most recent one: 4 hours ago)
+    match_a1 = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=team_a1,
+        away_team=team_a2,
+        date_time=now - timezone.timedelta(hours=6),
+        status="FT",
+        home_goals=1,
+        away_goals=1,
+    )
+    match_a2 = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=team_a1,
+        away_team=team_a2,
+        date_time=now - timezone.timedelta(hours=4),
+        status="FT",
+        home_goals=2,
+        away_goals=1,
+    )
+
+    # Grupo B: only closed matches (most recent: 2 hours ago)
+    # Even though 2 hours ago is more recent than 4 hours ago, Grupo A must come before Grupo B
+    # because groups are sorted alphabetically among inactive ones.
+    match_b1 = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=team_b1,
+        away_team=team_b2,
+        date_time=now - timezone.timedelta(hours=2),
+        status="FT",
+        home_goals=0,
+        away_goals=0,
+    )
+
+    # Grupo C: open match (starts in 1 hour).
+    # Since it is an active group, it must appear first (before A and B).
+    match_c1 = baker.make(
+        "core.Match",
+        competition=competition,
+        home_team=team_c1,
+        away_team=team_c2,
+        date_time=now + timezone.timedelta(hours=1),
+        status="NS",
+        home_goals=None,
+        away_goals=None,
+    )
+
+    client.force_login(guesser.user)
+    response = client.get(reverse("core:guesses_world_cup", kwargs={"pool_slug": pool.slug}))
+
+    assert response.status_code == 200
+    groups_data = response.context["groups_data"]
+
+    # We expect groups_data to have:
+    # 1. Grupo C (Active)
+    # 2. Grupo A (Inactive, alphabetically first)
+    # 3. Grupo B (Inactive, alphabetically second)
+    named_groups = [gd["group"] for gd in groups_data if gd["group"] is not None]
+
+    assert len(named_groups) == 3
+    assert named_groups[0] == group_c
+    assert named_groups[1] == group_a
+    assert named_groups[2] == group_b
+
+    # Now verify internal ordering of matches inside inactive Grupo A (must be chronological: match_a1 first, then match_a2)
+    group_a_data = next(gd for gd in groups_data if gd["group"] == group_a)
+    closed_matches_a = [item["match"] for item in group_a_data["closed"]]
+    assert len(closed_matches_a) == 2
+    assert closed_matches_a[0] == match_a1
+    assert closed_matches_a[1] == match_a2
