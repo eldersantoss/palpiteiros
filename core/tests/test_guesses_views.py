@@ -842,7 +842,8 @@ def test_guesses_view_post_replaces_existing_guess(client):
     new_guess = pool.guesses.get(guesser=guesser, match=match)
     assert new_guess.home_goals == 3
     assert new_guess.away_goals == 0
-    assert not pool.guesses.filter(pk=old_guess.pk).exists()
+    # Now that we update in-place, the original guess ID is preserved
+    assert new_guess.pk == old_guess.pk
 
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")

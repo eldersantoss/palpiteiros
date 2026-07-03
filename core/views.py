@@ -26,7 +26,7 @@ from .forms import (
     WorldCupRankingPeriodForm,
 )
 from .models import CompetitionGroup, Guess, GuessPool, Match
-from .viewmixins import GuessPoolMembershipMixin
+from .viewmixins import GuessPoolMembershipMixin, GuessSavingMixin
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +265,7 @@ class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Templat
         return context
 
 
-class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, GuessSavingMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         if self.pool.user_is_owner and not self.pool.user_is_guesser:
             return redirect_with_msg(
@@ -372,28 +372,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
         error_occurred = None
 
         try:
-            for match in open_matches:
-                guess_form = GuessForm(self.request.POST, match=match)
-
-                if guess_form.has_valid_guess_data():
-                    guess = Guess.objects.create(
-                        match=match,
-                        guesser=self.guesser,
-                        home_goals=guess_form.cleaned_data["home_goals"],
-                        away_goals=guess_form.cleaned_data["away_goals"],
-                    )
-                    self.pool.add_guess_to_pools(guess, for_all_pools)
-                    has_new_guesses = True
-                    results["success"].append(match.id)
-                else:
-                    if not guess_form.is_valid():
-                        has_validation_errors = True
-                        errors_dict = {f: e[0] for f, e in guess_form.errors.items() if e}
-                        errors_str = "; ".join(f"{f}: {e}" for f, e in errors_dict.items()) or "Erro de validação"
-                        results["validation_errors"][str(match.id)] = errors_str
-
-            if has_new_guesses:
-                self.pool.delete_orphans_guesses()
+            has_new_guesses, has_validation_errors = self.save_guesses(
+                open_matches, self.request.POST, for_all_pools, results
+            )
 
             # Identify if any submitted match was closed
             for m_id in submitted_match_ids:
@@ -592,7 +573,7 @@ class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.
         return self.pool.guesses.filter(filters).order_by("-match__date_time")
 
 
-class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, GuessSavingMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         today = timezone.localdate()
         if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
@@ -803,27 +784,9 @@ class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.V
         error_occurred = None
 
         try:
-            for match in open_matches:
-                guess_form = GuessForm(self.request.POST, match=match)
-                if guess_form.has_valid_guess_data():
-                    guess = Guess.objects.create(
-                        match=match,
-                        guesser=self.guesser,
-                        home_goals=guess_form.cleaned_data["home_goals"],
-                        away_goals=guess_form.cleaned_data["away_goals"],
-                    )
-                    self.pool.add_guess_to_pools(guess, for_all_pools)
-                    has_new_guesses = True
-                    results["success"].append(match.id)
-                else:
-                    if not guess_form.is_valid():
-                        has_validation_errors = True
-                        errors_dict = {f: e[0] for f, e in guess_form.errors.items() if e}
-                        errors_str = "; ".join(f"{f}: {e}" for f, e in errors_dict.items()) or "Erro de validação"
-                        results["validation_errors"][str(match.id)] = errors_str
-
-            if has_new_guesses:
-                self.pool.delete_orphans_guesses()
+            has_new_guesses, has_validation_errors = self.save_guesses(
+                open_matches, self.request.POST, for_all_pools, results
+            )
 
             # Identify if any submitted match was closed
             for m_id in submitted_match_ids:

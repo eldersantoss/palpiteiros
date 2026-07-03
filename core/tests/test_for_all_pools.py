@@ -247,10 +247,9 @@ def test_guesses_view_for_all_pools_replaces_existing_guess_in_other_pool(client
         for_all_pools=True,
     )
 
-    # Old guess removed from pool2
-    assert not pool2.guesses.filter(pk=old_guess_pk).exists()
-    # New guess present in pool2 with updated scores
+    # New guess present in pool2 with updated scores and preserved PK (in-place update)
     new_guess = pool2.guesses.get(guesser=guesser, match=match)
+    assert new_guess.pk == old_guess_pk
     assert new_guess.home_goals == 4
     assert new_guess.away_goals == 1
 

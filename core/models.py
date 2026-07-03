@@ -222,9 +222,18 @@ class CompetitionGroup(models.Model):
 
         group_ids = [g.id for g in groups]
 
+        # Batch check: identify which groups already have standing records in DB
+        groups_with_standings = set(
+            GroupStanding.objects.filter(group_id__in=group_ids)
+            .values_list("group_id", flat=True)
+            .distinct()
+        )
+
         # Fallback: Se algum grupo com times não possuir nenhum registro de standings no banco, recalculamos.
         for group in groups:
-            if group.teams.exists() and not GroupStanding.objects.filter(group=group).exists():
+            # Check prefetched teams if available to avoid DB query via exists()
+            has_teams = bool(group.teams.all())
+            if has_teams and group.id not in groups_with_standings:
                 group.recalculate_standings()
 
         standings_qs = GroupStanding.objects.filter(group_id__in=group_ids).select_related("team")
