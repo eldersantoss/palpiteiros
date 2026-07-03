@@ -151,7 +151,7 @@ class GuessesPeriodForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         if pool:
-            guessers = pool.guessers.all().order_by("user__first_name", "user__username")
+            guessers = pool.guessers.all().select_related("user").order_by("user__first_name", "user__username")
             self.fields["palpiteiro"].choices = [(g.id, g.user.get_full_name() or g.user.username) for g in guessers]
 
             years = sorted(
@@ -214,7 +214,7 @@ class WorldCupGuessesPeriodForm(forms.Form):
         pool = kwargs.pop("pool", None)
         super().__init__(*args, **kwargs)
         if pool:
-            guessers = pool.guessers.all().order_by("user__first_name", "user__username")
+            guessers = pool.guessers.all().select_related("user").order_by("user__first_name", "user__username")
             self.fields["palpiteiro"].choices = [(g.id, g.user.get_full_name() or g.user.username) for g in guessers]
 
     def get_period_dates(self) -> tuple:

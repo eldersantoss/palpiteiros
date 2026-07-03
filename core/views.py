@@ -928,7 +928,11 @@ class WorldCupGuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, 
                 match__date_time__date__gte=start_date,
                 match__date_time__date__lte=end_date,
             )
-        return self.pool.guesses.filter(filters).order_by("-match__date_time")
+        return self.pool.guesses.filter(filters).select_related(
+            "match",
+            "match__home_team",
+            "match__away_team",
+        ).order_by("-match__date_time")
 
 
 class WorldCupRankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):

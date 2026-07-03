@@ -363,3 +363,43 @@ def test_view_defaults_to_logged_in_guesser_when_no_params(mock_tz, client):
     assert response.status_code == 200
     guess_ids = {g.id for g in response.context["guesses"]}
     assert guess_a.id in guess_ids
+
+
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.views.timezone")
+def test_view_performance_query_count(mock_tz, client, django_assert_num_queries):
+    mock_tz.localdate.return_value = INSIDE_PERIOD
+    mock_tz.localtime.return_value = _make_aware(INSIDE_PERIOD, hour=23)
+
+    # Create 5 guessers
+    guessers = [baker.make("core.Guesser") for _ in range(5)]
+    pool = _make_pool(*guessers)
+
+    # Create 5 finished matches and guesses
+    rodada1_start, _ = WORLD_CUP_PERIOD_DATE_RANGES["rodada_1"]
+    for _ in range(5):
+        match = _make_finished_match(rodada1_start)
+        _make_guess(guessers[0], match, pool)
+
+    client.force_login(guessers[0].user)
+
+    # With N+1 problems:
+    # - 1 query for GuessPool
+    # - 1 query checking guessers.contains()
+    # - 1 query to fetch pool guessers for the form choice field
+    # - 5 queries (1 per guesser) to fetch g.user inside form __init__
+    # - 1 query to fetch guesses
+    # - 1 query to fetch total score (Sum)
+    # - 5 queries (1 per guess) to fetch guess.match
+    # - 5 queries to fetch match.home_team
+    # - 5 queries to fetch match.away_team
+    # Total would be 25+ queries!
+    # Let's assert a low number of queries (e.g. 7 queries) to fail initially.
+    # The expected optimized query count is exactly 8 queries.
+    with django_assert_num_queries(8):
+        response = client.get(
+            reverse(URL_NAME, kwargs={"pool_slug": pool.slug}),
+            {"palpiteiro": guessers[0].id, "periodo": "rodada_1"},
+        )
+        assert response.status_code == 200
+

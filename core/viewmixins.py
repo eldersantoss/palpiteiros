@@ -25,7 +25,7 @@ class GuessPoolMembershipMixin:
 
     def get_pool(self) -> GuessPool:
         pool_slug = self.kwargs.get(self.pool_slug_url_kwarg)
-        return GuessPool.objects.filter(slug=pool_slug).first()
+        return GuessPool.objects.select_related("owner").filter(slug=pool_slug).first()
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
