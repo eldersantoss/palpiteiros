@@ -36,44 +36,41 @@
     <table class="main-table ranking-table">
       <thead>
         <tr>
-          <th></th>
-          <th></th>
+          <th style="width:5%"></th>
+          <th style="width:10%"></th>
           <th style="width:60%"></th>
-          <th>PTS</th>
-          <th style="width:30%"></th>
+          <th style="width:10%">PTS</th>
+          <!-- <th style="width:30%"></th> -->
         </tr>
       </thead>
       <tbody>
         {% for entry in ranking_entries %}
-          <tr
-            class="clickable-row"
-            name="clickable-row{{ entry.user.id }}"
-            onclick="expandDetailRow('{{ entry.user.id }}')"
-          >
-            <td>
-              {% if forloop.counter == 1 %}
-              🥇
-              {% elif forloop.counter == 2 %}
-              🥈
-              {% elif forloop.counter == 3 %}
-              🥉
-              {% elif forloop.last %}
-              🔦
-              {% endif %}
-            </td>
-            <td>{{ forloop.counter }}º</td>
-            <td style="text-align:left">{{ entry }}</td>
-            <td>{{ entry.score }}</td>
-            {% comment %} <td class="expand-icon">Ver palpites</td> {% endcomment %}
-            <td class="expand-icon"></td>
-          </tr>
+        <tr class="clickable-row" name="clickable-row{{ entry.user.id }}"
+          onclick="expandDetailRow('{{ entry.user.id }}')">
+          <td>
+            {% if forloop.counter == 1 %}
+            🥇
+            {% elif forloop.counter == 2 %}
+            🥈
+            {% elif forloop.counter == 3 %}
+            🥉
+            {% elif forloop.last %}
+            🔦
+            {% endif %}
+          </td>
+          <td>{{ forloop.counter }}º</td>
+          <td style="text-align:left">{{ entry }}</td>
+          <td>{{ entry.score }}</td>
+          {% comment %} <td class="expand-icon">Ver palpites</td> {% endcomment %}
+          <!-- <td class="expand-icon"></td> -->
+        </tr>
 
         {% empty %}
-          <tr>
-              <td colspan="5" style="text-align: center; padding: 20px;">
-                  Não há dados de classificação para o período selecionado.
-              </td>
-          </tr>
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 20px;">
+            Não há dados de classificação para o período selecionado.
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

@@ -626,6 +626,10 @@ input {
   align-items: center;
 }
 
+.period-form div {
+  flex: 1;
+}
+
 .period-form label {
   display: block;
   font-size: 0.75rem;
@@ -633,12 +637,18 @@ input {
 }
 
 .period-form select {
+  /* height: 5vh; */
+  width: 80%;
+  padding: 1vh 0;
+  flex: 1;
   background: #f4f4f4;
-  border: none;
-  border-bottom: 1px solid #1c57b7;
+  border: 1px solid #1c57b7;
+  border-radius: 10px;
   color: #1c57b7;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: bold;
+  text-align: center;
+  margin-bottom: 1vh;
 }
 
 .period-form select option {
