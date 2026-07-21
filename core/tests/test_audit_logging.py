@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import date
 from unittest.mock import patch
 
 import pytest
@@ -149,7 +150,14 @@ def test_audit_log_and_display_error_message_on_guesses_validation_error(client,
 
 
 @override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
-def test_audit_log_and_display_error_message_on_guesses_world_cup_validation_error(client, configure_test_logs):
+@patch("core.views.timezone")
+def test_audit_log_and_display_error_message_on_guesses_world_cup_validation_error(
+    mock_tz, client, configure_test_logs
+):
+    mock_tz.localdate.return_value = date(2026, 6, 15)
+    mock_tz.now = timezone.now
+    mock_tz.timedelta = timezone.timedelta
+
     competition = baker.make("core.Competition")
     home_team = baker.make("core.Team", competitions=[competition])
     away_team = baker.make("core.Team", competitions=[competition])
