@@ -19,7 +19,7 @@
       <div class="pools-grid">
         {% for pool in pools %}
           <div></div>
-          <a href="{% url 'core:guesses_world_cup' pool.slug %}">{{ pool }}</a>
+          <a href="{% url 'core:guesses' pool.slug %}">{{ pool }}</a>
           <span class="pool-bell">{% if pool.is_pending %}🔔{% endif %}</span>
         {% endfor %}
       </div>
