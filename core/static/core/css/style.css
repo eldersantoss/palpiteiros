@@ -622,7 +622,6 @@ input {
 .period-form {
   margin-top: 2vh;
   display: flex;
-  column-gap: 5vh;
   align-items: center;
 }
 
