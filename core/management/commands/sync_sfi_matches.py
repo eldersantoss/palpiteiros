@@ -82,13 +82,12 @@ class Command(BaseCommand):
 
         updated_comp_ids = set()
         for target_date in dates:
-            updated_comp_ids.update(
-                self._process_date(service, target_date, competitions_by_sfi_id, today)
-            )
+            updated_comp_ids.update(self._process_date(service, target_date, competitions_by_sfi_id, today))
 
         if updated_comp_ids:
             self.stdout.write(f"Recalculating standings for updated competitions: {updated_comp_ids}")
             from core.models import CompetitionGroup
+
             for group in CompetitionGroup.objects.filter(competition_id__in=updated_comp_ids):
                 self.stdout.write(f"  Recalculating standings for group {group}...")
                 group.recalculate_standings()
@@ -107,7 +106,7 @@ class Command(BaseCommand):
             return [single]
 
         start = options.get("start_date") or (today - timedelta(days=1))
-        end = options.get("end_date") or (today + timedelta(days=1))
+        end = options.get("end_date") or (today + timedelta(days=2))
 
         return [start + timedelta(days=i) for i in range((end - start).days + 1)]
 
