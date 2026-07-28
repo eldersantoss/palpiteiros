@@ -2,6 +2,7 @@ from datetime import date, datetime
 from unittest.mock import patch
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -11,7 +12,8 @@ from core.models import Match, RankingEntry
 pytestmark = pytest.mark.django_db
 
 
-@patch("core.management.commands.sync_matches_sfi.django_timezone")
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
+@patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
 def test_ranking_view_shows_updated_score_after_sync(
     mock_get,
@@ -60,7 +62,7 @@ def test_ranking_view_shows_updated_score_after_sync(
 
     from django.core.management import call_command
 
-    call_command("sync_matches_sfi", date=date(2026, 2, 26))
+    call_command("sync_sfi_matches", date=date(2026, 2, 26))
 
     client.force_login(guesser.user)
     response = client.get(
@@ -74,6 +76,7 @@ def test_ranking_view_shows_updated_score_after_sync(
     assert row_for_guesser.score == 10
 
 
+@override_settings(STATICFILES_STORAGE="django.contrib.staticfiles.storage.StaticFilesStorage")
 def test_guesses_by_period_get_does_not_write_scores(client):
     """Rendering guesses-by-period should not trigger score consolidation side effects."""
     guesser = baker.make("core.Guesser")

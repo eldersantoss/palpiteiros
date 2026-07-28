@@ -44,6 +44,7 @@ idna==3.4
 iniconfig==2.0.0
 ipdb==0.13.13
 ipython==8.20.0
+isort==8.0.1
 jedi==0.19.1
 kombu==5.3.7
 Markdown==3.4.1

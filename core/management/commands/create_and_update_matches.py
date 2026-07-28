@@ -100,9 +100,13 @@ class Command(BaseCommand):
                             fields_to_update = ["status", "home_goals", "away_goals"]
                         match_instance.save(update_fields=fields_to_update)
 
-                    updated.append(match_instance)
-
                 self.stdout.write(f"{len(created)} matches created and {len(updated)} updated matches for {comp}")
+
+                if created or updated:
+                    from core.models import CompetitionGroup
+                    for group in comp.groups.all():
+                        self.stdout.write(f"Recalculating standings for group {group}...")
+                        group.recalculate_standings()
 
             except Exception as e:
                 self.stderr.write(f"Error when updating {comp}: {e}")

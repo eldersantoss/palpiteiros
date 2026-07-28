@@ -13,10 +13,10 @@
   </a>
 </div>
 
-<form action="{% url 'login' %}" method="post" class="main-form">
+<form action="{% url 'login' %}" method="post" class="main-form larger-form">
   {% csrf_token %}
   <div>
-    <p>Bem-vindo, palpiteiro(a)</p>
+    <p>Seja bem-vindo ao Palpiteiros!</p>
   </div>
   {{ form.as_div }}
   <a href="{% url 'password_reset' %}" class="forget-password">Esqueci minha senha</a>

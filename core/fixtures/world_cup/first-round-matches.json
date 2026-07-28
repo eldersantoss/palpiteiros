@@ -1,0 +1,3007 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [
+    {
+      "page": 1,
+      "per_page": 25,
+      "items": 24
+    }
+  ],
+  "result": [
+    {
+      "id": "e0b4f5a05670d921",
+      "date": "2026-06-11 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "4494f397133822b7",
+        "name": "Mexico",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e509575f1d",
+          "name": "Javier Aguirre"
+        }
+      },
+      "teamB": {
+        "id": "4719a60d951411bb",
+        "name": "South Africa",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4d48f96da",
+          "name": "Hugo Broos"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e8b6b6fbc98bcf5e",
+        "name": "Estadio Azteca"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.500",
+              "X": "4.000",
+              "2": "5.500"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "-1"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.444",
+              "X": "4.333",
+              "2": "7.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.900",
+              "u": "1.950",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.100",
+              "2": "1.775",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.050",
+              "X": "2.300",
+              "2": "6.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942569\/F3\/I0\/"
+    },
+    {
+      "id": "7e7c7203df3befb3",
+      "date": "2026-06-12 02:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "8b7b58d11e4662a2",
+        "name": "South Korea",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "6011fec949158fb3",
+          "name": "Hong Myungbo"
+        }
+      },
+      "teamB": {
+        "id": "ef8a29059df471f8",
+        "name": "Czechia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e52b0c7fd6",
+          "name": "Miroslav Koubek"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "5d2119ea477e3e91",
+        "name": "Estadio Akron"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.375",
+              "X": "3.250",
+              "2": "2.750"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.825",
+              "2": "2.025",
+              "v": "0"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "2.600",
+              "X": "3.100",
+              "2": "2.750"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "0"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "3.250",
+              "X": "2.050",
+              "2": "3.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256611\/F3\/I0\/"
+    },
+    {
+      "id": "d9770fdfd61d0dd8",
+      "date": "2026-06-12 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "b243f013c20111e7",
+        "name": "Canada",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e53dd48059",
+          "name": "Jesse Marsch"
+        }
+      },
+      "teamB": {
+        "id": "cd5eb391b94c65f8",
+        "name": "Bosnia-Herzegovina",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "f2141993088cf9db",
+          "name": "Sergej Barbarez"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "720880a0420f9c98",
+        "name": "BMO Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.200",
+              "X": "3.500",
+              "2": "2.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.900",
+              "u": "1.950",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.025",
+              "2": "1.825",
+              "v": "-0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.800",
+              "X": "3.700",
+              "2": "4.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.725",
+              "2": "2.150",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.100",
+              "u": "1.775",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "3.000",
+              "X": "2.100",
+              "2": "3.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256735\/F3\/I0\/"
+    },
+    {
+      "id": "7bad869a64b46823",
+      "date": "2026-06-13 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "93d7279d99dfcb9f",
+        "name": "USA",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4ab23672f",
+          "name": "Mauricio Pochettino"
+        }
+      },
+      "teamB": {
+        "id": "91b5a725af948fe0",
+        "name": "Paraguay",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e56ade6741",
+          "name": "Gustavo Alfaro"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "4ac387a53df5a4d5",
+        "name": "SoFi Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "2.300",
+              "X": "3.250",
+              "2": "2.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.950",
+              "X": "3.400",
+              "2": "4.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.775",
+              "2": "2.100",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.750",
+              "X": "2.200",
+              "2": "3.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942662\/F3\/I0\/"
+    },
+    {
+      "id": "9ebf7654f5a4bf3a",
+      "date": "2026-06-13 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "a917dadaa3228795",
+        "name": "Qatar",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e5b2667be8",
+          "name": "Julen Lopetegui"
+        }
+      },
+      "teamB": {
+        "id": "acded7a73883aaf5",
+        "name": "Switzerland",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e50620e2ae",
+          "name": "Murat Yakin"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "447149997396b232",
+        "name": "Levi's Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.500",
+              "X": "4.500",
+              "2": "1.400"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "12.000",
+              "X": "6.250",
+              "2": "1.222"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "1.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.000",
+              "X": "2.500",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942671\/F3\/I0\/"
+    },
+    {
+      "id": "cde2bf321b41a633",
+      "date": "2026-06-13 22:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "ed4f17bb5f58a226",
+        "name": "Brazil",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4dd471f19",
+          "name": "Carlo Ancelotti"
+        }
+      },
+      "teamB": {
+        "id": "e5d7cb5d1e6eeeea",
+        "name": "Morocco",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "742957a358b50a83",
+          "name": "Mohamed Ouahbi"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "63118436d8699710",
+        "name": "MetLife Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.444",
+              "X": "4.200",
+              "2": "6.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.650",
+              "X": "3.750",
+              "2": "5.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.825",
+              "2": "2.025",
+              "v": "-0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.909",
+              "X": "2.500",
+              "2": "7.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942576\/F3\/I0\/"
+    },
+    {
+      "id": "6a9e0e43c103b2b3",
+      "date": "2026-06-14 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "e4b1a2f4ef667c6",
+        "name": "Haiti",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e95e028fe3",
+          "name": "Sebastien Migne"
+        }
+      },
+      "teamB": {
+        "id": "a08b64c3a0c10288",
+        "name": "Scotland",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e7864d3ae3",
+          "name": "Steve Clarke"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "17e26dba42944943",
+        "name": "Gillette Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.250",
+              "X": "4.750",
+              "2": "1.380"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "5.500",
+              "X": "4.750",
+              "2": "1.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "1"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.500",
+              "X": "2.500",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942620\/F3\/I0\/"
+    },
+    {
+      "id": "2cd1f1230152d0c",
+      "date": "2026-06-14 04:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "1f8011a1c665881c",
+        "name": "Australia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4ab39ed9e",
+          "name": "Tony Popovic"
+        }
+      },
+      "teamB": {
+        "id": "1bd5f3ba4a71016d",
+        "name": "T\u00fcrkiye",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4c9e17f28",
+          "name": "Vincenzo Montella"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "30506c4bc48afd65",
+        "name": "BC Place"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "4.500",
+              "X": "3.500",
+              "2": "1.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.825",
+              "u": "2.025",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "4.750",
+              "X": "3.600",
+              "2": "1.750"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "5.000",
+              "X": "2.200",
+              "2": "2.375"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E195350662\/F3\/I0\/"
+    },
+    {
+      "id": "a86eb462606fd1c6",
+      "date": "2026-06-14 17:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "f1d4fd8711b33893",
+        "name": "Germany",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4e142145b",
+          "name": "Julian Nagelsmann"
+        }
+      },
+      "teamB": {
+        "id": "bcd1b3d609435a96",
+        "name": "Curacao",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4d888b067",
+          "name": "Dick Advocaat"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "497df7bfe45d4062",
+        "name": "NRG Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.020",
+              "X": "21.000",
+              "2": "29.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "4.0,4.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-3.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.030",
+              "X": "19.000",
+              "2": "41.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-3.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "4.0,4.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-1.75"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.5,2.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.142",
+              "X": "5.500",
+              "2": "41.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942665\/F3\/I0\/"
+    },
+    {
+      "id": "6310f6638de6003",
+      "date": "2026-06-14 20:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "1bd3dae83ff1e298",
+        "name": "Netherlands",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e4b3b79e74",
+          "name": "Ronald Koeman"
+        }
+      },
+      "teamB": {
+        "id": "13d2ad640332aa86",
+        "name": "Japan",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e54c6dad6d",
+          "name": "Hajime Moriyasu"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e98c0f18407e7929",
+        "name": "AT&T Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.727",
+              "X": "3.750",
+              "2": "4.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "-0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.950",
+              "X": "3.800",
+              "2": "3.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.250",
+              "X": "2.300",
+              "2": "5.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942617\/F3\/I0\/"
+    },
+    {
+      "id": "c6a569dba736f33f",
+      "date": "2026-06-14 23:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "113ed77cd2ccf09a",
+        "name": "Ivory Coast",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "348053b6b605b90b",
+          "name": "Emerse Fae"
+        }
+      },
+      "teamB": {
+        "id": "30ff617439afd7",
+        "name": "Ecuador",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": {
+          "id": "5fb962e56b0a047e",
+          "name": "Sebastian Beccacece"
+        }
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7ca1506f090689b4",
+        "name": "Lincoln Financial Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "3.100",
+              "X": "3.250",
+              "2": "2.150"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "0.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "3.500",
+              "X": "2.900",
+              "2": "2.300"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "0.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.800",
+              "u": "2.050",
+              "v": "1.5,2.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.250",
+              "2": "1.675",
+              "v": "0"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.125",
+              "u": "1.750",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "4.000",
+              "X": "2.050",
+              "2": "2.875"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942622\/F3\/I0\/"
+    },
+    {
+      "id": "b4e86695866bff88",
+      "date": "2026-06-15 02:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "61155ff668b4681b",
+        "name": "Sweden",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "e52cd9812770cbc1",
+        "name": "Tunisia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7ce8d43bcb0336e2",
+        "name": "Estadio BBVA Bancomer"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.833",
+              "X": "3.500",
+              "2": "3.800"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-0.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.850",
+              "X": "3.400",
+              "2": "4.333"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.500",
+              "X": "2.100",
+              "2": "4.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192256742\/F3\/I0\/"
+    },
+    {
+      "id": "d88b070487cc627b",
+      "date": "2026-06-15 16:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "23731ea5d5bfbd66",
+        "name": "Spain",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "c2019f2cf30222e1",
+        "name": "Cape Verde Islands",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "94afbe99024954ab",
+        "name": "Mercedes-Benz Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.083",
+              "X": "9.000",
+              "2": "23.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "3.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-2.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.090",
+              "X": "9.500",
+              "2": "23.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-2.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.925",
+              "u": "1.925",
+              "v": "3.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.150",
+              "2": "1.725",
+              "v": "-1.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.363",
+              "X": "3.500",
+              "2": "17.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942682\/F3\/I0\/"
+    },
+    {
+      "id": "1bf20836e33ef0f5",
+      "date": "2026-06-15 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "35a8890c2f413699",
+        "name": "Belgium",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "48aeabaecc064ddf",
+        "name": "Egypt",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "7c69cef439f23e0d",
+        "name": "CenturyLink Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.600",
+              "X": "3.800",
+              "2": "5.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.800",
+              "2": "2.050",
+              "v": "-0.75"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.650",
+              "X": "3.800",
+              "2": "5.000"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.750",
+              "2": "2.125",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.150",
+              "u": "1.725",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.100",
+              "X": "2.375",
+              "2": "5.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942667\/F3\/I0\/"
+    },
+    {
+      "id": "251e1c0b57777269",
+      "date": "2026-06-15 22:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "229c241d16a26021",
+        "name": "Saudi Arabia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "cdf59a91afd12aa2",
+        "name": "Uruguay",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "b40c2626c53636b4",
+        "name": "Hard Rock Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "5.750",
+              "X": "4.500",
+              "2": "1.420"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "6.500",
+              "X": "4.500",
+              "2": "1.450"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.775",
+              "2": "2.100",
+              "v": "1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.750",
+              "u": "2.125",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "7.000",
+              "X": "2.400",
+              "2": "1.909"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942680\/F3\/I0\/"
+    },
+    {
+      "id": "d2c4af00db356e28",
+      "date": "2026-06-16 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "163d72deef3b0010",
+        "name": "Iran",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "3cf67920ce26dcaa",
+        "name": "New Zealand",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "4ac387a53df5a4d5",
+        "name": "SoFi Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.571",
+              "X": "3.800",
+              "2": "5.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-1"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.900",
+              "X": "3.400",
+              "2": "4.200"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.750",
+              "2": "2.125",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.100",
+              "X": "2.300",
+              "2": "6.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942678\/F3\/I0\/"
+    },
+    {
+      "id": "39aa1f63a9ea4a96",
+      "date": "2026-06-16 19:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "2e092e81543720e3",
+        "name": "France",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "798b64e51b0c2036",
+        "name": "Senegal",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "63118436d8699710",
+        "name": "MetLife Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.380",
+              "X": "4.500",
+              "2": "7.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.450",
+              "X": "4.333",
+              "2": "6.250"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.775",
+              "2": "2.100",
+              "v": "-1"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.833",
+              "X": "2.500",
+              "2": "7.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942684\/F3\/I0\/"
+    },
+    {
+      "id": "871e3bcb0fb74193",
+      "date": "2026-06-16 22:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "8c225c0bfec84221",
+        "name": "Iraq",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "1f07fb3b0f3049af",
+        "name": "Norway",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "17e26dba42944943",
+        "name": "Gillette Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.000",
+              "X": "4.500",
+              "2": "1.400"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "12.000",
+              "X": "6.500",
+              "2": "1.200"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "1.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "3.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "6.500",
+              "X": "2.500",
+              "2": "1.909"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192268165\/F3\/I0\/"
+    },
+    {
+      "id": "6613bbc35a1aa83c",
+      "date": "2026-06-17 01:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "91c50d3ec60461e2",
+        "name": "Argentina",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "69c68ad2d831cf7",
+        "name": "Algeria",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "9f4f54c8af0ec062",
+        "name": "Arrowhead Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.285",
+              "X": "5.000",
+              "2": "8.500"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-1.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.380",
+              "X": "4.750",
+              "2": "7.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.950",
+              "u": "1.900",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.100",
+              "2": "1.775",
+              "v": "-0.75"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.725",
+              "u": "2.150",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.727",
+              "X": "2.500",
+              "2": "9.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942686\/F3\/I0\/"
+    },
+    {
+      "id": "5b630389912a4215",
+      "date": "2026-06-17 04:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "99204af5bbf8c2a4",
+        "name": "Austria",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "5c94ac809ad0511a",
+        "name": "Jordan",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "447149997396b232",
+        "name": "Levi's Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.380",
+              "X": "4.750",
+              "2": "6.500"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.800",
+              "u": "2.050",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.300",
+              "X": "5.500",
+              "2": "8.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.900",
+              "2": "1.950",
+              "v": "-1.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.800",
+              "u": "2.050",
+              "v": "2.5,3.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "-0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.025",
+              "u": "1.825",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.833",
+              "X": "2.600",
+              "2": "7.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942688\/F3\/I0\/"
+    },
+    {
+      "id": "aae66fc9364ed0b9",
+      "date": "2026-06-17 17:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "7dfcf2bb339df18e",
+        "name": "Portugal",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "894c25aba109d04e",
+        "name": "Congo DR",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "497df7bfe45d4062",
+        "name": "NRG Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.333",
+              "X": "4.750",
+              "2": "8.000"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.925",
+              "2": "1.925",
+              "v": "-1.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.250",
+              "X": "6.000",
+              "2": "9.500"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.025",
+              "2": "1.825",
+              "v": "-1.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.875",
+              "u": "1.975",
+              "v": "2.5,3.0"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.100",
+              "2": "1.775",
+              "v": "-0.75"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "1.727",
+              "X": "2.625",
+              "2": "8.000"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E192258960\/F3\/I0\/"
+    },
+    {
+      "id": "6a6fcfd2b8bfd9dc",
+      "date": "2026-06-17 20:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "1c2725ea075ff4f6",
+        "name": "England",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "2f4e967cf6ce5464",
+        "name": "Croatia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e98c0f18407e7929",
+        "name": "AT&T Stadium"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.571",
+              "X": "4.000",
+              "2": "4.750"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-1"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "1.727",
+              "X": "3.700",
+              "2": "4.750"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.950",
+              "2": "1.900",
+              "v": "-0.75"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.875",
+              "u": "1.975",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.750",
+              "2": "2.125",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.775",
+              "u": "2.100",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.100",
+              "X": "2.300",
+              "2": "5.500"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942637\/F3\/I0\/"
+    },
+    {
+      "id": "c263f9d55d5abe0e",
+      "date": "2026-06-17 23:00:00",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "7cc1506ef67b6ba1",
+        "name": "Ghana",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "f4c5ab9ff4820631",
+        "name": "Panama",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "720880a0420f9c98",
+        "name": "BMO Field"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "1.800",
+              "X": "3.500",
+              "2": "3.900"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "2.5"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.850",
+              "2": "2.000",
+              "v": "-0.5"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "2.000",
+              "X": "3.500",
+              "2": "3.600"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "2.050",
+              "2": "1.800",
+              "v": "-0.5"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "2.000",
+              "u": "1.850",
+              "v": "2.0,2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "2.000",
+              "2": "1.850",
+              "v": "-0.25"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "1.0"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "2.400",
+              "X": "2.200",
+              "2": "4.750"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942641\/F3\/I0\/"
+    },
+    {
+      "id": "7037beb805859880",
+      "date": "2026-06-18 02:00:15",
+      "status": "NOT_STARTED",
+      "timer": "00:00",
+      "championship": {
+        "id": "5085a3cde16c822b",
+        "name": "World Cup 2026",
+        "s_name": "World Cup 2026"
+      },
+      "teamA": {
+        "id": "d864bf205514500b",
+        "name": "Uzbekistan",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "teamB": {
+        "id": "1c272439cc6a4f0e",
+        "name": "Colombia",
+        "score": {
+          "f": 0,
+          "1h": null,
+          "2h": null,
+          "o": null,
+          "p": null
+        },
+        "stats": {
+          "xG": {
+            "kickoff": null,
+            "live": null
+          }
+        },
+        "manager": null
+      },
+      "referee": null,
+      "stadium": {
+        "id": "e8b6b6fbc98bcf5e",
+        "name": "Estadio Azteca"
+      },
+      "odds": {
+        "starting": {
+          "1X2": {
+            "bet365": {
+              "1": "6.500",
+              "X": "4.500",
+              "2": "1.380"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.850",
+              "u": "2.000",
+              "v": "2.5,3.0"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "1.25"
+            }
+          }
+        },
+        "live": {
+          "1X2": {
+            "bet365": {
+              "1": "7.500",
+              "X": "4.500",
+              "2": "1.400"
+            }
+          },
+          "asian_handicap": {
+            "bet365": {
+              "1": "1.875",
+              "2": "1.975",
+              "v": "1.25"
+            }
+          },
+          "over_under": {
+            "bet365": {
+              "o": "1.975",
+              "u": "1.875",
+              "v": "2.5"
+            }
+          },
+          "1h_asian_handicap": {
+            "bet365": {
+              "1": "1.975",
+              "2": "1.875",
+              "v": "0.5"
+            }
+          },
+          "1h_goalline": {
+            "bet365": {
+              "o": "2.050",
+              "u": "1.800",
+              "v": "1.0,1.5"
+            }
+          },
+          "1h_result": {
+            "bet365": {
+              "1": "8.000",
+              "X": "2.400",
+              "2": "1.833"
+            }
+          }
+        }
+      },
+      "bet365_url": "https:\/\/www.bet365.EXT\/#\/AC\/B1\/C1\/D8\/E185942633\/F3\/I0\/"
+    }
+  ]
+}

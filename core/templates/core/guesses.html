@@ -1,55 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %} Palpites | Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
+{% comment %} {% static 'core/img/team-placeholder.png' as placeholder_url %} {% endcomment %}
 
-{% if guess_forms %}
-<h3>Palpites abertos</h3>
+<div class="page-container">
+  <div class="scrollable-content">
+    {% if guess_forms %}
+    <form id="guesses-form" action="{% url 'core:guesses' pool.slug %}" method="post" class="main-form">
+      {% csrf_token %}
 
-<form action="{% url 'core:guesses' pool.slug %}" method="post" class="main-form">
-  {% csrf_token %}
-
-  <div>
-    <div class="guesses-checkbox">
-      <label for="id_for_all_pools">
-        Aproveitar palpites em todos os bolões
-      </label>
-      <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
-    </div>
-  </div>
-
-  {% for guess_form in guess_forms %}
-    <div class="match-wrapper">
-      <p class="match-time">
-        {{ guess_form.match.date_time|date:"l d/m H:i" }}
-        {% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
-        {% if guess_form.match.double_score %}
-        <strong>(x2 🔥)</strong>
-        {% endif %}
-      </p>
-      <div class="guess-wrapper">
-        <div class="team">
-          <div>
-            <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo">
-            {{ guess_form.home_goals.label_tag }}
-          </div>
-          {{ guess_form.home_goals }}
+      <div>
+        <div class="guesses-checkbox">
+          <label for="id_for_all_pools">
+            Aproveitar palpites em todos os bolões
+          </label>
+          <input type="checkbox" name="for_all_pools" id="id_for_all_pools" checked>
         </div>
-        <div class="separador-equipes">x</div>
-        <div class="team">
-          {{ guess_form.away_goals }}
-          <div>
-            <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo">
-            {{ guess_form.away_goals.label_tag }}
+      </div>
+
+      {% for guess_form in guess_forms %}
+      <div class="match-wrapper">
+        <p class="match-time">
+          {{ guess_form.match.date_time|date:"l d/m H:i" }}
+          {% if guess_form.match.competition %} - {{ guess_form.match.competition }}{% endif %}
+          {% if guess_form.match.double_score %}
+          <strong>(x2 🔥)</strong>
+          {% endif %}
+        </p>
+        {% if guess_form.errors or guess_form.non_field_errors %}
+        <div class="form-errors alert alert-danger"
+          style="color: var(--error-color, #dc3545); font-size: 0.9rem; margin-bottom: 0.5rem; text-align: center;">
+          {% for error in guess_form.non_field_errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+          {% for field in guess_form %}
+          {% for error in field.errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="guess-wrapper">
+          <div class="team">
+            <div>
+              <img src="{{ guess_form.match.home_team.logo_url}}" class="small-team-logo"
+                onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+              {{ guess_form.home_goals.label_tag }}
+            </div>
+            {{ guess_form.home_goals }}
+          </div>
+          <div class="separador-equipes">x</div>
+          <div class="team">
+            {{ guess_form.away_goals }}
+            <div>
+              <img src="{{ guess_form.match.away_team.logo_url}}" class="small-team-logo"
+                onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
+              {{ guess_form.away_goals.label_tag }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  {% endfor %}
+      {% endfor %}
 
-  {% if closed_matches_and_guesses %}
-    {% for item in closed_matches_and_guesses %}
+      {% if closed_matches_and_guesses %}
+      {% for item in closed_matches_and_guesses %}
       <div class="match-wrapper">
         <p class="match-time">
           {{ item.match.date_time|date:"l d/m H:i" }}
@@ -61,7 +80,8 @@
         <div class="guess-wrapper">
           <div class="team">
             <div>
-              <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo">
+              <img src="{{ item.match.home_team.logo_url}}" class="small-team-logo"
+                onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
               {{ item.match.home_team.name }}
             </div>
             <p class="guess-score">{% if item.guess %}{{ item.guess.home_goals }}{% else %}-{% endif %}</p>
@@ -70,17 +90,29 @@
           <div class="team">
             <p class="guess-score">{% if item.guess %}{{ item.guess.away_goals }}{% else %}-{% endif %}</p>
             <div>
-              <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo">
+              <img src="{{ item.match.away_team.logo_url}}" class="small-team-logo"
+                onerror="this.onerror=null;this.src='{{ placeholder_url }}'">
               {{ item.match.away_team.name }}
             </div>
           </div>
         </div>
+        {% if item.guess and item.guess.score %}
+        <p class="guess-points">Pontos ganhos: {{ item.guess.score }}</p>
+        {% endif %}
       </div>
-    {% endfor %}
-  {% endif %}
+      {% endfor %}
+      {% endif %}
+    </form>
+    {% endif %}
+  </div>
 
-  <input type="submit" value="Salvar palpites">
-</form>
-{% endif %}
+  <div class="action-bar">
+    <a href="javascript:history.back()"
+      class="btn {% if guess_forms %}btn-secondary{% else %}btn-primary{% endif %}">Voltar</a>
+    {% if guess_forms %}
+    <button type="submit" form="guesses-form" class="btn btn-primary">Salvar palpites</button>
+    {% endif %}
+  </div>
+</div>
 
 {% endblock content %}

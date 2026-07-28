@@ -6,30 +6,33 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" type="image/x-icon" href={% static 'core/img/palpiteiros.ico' %}>
   <link rel="stylesheet" href={% static 'core/css/style.css' %}>
 
   <title>{% block title %}{% endblock title %}</title>
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
   <header>
     {% if request.user.is_authenticated %}
-      <a href={% if pool %}{% url 'core:pool_home' pool.slug %}{% else %}{% url 'core:index' %}{% endif %}>
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+
+      <a class="logo-link" href={% url 'core:index' %}>
         <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
       </a>
 
       {% if request.user.is_authenticated %}
         <div class="action-menu top-action-menu">
           <nav class="menu horizontal">
-            {% if pool %}
-              <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-            {% endif %}
-            <a href="{% url 'core:index' %}">🍀 Bolões</a>
-            <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
-            <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
+            {% if pool.user_is_guesser %}<a href="{% url 'core:guesses' pool.slug %}">⚽️ Palpitar</a>{% endif %}
+            {% if pool.user_is_guesser %}<a href="{% url 'core:ranking' pool.slug %}">🏆 Classificação</a>{% endif %}
+            {% if pool.user_is_guesser %}<a href="{% url 'core:guesses_by_period' pool.slug %}">📋 Todos os palpites</a>{% endif %}
+            <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+            {% comment %} <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a> {% endcomment %}
+            {% comment %} <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a> {% endcomment %}
+            {% if pool.user_is_owner %}<a href="{% url 'core:pool_management' pool.slug %}">🛠️ Gerenciar bolão</a><div></div>{% endif %}
             <details class="profile">
               <summary>
                 {{ request.user.first_name|default:request.user.username }}
@@ -60,9 +63,30 @@
         </details>
       {% endif %}
 
-
     {% endif %}
   </header>
+
+  {% if request.user.is_authenticated %}
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <nav class="sidebar" id="sidebar">
+      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+      <a class="sidebar-logo" href={% url 'core:index' %}>
+        <img src={% static 'core/img/palpiteiros.png' %} alt="Logo Palpiteiros" class="small-logo">
+      </a>
+      <div class="sidebar-links-container">
+        {% if pool.user_is_guesser %}<a href="{% url 'core:guesses' pool.slug %}">⚽️ Palpitar</a>{% endif %}
+        {% if pool.user_is_guesser %}<a href="{% url 'core:ranking' pool.slug %}">🏆 Classificação</a>{% endif %}
+        {% if pool.user_is_guesser %}<a href="{% url 'core:guesses_by_period' pool.slug %}">📋 Todos os palpites</a>{% endif %}
+        <a href="{% url 'core:index' %}">🍀 Selecionar bolão</a>
+        {% comment %} <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão público</a> {% endcomment %}
+        {% comment %} <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a> {% endcomment %}
+        {% if pool.user_is_owner %}<a href="{% url 'core:pool_management' pool.slug %}">🛠️ Gerenciar bolão</a><div></div>{% endif %}
+      </div>
+      <address class="sidebar-address">
+        Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
+      </address>
+    </nav>
+  {% endif %}
 
   <main>
     {% if messages %}
@@ -84,21 +108,7 @@
   </main>
 
   <footer>
-    {% if request.user.is_authenticated %}
-      <div class="action-menu bottom-action-menu">
-        <hr class="spacer">
-        <nav class="menu horizontal">
-          {% if pool %}
-            <a href="{% url 'core:pool_home' pool.slug %}">🏠 Início</a>
-          {% endif %}
-          <a href="{% url 'core:index' %}">🍀 Bolões</a>
-          <a href="{% url 'core:pool_list' %}">🔍 Buscar bolão</a>
-          <a href="{% url 'core:create_pool' %}">➕ Criar bolão</a>
-        </nav>
-      </div>
-    {% endif %}
-
-    <address>
+    <address class="footer-address">
       Feito por <a href="https://github.com/eldersantoss">@eldersantoss</a>
     </address>
   </footer>

@@ -1,0 +1,254 @@
+[
+  {
+    "name": "Grupo A",
+    "teams": [
+      {
+        "id": "4494f397133822b7",
+        "name": "México"
+      },
+      {
+        "id": "4719a60d951411bb",
+        "name": "África do Sul"
+      },
+      {
+        "id": "8b7b58d11e4662a2",
+        "name": "Coreia do Sul"
+      },
+      {
+        "id": "ef8a29059df471f8",
+        "name": "República Tcheca"
+      }
+    ]
+  },
+  {
+    "name": "Grupo B",
+    "teams": [
+      {
+        "id": "b243f013c20111e7",
+        "name": "Canadá"
+      },
+      {
+        "id": "cd5eb391b94c65f8",
+        "name": "Bósnia"
+      },
+      {
+        "id": "a917dadaa3228795",
+        "name": "Catar"
+      },
+      {
+        "id": "acded7a73883aaf5",
+        "name": "Suíça"
+      }
+    ]
+  },
+  {
+    "name": "Grupo C",
+    "teams": [
+      {
+        "id": "ed4f17bb5f58a226",
+        "name": "Brasil"
+      },
+      {
+        "id": "e5d7cb5d1e6eeeea",
+        "name": "Marrocos"
+      },
+      {
+        "id": "e4b1a2f4ef667c6",
+        "name": "Haiti"
+      },
+      {
+        "id": "a08b64c3a0c10288",
+        "name": "Escócia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo D",
+    "teams": [
+      {
+        "id": "93d7279d99dfcb9f",
+        "name": "Estados Unidos"
+      },
+      {
+        "id": "91b5a725af948fe0",
+        "name": "Paraguai"
+      },
+      {
+        "id": "1f8011a1c665881c",
+        "name": "Austrália"
+      },
+      {
+        "id": "1bd5f3ba4a71016d",
+        "name": "Turquia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo E",
+    "teams": [
+      {
+        "id": "f1d4fd8711b33893",
+        "name": "Alemanha"
+      },
+      {
+        "id": "bcd1b3d609435a96",
+        "name": "Curaçao"
+      },
+      {
+        "id": "113ed77cd2ccf09a",
+        "name": "Costa do Marfim"
+      },
+      {
+        "id": "30ff617439afd7",
+        "name": "Equador"
+      }
+    ]
+  },
+  {
+    "name": "Grupo F",
+    "teams": [
+      {
+        "id": "1bd3dae83ff1e298",
+        "name": "Holanda"
+      },
+      {
+        "id": "13d2ad640332aa86",
+        "name": "Japão"
+      },
+      {
+        "id": "61155ff668b4681b",
+        "name": "Suécia"
+      },
+      {
+        "id": "e52cd9812770cbc1",
+        "name": "Tunísia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo G",
+    "teams": [
+      {
+        "id": "35a8890c2f413699",
+        "name": "Bélgica"
+      },
+      {
+        "id": "48aeabaecc064ddf",
+        "name": "Egito"
+      },
+      {
+        "id": "163d72deef3b0010",
+        "name": "Irã"
+      },
+      {
+        "id": "3cf67920ce26dcaa",
+        "name": "Nova Zelândia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo H",
+    "teams": [
+      {
+        "id": "23731ea5d5bfbd66",
+        "name": "Espanha"
+      },
+      {
+        "id": "c2019f2cf30222e1",
+        "name": "Cabo Verde"
+      },
+      {
+        "id": "229c241d16a26021",
+        "name": "Arábia Saudita"
+      },
+      {
+        "id": "cdf59a91afd12aa2",
+        "name": "Uruguai"
+      }
+    ]
+  },
+  {
+    "name": "Grupo I",
+    "teams": [
+      {
+        "id": "2e092e81543720e3",
+        "name": "França"
+      },
+      {
+        "id": "798b64e51b0c2036",
+        "name": "Senegal"
+      },
+      {
+        "id": "8c225c0bfec84221",
+        "name": "Iraque"
+      },
+      {
+        "id": "1f07fb3b0f3049af",
+        "name": "Noruega"
+      }
+    ]
+  },
+  {
+    "name": "Grupo J",
+    "teams": [
+      {
+        "id": "91c50d3ec60461e2",
+        "name": "Argentina"
+      },
+      {
+        "id": "69c68ad2d831cf7",
+        "name": "Argélia"
+      },
+      {
+        "id": "99204af5bbf8c2a4",
+        "name": "Áustria"
+      },
+      {
+        "id": "5c94ac809ad0511a",
+        "name": "Jordânia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo K",
+    "teams": [
+      {
+        "id": "7dfcf2bb339df18e",
+        "name": "Portugal"
+      },
+      {
+        "id": "894c25aba109d04e",
+        "name": "RD Congo"
+      },
+      {
+        "id": "d864bf205514500b",
+        "name": "Uzbequistão"
+      },
+      {
+        "id": "1c272439cc6a4f0e",
+        "name": "Colômbia"
+      }
+    ]
+  },
+  {
+    "name": "Grupo L",
+    "teams": [
+      {
+        "id": "1c2725ea075ff4f6",
+        "name": "Inglaterra"
+      },
+      {
+        "id": "2f4e967cf6ce5464",
+        "name": "Croácia"
+      },
+      {
+        "id": "7cc1506ef67b6ba1",
+        "name": "Gana"
+      },
+      {
+        "id": "f4c5ab9ff4820631",
+        "name": "Panamá"
+      }
+    ]
+  }
+]

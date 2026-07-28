@@ -178,14 +178,30 @@ SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
 
 # Logging
 
+(BASE_DIR / "data" / "logs").mkdir(exist_ok=True, parents=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "raw": {
+            "format": "%(message)s",
+        },
+    },
     "handlers": {
         "console": {
             "level": "INFO",
             "class": "logging.StreamHandler",
             "stream": sys.stdout,
+        },
+        "guesses_audit_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "data" / "logs" / "guesses_audit.log",
+            "maxBytes": 25 * 1024 * 1024,  # 25MB
+            "backupCount": 3,
+            "formatter": "raw",
+            "encoding": "utf-8",
         },
     },
     "loggers": {
@@ -196,6 +212,11 @@ LOGGING = {
         },
         "core": {
             "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "guesses_audit": {
+            "handlers": ["guesses_audit_file"],
             "level": "INFO",
             "propagate": False,
         },

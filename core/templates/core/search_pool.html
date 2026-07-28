@@ -2,27 +2,37 @@
 
 {% block title %}Buscar bolão | Palpiteiros{% endblock title %}
 
+{% block body_class %}fixed-layout{% endblock %}
+
 {% block content %}
 
-<h2>Bolões públicos</h2>
+<div class="page-container">
+  <h2>Bolões públicos</h2>
+  <div class="scrollable-content">
 
-{% comment %} <form action="{% url 'core:ranking' pool.slug %}" method="GET" class="menu horizontal period-form">
-  {{ period_form.as_div }}
-</form> {% endcomment %}
+    <table class="main-table open-pools-table">
+      <thead>
+        <tr>
+          <th>Bolão</th>
+          <th>Administrador</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pool in pools %}
+          <tr>
+            <td>{{ pool }}</td>
+            <td>{{ pool.owner }}</td>
+            <td><a href={% url 'core:signin_pool' pool.uuid %}>Entrar</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-<table class="main-table open-pools-table">
-  <tr>
-    <th>Bolão</th>
-    <th>Administrador</th>
-    <th></th>
-  </tr>
-  {% for pool in pools %}
-    <tr>
-        <td>{{ pool }}</td>
-        <td>{{ pool.owner }}</td>
-        <td><a href={% url 'core:signin_pool' pool.uuid %}>Entrar</a></td>
-    </tr>
-  {% endfor %}
-</table>
+  <div class="action-bar">
+    <a href="javascript:history.back()" class="btn btn-primary">Voltar</a>
+  </div>
+</div>
 
 {% endblock content %}
