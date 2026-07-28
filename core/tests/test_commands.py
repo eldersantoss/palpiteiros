@@ -122,6 +122,26 @@ def test_sync_sfi_matches_creates_not_started_match(
     assert match.away_goals is None
 
 
+@patch("core.management.commands.sync_sfi_matches.logger")
+@patch("core.management.commands.sync_sfi_matches.Match.objects.update_or_create")
+def test_upsert_not_started_match_handles_exception(mock_update_or_create, mock_logger):
+    """When update_or_create fails in _upsert_not_started_match, log error and return skipped."""
+    from core.management.commands.sync_sfi_matches import Command, ProcessMatchResult
+
+    mock_update_or_create.side_effect = Exception("DB connection error")
+
+    cmd = Command()
+    match_data = {"id": "match-err-001", "date": "2026-03-03 15:00:00"}
+    competition = baker.make("core.Competition")
+    home_team = baker.make("core.Team")
+    away_team = baker.make("core.Team")
+
+    result = cmd._upsert_not_started_match(match_data, competition, home_team, away_team)
+
+    assert result == ProcessMatchResult.skipped
+    mock_logger.exception.assert_called_once()
+
+
 @patch("core.management.commands.sync_sfi_matches.django_timezone")
 @patch("requests.get")
 def test_sync_sfi_matches_updates_ended_match_when_exists(

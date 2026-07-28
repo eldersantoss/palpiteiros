@@ -275,16 +275,27 @@ class Command(BaseCommand):
         """Create or update a NOT_STARTED match without touching goal fields."""
         date_time = self._parse_match_datetime(match["date"])
 
-        _, created = Match.objects.update_or_create(
-            sfi_id=match["id"],
-            defaults={
-                "competition": competition,
-                "home_team": home_team,
-                "away_team": away_team,
-                "date_time": date_time,
-                "status": Match.NOT_STARTED,
-            },
-        )
+        try:
+            _, created = Match.objects.update_or_create(
+                sfi_id=match["id"],
+                defaults={
+                    "competition": competition,
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "date_time": date_time,
+                    "status": Match.NOT_STARTED,
+                },
+            )
+        except Exception as exc:
+            logger.exception(
+                "Error upserting NOT_STARTED match %s (%s vs %s at %s): %s",
+                match.get("id"),
+                match.get("teamA")["name"],
+                match.get("teamB")["name"],
+                match.get("date"),
+                exc,
+            )
+            return ProcessMatchResult.skipped
 
         return ProcessMatchResult.created if created else ProcessMatchResult.updated
 
