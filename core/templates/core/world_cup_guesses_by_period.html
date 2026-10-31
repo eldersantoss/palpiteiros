@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Todos os Palpites | Palpiteiros{% endblock title %}
+
+{% block body_class %}fixed-layout{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+  <h3>Todos os Palpites</h3>
+  <div class="scrollable-content">
+
+    <div class="period-form-container">
+      <p>Escolha o palpiteiro e a fase que deseja ver os palpites:</p>
+      <form action="{% url 'core:world_cup_guesses_by_period' pool.slug %}" method="GET" id="guesses-form" style="display:flex; flex-direction:column; gap:1vh; margin-top:2vh;">
+        <div class="world-cup-ranking-form-group">
+          {{ form.palpiteiro }}
+        </div>
+        <div class="world-cup-ranking-form-group">
+          {{ form.periodo }}
+        </div>
+      </form>
+    </div>
+
+    {% if guesses %}
+        <h4 class="total-score">Pontuação total no período: <span style="color:#1c57b7">{{ total_score }}<span></h4>
+        <table class="main-table ranking-table all-guesses-table">
+        <thead>
+            <tr>
+            <th style="width:50%">Partida</th>
+            <th style="width:15%">Resultado</th>
+            <th style="width:15%">Palpite</th>
+            <th style="width:15%">Pontuação</th>
+            <th style="width:5%"></th>
+            </tr>
+        </thead>
+
+        <tbody id="guesses-tbody">
+          {% for guess in guesses %}
+            <tr class="detail-table-row">
+              <td>
+                    <p class="match-info-all-guesses">{{ guess.match.date_time|date:"l d/m H:i" }}</p>
+                    <p>{{ guess.match.home_team }}</p>
+                    <p>x</p>
+                    <p>{{ guess.match.away_team }}</p>
+                </td>
+                <td>{{ guess.match.result_str|default:"-" }}</td>
+                <td>{{ guess.result_str }}</td>
+                {% if guess.match.result_str %}
+                    <td>{{ guess.score }}</td>
+                {% else %}
+                    <td>-</td>
+                {% endif %}
+                <td>
+                {% if guess.match.double_score %}
+                🔥
+                {% endif %}
+                </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+
+    {% else %}
+        <p class="main-msg">Nenhum palpite encontrado para o palpiteiro no período selecionado.</p>
+    {% endif %}
+  </div>
+
+  <div class="action-bar">
+    <a href="javascript:history.back()" class="btn btn-primary">Voltar</a>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('guesses-form');
+    document.getElementById('id_palpiteiro').addEventListener('change', function () { form.submit(); });
+    document.getElementById('id_periodo').addEventListener('change', function () { form.submit(); });
+});
+</script>
+
+{% endblock content %}

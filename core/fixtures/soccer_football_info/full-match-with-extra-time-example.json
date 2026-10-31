@@ -1,0 +1,1739 @@
+{
+  "status": 200,
+  "errors": [],
+  "pagination": [],
+  "result": [
+    {
+      "id": "2cfb049ba8726afa",
+      "date": "2026-02-27 00:30:00",
+      "status": "ENDED",
+      "timer": "90:00",
+      "championship": {
+        "id": "c1ea47eeb6dc7555",
+        "name": "Recopa Sudamericana",
+        "s_name": "CONMEBOL Recopa 2026"
+      },
+      "teamA": {
+        "id": "74becc28c493fff8",
+        "name": "Flamengo",
+        "score": {
+          "f": 2,
+          "1h": 1,
+          "2h": 2,
+          "o": 2,
+          "p": null
+        },
+        "stats": {
+          "possession": "77",
+          "attacks": {
+            "n": "179",
+            "d": "95",
+            "o_s": "0"
+          },
+          "shoots": {
+            "t": "20",
+            "off": "13",
+            "on": "7",
+            "g_a": "7"
+          },
+          "penalties": "2",
+          "corners": {
+            "t": "9",
+            "f": "6",
+            "h": "4"
+          },
+          "fouls": {
+            "t": "8",
+            "y_c": "2",
+            "y_t_r_c": "0",
+            "r_c": "0"
+          },
+          "substitutions": "6",
+          "throwins": null,
+          "injuries": null,
+          "dominance_avg_2_5": "8.70",
+          "xG": {
+            "kickoff": "0",
+            "live": "3.24"
+          }
+        },
+        "manager": {
+          "id": "a04c6da93a62fd52",
+          "name": "Filipe Luis"
+        }
+      },
+      "teamB": {
+        "id": "c831dae786293cc6",
+        "name": "Lanus",
+        "score": {
+          "f": 1,
+          "1h": 1,
+          "2h": 1,
+          "o": 3,
+          "p": null
+        },
+        "stats": {
+          "possession": "23",
+          "attacks": {
+            "n": "84",
+            "d": "24",
+            "o_s": "1"
+          },
+          "shoots": {
+            "t": "9",
+            "off": "5",
+            "on": "4",
+            "g_a": "6"
+          },
+          "penalties": "0",
+          "corners": {
+            "t": "3",
+            "f": "1",
+            "h": "1"
+          },
+          "fouls": {
+            "t": "4",
+            "y_c": "2",
+            "y_t_r_c": "0",
+            "r_c": "0"
+          },
+          "substitutions": "6",
+          "throwins": null,
+          "injuries": null,
+          "dominance_avg_2_5": "3.63",
+          "xG": {
+            "kickoff": "0.02",
+            "live": "0.87"
+          }
+        },
+        "manager": {
+          "id": "5fb962e4b4817489",
+          "name": "Mauricio Pellegrino"
+        }
+      },
+      "events": [
+        {
+          "type": "goal",
+          "timer": "120+2",
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": "120+1",
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 118,
+          "team": "B"
+        },
+        {
+          "type": "goal",
+          "timer": 118,
+          "team": "B"
+        },
+        {
+          "type": "corner",
+          "timer": 115,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 107,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": "105+1",
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 105,
+          "team": "B"
+        },
+        {
+          "type": "corner",
+          "timer": 99,
+          "team": "B"
+        },
+        {
+          "type": "corner",
+          "timer": 97,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 96,
+          "team": "B"
+        },
+        {
+          "type": "substitution",
+          "timer": 96,
+          "team": "B"
+        },
+        {
+          "type": "substitution",
+          "timer": 92,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": "90+7",
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": "90+6",
+          "team": "A"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 88,
+          "team": "A"
+        },
+        {
+          "type": "cancel_goal",
+          "timer": 85,
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 85,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 75,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 70,
+          "team": "B"
+        },
+        {
+          "type": "substitution",
+          "timer": 70,
+          "team": "B"
+        },
+        {
+          "type": "yellow_card",
+          "timer": 69,
+          "team": "B"
+        },
+        {
+          "type": "substitution",
+          "timer": 64,
+          "team": "B"
+        },
+        {
+          "type": "substitution",
+          "timer": 64,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 64,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 58,
+          "team": "A"
+        },
+        {
+          "type": "substitution",
+          "timer": 58,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 45,
+          "team": "A"
+        },
+        {
+          "type": "cancel_goal",
+          "timer": 37,
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 37,
+          "team": "A"
+        },
+        {
+          "type": "goal",
+          "timer": 29,
+          "team": "B"
+        },
+        {
+          "type": "corner",
+          "timer": 27,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 16,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 5,
+          "team": "A"
+        },
+        {
+          "type": "corner",
+          "timer": 2,
+          "team": "B"
+        }
+      ],
+      "dominance_index": [
+        {
+          "timer": "00:00",
+          "teamA": "5.00",
+          "teamB": "5.00"
+        },
+        {
+          "timer": "00:30",
+          "teamA": "5.00",
+          "teamB": "5.00"
+        },
+        {
+          "timer": "01:00",
+          "teamA": "8.00",
+          "teamB": "7.00"
+        },
+        {
+          "timer": "01:30",
+          "teamA": "5.00",
+          "teamB": "13.00"
+        },
+        {
+          "timer": "02:00",
+          "teamA": "4.10",
+          "teamB": "7.90"
+        },
+        {
+          "timer": "02:30",
+          "teamA": "4.10",
+          "teamB": "11.90"
+        },
+        {
+          "timer": "03:00",
+          "teamA": "4.10",
+          "teamB": "8.90"
+        },
+        {
+          "timer": "03:30",
+          "teamA": "4.10",
+          "teamB": "5.90"
+        },
+        {
+          "timer": "04:00",
+          "teamA": "4.30",
+          "teamB": "14.70"
+        },
+        {
+          "timer": "04:30",
+          "teamA": "4.60",
+          "teamB": "6.40"
+        },
+        {
+          "timer": "05:00",
+          "teamA": "5.60",
+          "teamB": "5.40"
+        },
+        {
+          "timer": "05:30",
+          "teamA": "13.50",
+          "teamB": "4.50"
+        },
+        {
+          "timer": "06:00",
+          "teamA": "9.60",
+          "teamB": "5.40"
+        },
+        {
+          "timer": "06:30",
+          "teamA": "14.00",
+          "teamB": "4.00"
+        },
+        {
+          "timer": "07:00",
+          "teamA": "6.00",
+          "teamB": "7.00"
+        },
+        {
+          "timer": "07:30",
+          "teamA": "6.00",
+          "teamB": "4.00"
+        },
+        {
+          "timer": "08:00",
+          "teamA": "12.00",
+          "teamB": "4.00"
+        },
+        {
+          "timer": "08:30",
+          "teamA": "6.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "09:00",
+          "teamA": "6.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "09:30",
+          "teamA": "6.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "100:00",
+          "teamA": "99.99",
+          "teamB": "99.99"
+        },
+        {
+          "timer": "100:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "101:00",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "101:30",
+          "teamA": "9.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "102:00",
+          "teamA": "15.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "102:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "103:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "103:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "104:00",
+          "teamA": "15.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "104:30",
+          "teamA": "7.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "105:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "105:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "106:00",
+          "teamA": "12.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "106:30",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "107:00",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "107:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "108:00",
+          "teamA": "13.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "108:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "109:00",
+          "teamA": "13.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "109:30",
+          "teamA": "15.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "10:00",
+          "teamA": "7.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "10:30",
+          "teamA": "10.00",
+          "teamB": "4.00"
+        },
+        {
+          "timer": "110:00",
+          "teamA": "99.99",
+          "teamB": "99.99"
+        },
+        {
+          "timer": "110:30",
+          "teamA": "8.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "111:00",
+          "teamA": "9.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "111:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "112:00",
+          "teamA": "7.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "112:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "113:00",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "113:30",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "114:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "114:30",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "115:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "115:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "116:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "116:30",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "117:00",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "117:30",
+          "teamA": "8.70",
+          "teamB": "4.30"
+        },
+        {
+          "timer": "118:00",
+          "teamA": "7.70",
+          "teamB": "4.30"
+        },
+        {
+          "timer": "118:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "119:00",
+          "teamA": "7.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "119:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "11:00",
+          "teamA": "7.00",
+          "teamB": "3.00"
+        },
+        {
+          "timer": "11:30",
+          "teamA": "7.00",
+          "teamB": "4.00"
+        },
+        {
+          "timer": "120:00+00:00",
+          "teamA": "99.99",
+          "teamB": "99.99"
+        },
+        {
+          "timer": "120:00+00:30",
+          "teamA": "10.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "120:00+01:00",
+          "teamA": "10.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "120:00+01:30",
+          "teamA": "7.70",
+          "teamB": "7.30"
+        },
+        {
+          "timer": "120:00+02:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "120:00+02:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "120:00+03:00",
+          "teamA": "7.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "120:00+03:30",
+          "teamA": "7.70",
+          "teamB": "25.30"
+        },
+        {
+          "timer": "12:00",
+          "teamA": "8.00",
+          "teamB": "3.00"
+        },
+        {
+          "timer": "12:30",
+          "teamA": "21.00",
+          "teamB": "3.00"
+        },
+        {
+          "timer": "13:00",
+          "teamA": "8.00",
+          "teamB": "3.00"
+        },
+        {
+          "timer": "13:30",
+          "teamA": "8.10",
+          "teamB": "2.90"
+        },
+        {
+          "timer": "14:00",
+          "teamA": "13.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "14:30",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "15:00",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "15:30",
+          "teamA": "12.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "16:00",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "16:30",
+          "teamA": "15.40",
+          "teamB": "3.60"
+        },
+        {
+          "timer": "17:00",
+          "teamA": "7.40",
+          "teamB": "4.60"
+        },
+        {
+          "timer": "17:30",
+          "teamA": "9.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "18:00",
+          "teamA": "8.40",
+          "teamB": "4.60"
+        },
+        {
+          "timer": "18:30",
+          "teamA": "14.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "19:00",
+          "teamA": "8.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "19:30",
+          "teamA": "13.60",
+          "teamB": "4.40"
+        },
+        {
+          "timer": "20:00",
+          "teamA": "7.50",
+          "teamB": "2.50"
+        },
+        {
+          "timer": "20:30",
+          "teamA": "10.50",
+          "teamB": "2.50"
+        },
+        {
+          "timer": "21:00",
+          "teamA": "10.50",
+          "teamB": "3.50"
+        },
+        {
+          "timer": "21:30",
+          "teamA": "7.50",
+          "teamB": "2.50"
+        },
+        {
+          "timer": "22:00",
+          "teamA": "7.50",
+          "teamB": "2.50"
+        },
+        {
+          "timer": "22:30",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "23:00",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "23:30",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "24:00",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "24:30",
+          "teamA": "7.30",
+          "teamB": "4.70"
+        },
+        {
+          "timer": "25:00",
+          "teamA": "8.30",
+          "teamB": "6.70"
+        },
+        {
+          "timer": "25:30",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "26:00",
+          "teamA": "11.30",
+          "teamB": "3.70"
+        },
+        {
+          "timer": "26:30",
+          "teamA": "9.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "27:00",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "27:30",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "28:00",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "28:30",
+          "teamA": "7.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "29:00",
+          "teamA": "13.30",
+          "teamB": "12.70"
+        },
+        {
+          "timer": "29:30",
+          "teamA": "8.30",
+          "teamB": "2.70"
+        },
+        {
+          "timer": "30:00",
+          "teamA": "7.40",
+          "teamB": "5.60"
+        },
+        {
+          "timer": "30:30",
+          "teamA": "7.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "31:00",
+          "teamA": "13.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "31:30",
+          "teamA": "14.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "32:00",
+          "teamA": "13.40",
+          "teamB": "2.60"
+        },
+        {
+          "timer": "32:30",
+          "teamA": "8.60",
+          "teamB": "3.40"
+        },
+        {
+          "timer": "33:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "33:30",
+          "teamA": "8.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "34:00",
+          "teamA": "11.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "34:30",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "35:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "35:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "36:00",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "36:30",
+          "teamA": "17.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "37:00",
+          "teamA": "10.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "37:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "38:00",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "38:30",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "39:00",
+          "teamA": "11.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "39:30",
+          "teamA": "14.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "40:00",
+          "teamA": "17.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "40:30",
+          "teamA": "9.70",
+          "teamB": "9.30"
+        },
+        {
+          "timer": "41:00",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "41:30",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "42:00",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "42:30",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "43:00",
+          "teamA": "16.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "43:30",
+          "teamA": "11.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "44:00",
+          "teamA": "25.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "44:30",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "45:00",
+          "teamA": "16.90",
+          "teamB": "6.10"
+        },
+        {
+          "timer": "45:00+00:00",
+          "teamA": "11.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "45:00+00:30",
+          "teamA": "7.90",
+          "teamB": "2.10"
+        },
+        {
+          "timer": "45:00+01:00",
+          "teamA": "8.90",
+          "teamB": "2.10"
+        },
+        {
+          "timer": "45:00+01:30",
+          "teamA": "7.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "45:00+02:00",
+          "teamA": "7.90",
+          "teamB": "4.10"
+        },
+        {
+          "timer": "45:00+02:30",
+          "teamA": "8.90",
+          "teamB": "2.10"
+        },
+        {
+          "timer": "45:00+03:00",
+          "teamA": "9.90",
+          "teamB": "3.10"
+        },
+        {
+          "timer": "45:00+03:30",
+          "teamA": "8.90",
+          "teamB": "2.10"
+        },
+        {
+          "timer": "45:30",
+          "teamA": "7.90",
+          "teamB": "4.10"
+        },
+        {
+          "timer": "46:00",
+          "teamA": "7.90",
+          "teamB": "9.10"
+        },
+        {
+          "timer": "46:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "47:00",
+          "teamA": "13.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "47:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "48:00",
+          "teamA": "10.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "48:30",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "49:00",
+          "teamA": "8.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "49:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "50:00",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "50:30",
+          "teamA": "10.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "51:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "51:30",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "52:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "52:30",
+          "teamA": "9.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "53:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "53:30",
+          "teamA": "15.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "54:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "54:30",
+          "teamA": "8.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "55:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "55:30",
+          "teamA": "9.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "56:00",
+          "teamA": "13.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "56:30",
+          "teamA": "11.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "57:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "57:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "58:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "58:30",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "59:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "59:30",
+          "teamA": "13.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "60:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "60:30",
+          "teamA": "9.60",
+          "teamB": "3.40"
+        },
+        {
+          "timer": "61:00",
+          "teamA": "10.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "61:30",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "62:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "62:30",
+          "teamA": "10.70",
+          "teamB": "4.30"
+        },
+        {
+          "timer": "63:00",
+          "teamA": "14.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "63:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "64:00",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "64:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "65:00",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "65:30",
+          "teamA": "15.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "66:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "66:30",
+          "teamA": "8.70",
+          "teamB": "4.30"
+        },
+        {
+          "timer": "67:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "67:30",
+          "teamA": "7.60",
+          "teamB": "3.40"
+        },
+        {
+          "timer": "68:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "68:30",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "69:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "69:30",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "70:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "70:30",
+          "teamA": "8.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "71:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "71:30",
+          "teamA": "12.60",
+          "teamB": "6.40"
+        },
+        {
+          "timer": "72:00",
+          "teamA": "7.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "72:30",
+          "teamA": "10.60",
+          "teamB": "2.40"
+        },
+        {
+          "timer": "73:00",
+          "teamA": "9.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "73:30",
+          "teamA": "16.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "74:00",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "74:30",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "75:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "75:30",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "76:00",
+          "teamA": "14.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "76:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "77:00",
+          "teamA": "8.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "77:30",
+          "teamA": "11.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "78:00",
+          "teamA": "14.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "78:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "79:00",
+          "teamA": "7.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "79:30",
+          "teamA": "7.80",
+          "teamB": "11.20"
+        },
+        {
+          "timer": "80:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "80:30",
+          "teamA": "17.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "81:00",
+          "teamA": "8.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "81:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "82:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "82:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "83:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "83:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "84:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "84:30",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "85:00",
+          "teamA": "20.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "85:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "86:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "86:30",
+          "teamA": "7.80",
+          "teamB": "5.20"
+        },
+        {
+          "timer": "87:00",
+          "teamA": "8.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "87:30",
+          "teamA": "7.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "88:00",
+          "teamA": "10.80",
+          "teamB": "3.20"
+        },
+        {
+          "timer": "88:30",
+          "teamA": "7.80",
+          "teamB": "10.20"
+        },
+        {
+          "timer": "89:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "89:30",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "90:00",
+          "teamA": "37.70",
+          "teamB": "16.30"
+        },
+        {
+          "timer": "90:00+00:00",
+          "teamA": "7.70",
+          "teamB": "5.30"
+        },
+        {
+          "timer": "90:00+00:30",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+01:00",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "90:00+01:30",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+02:00",
+          "teamA": "12.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+02:30",
+          "teamA": "10.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "90:00+03:00",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "90:00+03:30",
+          "teamA": "9.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+04:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+04:30",
+          "teamA": "7.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "90:00+05:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+05:30",
+          "teamA": "7.70",
+          "teamB": "8.30"
+        },
+        {
+          "timer": "90:00+06:00",
+          "teamA": "13.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+06:30",
+          "teamA": "13.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+07:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "90:00+07:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+08:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+14:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+15:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+15:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+16:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+23:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+24:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+26:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+27:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+27:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+28:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+29:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+30:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+31:30",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:00+32:00",
+          "teamA": "",
+          "teamB": ""
+        },
+        {
+          "timer": "90:30",
+          "teamA": "12.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "91:00",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "91:30",
+          "teamA": "10.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "92:00",
+          "teamA": "9.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "92:30",
+          "teamA": "11.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "93:00",
+          "teamA": "7.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "93:30",
+          "teamA": "7.80",
+          "teamB": "6.20"
+        },
+        {
+          "timer": "94:00",
+          "teamA": "12.80",
+          "teamB": "2.20"
+        },
+        {
+          "timer": "94:30",
+          "teamA": "11.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "95:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "95:30",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        },
+        {
+          "timer": "96:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "96:30",
+          "teamA": "8.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "97:00",
+          "teamA": "10.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "97:30",
+          "teamA": "9.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "98:00",
+          "teamA": "7.70",
+          "teamB": "2.30"
+        },
+        {
+          "timer": "98:30",
+          "teamA": "7.70",
+          "teamB": "7.30"
+        },
+        {
+          "timer": "99:00",
+          "teamA": "7.70",
+          "teamB": "4.30"
+        },
+        {
+          "timer": "99:30",
+          "teamA": "8.70",
+          "teamB": "3.30"
+        }
+      ],
+      "referee": {
+        "id": "cdb124098a4e4337",
+        "name": "Gustavo Tejera"
+      },
+      "stadium": {
+        "id": "268401a9796e8857",
+        "name": "Estadio do Maracana"
+      },
+      "bet365_url": "https://www.bet365.EXT/#/AC/B1/C1/D8/E186697588/F3/I0/"
+    }
+  ]
+}

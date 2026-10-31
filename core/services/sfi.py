@@ -35,12 +35,38 @@ SFIScore = TypedDict(
 )
 
 
+class SFIFouls(TypedDict):
+    """Foul statistics for one team in a match."""
+
+    t: str | None
+    y_c: str | None
+    y_t_r_c: str | None
+    r_c: str | None
+
+
+class SFIStats(TypedDict):
+    """In-match statistics for one team."""
+
+    possession: Any
+    attacks: Any
+    shoots: Any
+    penalties: Any
+    corners: Any
+    fouls: SFIFouls
+    substitutions: Any
+    throwins: Any
+    injuries: Any
+    dominance_avg_2_5: Any
+    xG: Any
+
+
 class SFITeamRef(TypedDict):
     """Lightweight team descriptor embedded inside a match payload."""
 
     id: str
     name: str
     score: SFIScore
+    stats: SFIStats
 
 
 class SFIChampionshipRef(TypedDict):
@@ -171,6 +197,7 @@ class SFIService:
 
     _BASE_URL = "https://{host}"
     _MATCHES_BY_DAY_PATH = "/matches/day/basic/"
+    _MATCHES_BY_CHAMPIONSHIP_PATH = "/matches/by/basic/"
     _CHAMPIONSHIPS_VIEW_PATH = "/championships/view/"
 
     SFI_NOT_STARTED_STATUS = "NOT_STARTED"
@@ -214,6 +241,38 @@ class SFIService:
 
         response = requests.get(
             self._base_url + self._MATCHES_BY_DAY_PATH,
+            headers=self._headers,
+            params=params,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_matches_by_championship(self, championship_id: str, page: int = 1) -> SFIMatchesResponse:
+        """Fetch matches for a specific championship.
+
+        The response is paginated (25 matches per page); iterate pages until all
+        items are consumed.
+
+        Args:
+            championship_id: The SFI championship ID.
+            page: 1-based page number.
+
+        Returns:
+            The raw JSON response parsed into an ``SFIMatchesResponse`` dict.
+
+        Raises:
+            requests.HTTPError: If the HTTP response status is 4xx or 5xx.
+            requests.RequestException: On network-level errors.
+        """
+        params = {
+            "c": championship_id,
+            "p": page,
+        }
+
+        logger.debug("SFI request: GET %s%s params=%s", self._base_url, self._MATCHES_BY_CHAMPIONSHIP_PATH, params)
+
+        response = requests.get(
+            self._base_url + self._MATCHES_BY_CHAMPIONSHIP_PATH,
             headers=self._headers,
             params=params,
         )
@@ -312,3 +371,106 @@ class SFIService:
             "name": championship_name,
             "seasons": {str(year): {"teams": teams}},
         }
+
+    def get_championship(self, championship_id: str) -> SFIChampionshipView | None:
+        """Fetch championship metadata by SFI ID.
+
+        Args:
+            championship_id: The SFI championship ID.
+
+        Returns:
+            The championship data dict, or None if not found.
+
+        Raises:
+            requests.HTTPError: If the HTTP response status is 4xx or 5xx.
+            requests.RequestException: On network-level errors.
+        """
+        params = {"i": championship_id}
+
+        logger.debug(
+            "SFI request: GET %s%s params=%s",
+            self._base_url,
+            self._CHAMPIONSHIPS_VIEW_PATH,
+            params,
+        )
+
+        response = requests.get(
+            self._base_url + self._CHAMPIONSHIPS_VIEW_PATH,
+            headers=self._headers,
+            params=params,
+        )
+        response.raise_for_status()
+        data: SFIChampionshipViewResponse = response.json()
+
+        result = data.get("result", [])
+        return result[0] if result else None
+
+    def get_groups_of_championship(self, championship_id: str, year: int) -> list[dict]:
+        """Fetch groups with their teams from a specific championship season.
+
+        Unlike get_teams_of_championship, this preserves the group structure
+        instead of deduplicating teams into a flat list.
+
+        Args:
+            championship_id: The SFI championship ID.
+            year: The season year (matched against each season's "from" field).
+
+        Returns:
+            List of groups, each with "name" and "teams" keys::
+
+                [{"name": "Grupo A", "teams": [{"id": "...", "name": "..."}]}]
+
+            Empty list if no season or groups are found.
+        """
+        params = {"i": championship_id}
+
+        logger.debug(
+            "SFI request: GET %s%s params=%s",
+            self._base_url,
+            self._CHAMPIONSHIPS_VIEW_PATH,
+            params,
+        )
+
+        response = requests.get(
+            self._base_url + self._CHAMPIONSHIPS_VIEW_PATH,
+            headers=self._headers,
+            params=params,
+        )
+        response.raise_for_status()
+        data: SFIChampionshipViewResponse = response.json()
+
+        result = data.get("result", [])
+        if not result:
+            return []
+
+        championship = result[0]
+        seasons = championship.get("seasons", [])
+
+        target_season = None
+        for season in seasons:
+            season_from = season.get("from", "")
+            if season_from:
+                try:
+                    if date.fromisoformat(season_from).year == year:
+                        target_season = season
+                        break
+                except ValueError:
+                    logger.warning("Could not parse season date: %s", season_from)
+
+        if not target_season:
+            return []
+
+        groups = []
+        for group in target_season.get("groups", []):
+            group_name = group.get("name", "")
+            teams: list[SFITeamInfo] = []
+            seen_ids: set = set()
+            for entry in group.get("table", []):
+                team_data = entry.get("team", {})
+                team_id = team_data.get("id")
+                if team_id and team_id not in seen_ids:
+                    seen_ids.add(team_id)
+                    teams.append({"id": team_id, "name": team_data.get("name", "")})
+            groups.append({"name": group_name, "teams": teams})
+
+        return groups

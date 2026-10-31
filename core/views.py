@@ -1,16 +1,20 @@
 import logging
+from typing import Any, Iterable
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.forms import CheckboxSelectMultiple, modelform_factory
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.text import slugify
 from django.views import generic
 
-from core.helpers import redirect_with_msg
+from core.constants import WORLD_CUP_END_DATE, WORLD_CUP_START_DATE
+from core.helpers import extract_and_parse_guesses_for_log, redirect_with_msg
+from core.loggers import log_guess_submission
 
 from .forms import (
     GuesserEditForm,
@@ -18,9 +22,11 @@ from .forms import (
     GuessForm,
     RankingPeriodForm,
     UserEditForm,
+    WorldCupGuessesPeriodForm,
+    WorldCupRankingPeriodForm,
 )
-from .models import Guess, GuessPool
-from .viewmixins import GuessPoolMembershipMixin
+from .models import CompetitionGroup, Guess, GuessPool, Match
+from .viewmixins import GuessPoolMembershipMixin, GuessSavingMixin
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +154,7 @@ class ManagePoolView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.Updat
         "name",
         "minutes_before_start_match",
         "hours_before_open_to_guesses",
+        "hours_to_keep_closed_matches_in_ranking",
         "private",
         "competitions",
         "teams",
@@ -243,7 +250,7 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
                 self.request,
                 "error",
                 "Nenhum bolão público cadastrado... Que tal criar um agora mesmo? Basta clicar em <strong>Criar bolão</strong> e configurar como quiser 😎",
-                "long",
+                "mid",
             )
         return super().get(request, *args, **kwargs)
 
@@ -251,15 +258,21 @@ class GuessPoolListView(LoginRequiredMixin, generic.ListView):
 class PoolHomeView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
     template_name = "core/pool_home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = timezone.localdate()
+        context["show_grouped_guesses"] = WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE
+        return context
 
-class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+
+class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, GuessSavingMixin, generic.View):
     def dispatch(self, request, *args, **kwargs):
         if self.pool.user_is_owner and not self.pool.user_is_guesser:
             return redirect_with_msg(
                 self.request,
                 "error",
                 "Você não está cadastrado como palpiteiro. Acesse <strong>Gerenciar bolão</strong> e marque seu usuário como <strong>Palpiteiro</strong> para ter acesso à esta ação.",
-                "long",
+                "mid",
                 self.pool,
             )
 
@@ -268,10 +281,9 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
     def get(self, *args, **kwargs):
         logger.info(f"{timezone.now()}: user {self.request.user} accessed the /palpites route")
 
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        has_matches = open_matches.exists() or closed_matches.exists()
+        has_matches = bool(open_matches or closed_matches)
         if not has_matches:
             return redirect_with_msg(
                 self.request,
@@ -281,33 +293,32 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 self.pool,
             )
 
+        # Batch query for all user guesses for these matches
+        all_match_ids = [m.id for m in open_matches] + [m.id for m in closed_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
         guess_forms = []
         for match in open_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
-                )
+            guess = existing_guesses.get(match.id)
+            if guess:
                 initial_data = {
                     f"home_goals_{match.id}": guess.home_goals,
                     f"away_goals_{match.id}": guess.away_goals,
                 }
-            except Guess.DoesNotExist:
+            else:
                 initial_data = None
 
             guess_forms.append(GuessForm(initial_data, match=match))
 
-        closed_matches_and_guesses = []
-        for match in closed_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
-                )
-            except Guess.DoesNotExist:
-                guess = None
-
-            closed_matches_and_guesses.append({"match": match, "guess": guess})
+        closed_matches_and_guesses = [
+            {"match": match, "guess": existing_guesses.get(match.id)} for match in closed_matches
+        ]
 
         return render(
             self.request,
@@ -321,15 +332,31 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
 
     def post(self, *args, **kwargs):
         guesses_data = dict(**self.request.POST)
-        guesses_data.pop("csrfmiddlewaretoken")
+        guesses_data.pop("csrfmiddlewaretoken", None)
         logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
 
         for_all_pools = bool(self.request.POST.get("for_all_pools"))
 
-        open_matches = self.pool.get_open_matches()
-        closed_matches = self.pool.get_closed_recent_matches()
+        open_matches, closed_matches = self.pool.get_relevant_matches()
 
-        if not open_matches.exists():
+        # Parse submitted guesses for logging
+        guesses_submitted = extract_and_parse_guesses_for_log(self.request.POST)
+
+        open_match_ids = {m.id for m in open_matches}
+        results = {"success": [], "validation_errors": {}, "match_closed": []}
+
+        if not open_matches:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error="Não existem partidas abertas neste momento",
+                request=self.request,
+            )
             return redirect_with_msg(
                 self.request,
                 "error",
@@ -338,68 +365,98 @@ class GuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
                 self.pool,
             )
 
+        submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
+
+        has_new_guesses = False
+        has_validation_errors = False
+        error_occurred = None
+
+        try:
+            has_new_guesses, has_validation_errors = self.save_guesses(
+                open_matches, self.request.POST, for_all_pools, results
+            )
+
+            # Identify if any submitted match was closed
+            for m_id in submitted_match_ids:
+                if m_id not in open_match_ids:
+                    results["match_closed"].append(m_id)
+
+        except Exception as e:
+            error_occurred = e
+            raise e
+
+        finally:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error=error_occurred,
+                request=self.request,
+            )
+
+        # Re-fetch the updated/current guesses for all matches to construct the forms/context
+        all_match_ids = [m.id for m in open_matches] + [m.id for m in closed_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
         guess_forms = []
         for match in open_matches:
             guess_form = GuessForm(self.request.POST, match=match)
 
             if guess_form.is_valid():
-                """
-                Quando o palpite é aproveitado em todos os bolões, a mesma
-                instância de palpite é adicionada no relacionamento guesses
-                de todos os bolões nos quais ele é aproveitado. Então, quando
-                essa instância for modificada, todos os bolões terão seus
-                palpites afetados. Por isso, só se deve ATUALIZAR um palpite
-                se ele for aproveitado em todos os bolões (for_all_pools). Caso
-                contrário, quando o palpite for exclusivo de um único bolão,
-                deve-se sempre criar um novo palpite e substituir o antigo pelo
-                novo na relação guesses.
-                """
-
-                guess = Guess.objects.create(
-                    match=match,
-                    guesser=self.guesser,
-                    home_goals=guess_form.cleaned_data["home_goals"],
-                    away_goals=guess_form.cleaned_data["away_goals"],
-                )
-                self.pool.add_guess_to_pools(guess, for_all_pools)
-                self.pool.delete_orphans_guesses()
-
-                guess_forms.append(guess_form)
-
-            else:
-                try:
-                    guess = self.pool.guesses.get(
-                        match=match,
-                        guesser=self.guesser,
-                    )
+                guess = existing_guesses.get(match.id)
+                if guess:
                     initial_data = {
                         f"home_goals_{match.id}": guess.home_goals,
                         f"away_goals_{match.id}": guess.away_goals,
                     }
-
-                except Guess.DoesNotExist:
+                else:
                     initial_data = None
 
                 guess_forms.append(GuessForm(initial_data, match=match))
+            else:
+                guess_forms.append(guess_form)
 
-        closed_matches_and_guesses = []
-        for match in closed_matches:
-            try:
-                guess = self.pool.guesses.get(
-                    match=match,
-                    guesser=self.guesser,
+        closed_matches_and_guesses = [
+            {"match": match, "guess": existing_guesses.get(match.id)} for match in closed_matches
+        ]
+
+        if has_validation_errors:
+            if has_new_guesses:
+                messages.warning(
+                    self.request,
+                    "Alguns palpites foram salvos, mas outros contêm erros e foram ignorados. Verifique os campos destacados abaixo. ⚠️",
+                    "temp-msg mid-time-msg",
+                )
+            else:
+                messages.error(
+                    self.request,
+                    "Nenhum palpite foi salvo. Por favor, corrija os erros nos campos destacados abaixo. ❌",
+                    "temp-msg mid-time-msg",
                 )
 
-            except Guess.DoesNotExist:
-                guess = None
+        elif has_new_guesses:
+            messages.success(
+                self.request,
+                "Palpites salvos ✅",
+                "temp-msg short-time-msg",
+            )
 
-            closed_matches_and_guesses.append({"match": match, "guess": guess})
-
-        messages.success(
-            self.request,
-            "Palpites salvos ✅",
-            "temp-msg short-time-msg",
-        )
+        if submitted_match_ids - open_match_ids:
+            messages.warning(
+                self.request,
+                "🚨 <strong>ATENÇÃO</strong> 🚨<br>Alguns palpites não foram salvos porque o tempo limite foi atingido.",
+                "temp-msg mid-time-msg",
+            )
 
         return render(
             self.request,
@@ -514,3 +571,375 @@ class GuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.
             filters &= Q(match__date_time__year=year, match__date_time__week=week)
 
         return self.pool.guesses.filter(filters).order_by("-match__date_time")
+
+
+class GroupedGuessesView(LoginRequiredMixin, GuessPoolMembershipMixin, GuessSavingMixin, generic.View):
+    def dispatch(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
+            return redirect_with_msg(
+                request,
+                "error",
+                "Esta funcionalidade não está disponível neste período ❌",
+                "short",
+                self.pool,
+            )
+
+        if self.pool.user_is_owner and not self.pool.user_is_guesser:
+            return redirect_with_msg(
+                request,
+                "error",
+                "Você não está cadastrado como palpiteiro. Acesse <strong>Gerenciar bolão</strong> e marque seu usuário como <strong>Palpiteiro</strong> para ter acesso à esta ação.",
+                "mid",
+                self.pool,
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def _get_group_by_team_id_map(self, matches) -> dict[int, CompetitionGroup]:
+        competition_ids = {m.competition_id for m in matches}
+        groups = CompetitionGroup.objects.filter(competition_id__in=competition_ids).prefetch_related("teams")
+
+        group_by_team_id_map: dict[int, CompetitionGroup] = {}
+        for group in groups:
+            for team in group.teams.all():
+                group_by_team_id_map[team.id] = group
+        return group_by_team_id_map
+
+    def _build_groups_data(
+        self,
+        open_matches: Iterable[Match],
+        closed_matches: Iterable[Match],
+        post_data: QueryDict | None = None,
+    ):
+        all_matches = list(open_matches) + list(closed_matches)
+        group_by_team_id_map = self._get_group_by_team_id_map(all_matches)
+
+        # Batch query for all user guesses for these matches
+        all_match_ids = [m.id for m in all_matches]
+        existing_guesses = {
+            g.match_id: g
+            for g in self.pool.guesses.filter(
+                guesser=self.guesser,
+                match_id__in=all_match_ids,
+            )
+        }
+
+        # Collect unique groups
+        unique_groups = set()
+        for match in all_matches:
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)
+            if group:
+                unique_groups.add(group)
+
+        # Batch query for standings of all unique groups
+        standings_batch = CompetitionGroup.get_standings_batch(list(unique_groups))
+
+        groups_dict: dict[int | None, dict[str, Any]] = {}
+
+        for match in open_matches:
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)  # type: ignore
+            group_id = group.id if group else None  # type: ignore
+
+            if group_id not in groups_dict:
+                groups_dict[group_id] = {
+                    "group": group,
+                    "open_forms": [],
+                    "closed": [],
+                    "standings": standings_batch.get(group_id, []) if group_id else [],
+                }
+
+            if post_data is not None:
+                guess_form = GuessForm(post_data, match=match)
+                if guess_form.is_valid():
+                    existing = existing_guesses.get(match.id)
+                    if existing:
+                        initial = {
+                            f"home_goals_{match.id}": existing.home_goals,
+                            f"away_goals_{match.id}": existing.away_goals,
+                        }
+                    else:
+                        initial = None
+                    guess_form = GuessForm(initial, match=match)
+            else:
+                existing = existing_guesses.get(match.id)
+                if existing:
+                    initial = {
+                        f"home_goals_{match.id}": existing.home_goals,
+                        f"away_goals_{match.id}": existing.away_goals,
+                    }
+                else:
+                    initial = None
+                guess_form = GuessForm(initial, match=match)
+
+            groups_dict[group_id]["open_forms"].append(guess_form)
+
+        for match in closed_matches:
+            group = group_by_team_id_map.get(match.home_team_id) or group_by_team_id_map.get(match.away_team_id)  # type: ignore
+            group_id = group.id if group else None  # type: ignore
+
+            if group_id not in groups_dict:
+                groups_dict[group_id] = {
+                    "group": group,
+                    "open_forms": [],
+                    "closed": [],
+                    "standings": standings_batch.get(group_id, []) if group_id else [],
+                }
+
+            guess = existing_guesses.get(match.id)
+            groups_dict[group_id]["closed"].append({"match": match, "guess": guess})
+
+        # Separate named active and inactive groups
+        active_groups = []
+        inactive_groups = []
+
+        for k, v in groups_dict.items():
+            if k is not None:
+                if v["open_forms"]:
+                    active_groups.append(v)
+                else:
+                    # Sort closed matches chronologically (oldest first) inside inactive groups
+                    v["closed"].sort(key=lambda item: item["match"].date_time)
+                    inactive_groups.append(v)
+
+        # Sort active groups: earliest open match first (ascending)
+        active_sorted = sorted(
+            active_groups,
+            key=lambda d: min(f.match.date_time for f in d["open_forms"]),
+        )
+
+        # Sort inactive groups: alphabetically (ascending)
+        inactive_sorted = sorted(
+            inactive_groups,
+            key=lambda d: d["group"].name,
+        )
+
+        named = active_sorted + inactive_sorted
+        ungrouped = [v for k, v in groups_dict.items() if k is None]
+        return named + ungrouped
+
+    def get(self, *args, **kwargs):
+        open_matches, closed_matches = self.pool.get_relevant_matches()
+
+        has_matches = bool(open_matches or closed_matches)
+        if not has_matches:
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Não existem partidas para exibir neste momento ❌",
+                "short",
+                self.pool,
+            )
+
+        groups_data = self._build_groups_data(open_matches, closed_matches)
+
+        return render(
+            self.request,
+            "core/guesses_by_group.html",
+            {
+                "pool": self.pool,
+                "groups_data": groups_data,
+            },
+        )
+
+    def post(self, *args, **kwargs):
+        guesses_data = dict(**self.request.POST)
+        guesses_data.pop("csrfmiddlewaretoken", None)
+        logger.info(f"{timezone.now()}: user {self.request.user} submitted following guesses: {guesses_data}")
+
+        for_all_pools = True  # Grouped guesses are always applied to all pools they belong to
+
+        open_matches, closed_matches = self.pool.get_relevant_matches()
+
+        # Parse submitted guesses for logging
+        guesses_submitted = extract_and_parse_guesses_for_log(self.request.POST)
+
+        open_match_ids = {m.id for m in open_matches}
+        results = {"success": [], "validation_errors": {}, "match_closed": []}
+
+        if not open_matches:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_grouped_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error="Não existem partidas abertas neste momento",
+                request=self.request,
+            )
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Não existem partidas abertas neste momento ❌",
+                "short",
+                self.pool,
+            )
+
+        submitted_match_ids = {int(key.split("_")[-1]) for key in self.request.POST if key.startswith("home_goals_")}
+
+        has_new_guesses = False
+        has_validation_errors = False
+        error_occurred = None
+
+        try:
+            has_new_guesses, has_validation_errors = self.save_guesses(
+                open_matches, self.request.POST, for_all_pools, results
+            )
+
+            # Identify if any submitted match was closed
+            for m_id in submitted_match_ids:
+                if m_id not in open_match_ids:
+                    results["match_closed"].append(m_id)
+
+        except Exception as e:
+            error_occurred = e
+            raise e
+
+        finally:
+            log_guess_submission(
+                user=self.request.user,
+                guesser=self.guesser,
+                pool=self.pool,
+                for_all_pools=for_all_pools,
+                action="submit_grouped_guesses",
+                guesses_submitted=guesses_submitted,
+                results=results,
+                error=error_occurred,
+                request=self.request,
+            )
+
+        groups_data = self._build_groups_data(open_matches, closed_matches, post_data=self.request.POST)
+
+        if has_validation_errors:
+            if has_new_guesses:
+                messages.warning(
+                    self.request,
+                    "Alguns palpites foram salvos, mas outros contêm erros e foram ignorados. Verifique os campos destacados abaixo. ⚠️",
+                    "temp-msg mid-time-msg",
+                )
+            else:
+                messages.error(
+                    self.request,
+                    "Nenhum palpite foi salvo. Por favor, corrija os erros nos campos destacados abaixo. ❌",
+                    "temp-msg mid-time-msg",
+                )
+
+        elif has_new_guesses:
+            messages.success(
+                self.request,
+                "Palpites salvos ✅",
+                "temp-msg short-time-msg",
+            )
+
+        if submitted_match_ids - open_match_ids:
+            messages.warning(
+                self.request,
+                "🚨 <strong>ATENÇÃO</strong> 🚨<br>Alguns palpites não foram salvos porque o tempo limite foi atingido.",
+                "temp-msg mid-time-msg",
+            )
+
+        return render(
+            self.request,
+            "core/guesses_by_group.html",
+            {
+                "pool": self.pool,
+                "groups_data": groups_data,
+            },
+        )
+
+
+class WorldCupGuessesByPeriodView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.View):
+    template_name = "core/world_cup_guesses_by_period.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
+            return redirect_with_msg(
+                request,
+                "error",
+                "Esta funcionalidade não está disponível fora do período da Copa do Mundo ❌",
+                "short",
+                self.pool,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        default = {"periodo": "geral", "palpiteiro": self.guesser.id}
+        form = WorldCupGuessesPeriodForm(request.GET or default, pool=self.pool)
+        form.is_valid()
+        start_date, end_date = form.get_period_dates()
+        guesser = form.get_guesser()
+        guesses = self.get_queryset(guesser, start_date, end_date)
+        total_score = guesses.aggregate(total=Sum("score"))["total"] or 0
+        return render(
+            request,
+            self.template_name,
+            {
+                "pool": self.pool,
+                "form": form,
+                "guesses": guesses,
+                "total_score": total_score,
+            },
+        )
+
+    def get_queryset(self, guesser, start_date, end_date):
+        filters = Q(guesser=guesser) & Q(match__date_time__lt=timezone.localtime())
+        if start_date and end_date:
+            filters &= Q(
+                match__date_time__date__gte=start_date,
+                match__date_time__date__lte=end_date,
+            )
+        return self.pool.guesses.filter(filters).select_related(
+            "match",
+            "match__home_team",
+            "match__away_team",
+        ).order_by("-match__date_time")
+
+
+class WorldCupRankingView(LoginRequiredMixin, GuessPoolMembershipMixin, generic.TemplateView):
+    template_name = "core/world_cup_ranking.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        today = timezone.localdate()
+        if not (WORLD_CUP_START_DATE <= today <= WORLD_CUP_END_DATE):
+            return redirect_with_msg(
+                request,
+                "error",
+                "Esta funcionalidade não está disponível fora do período da Copa do Mundo ❌",
+                "short",
+                self.pool,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if context.get("no_guessers"):
+            return redirect_with_msg(
+                self.request,
+                "error",
+                "Nenhum palpiteiro cadastrado no bolão 😕",
+                "short",
+                self.pool,
+            )
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        default_period = {"periodo": "geral"}
+        form_data = self.request.GET if self.request.GET else default_period
+        form = WorldCupRankingPeriodForm(form_data)
+        form.is_valid()
+
+        start_date, end_date = form.get_period_dates()
+        ranking_entries = self.pool.get_ranking_for_world_cup_period(start_date, end_date)
+
+        context["period_form"] = form
+        context["ranking_entries"] = ranking_entries
+
+        if not self.pool.guessers.exists():
+            context["no_guessers"] = True
+
+        return context

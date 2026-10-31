@@ -4,14 +4,26 @@
 
 {% block content %}
 
-<nav class="menu vertical">
-  {% if pool.user_is_guesser%}<a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>{% endif %}
-  <a href="{% url 'core:ranking' pool.slug %}">Classificação</a>
-  <a href="{% url 'core:guesses_by_period' pool.slug %}">Palpites por período</a>
-  {% if pool.user_is_owner%}<a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>{% endif %}
-</nav>
-
-<button class="exit-btn" onclick="showPoolLeavingConfirmation()">Sair do bolão ❌</button>
+<div class="menu-container">
+  <div class="pools-grid">
+    {% if pool.user_is_guesser%}<div></div><a href="{% url 'core:guesses' pool.slug %}">Palpitar</a>
+    <div></div>{% endif %}
+    <div></div><a href="{% url 'core:ranking' pool.slug %}">Classificação</a>
+    <div></div>
+    <div></div><a href="{% url 'core:guesses_by_period' pool.slug %}">Todos os
+      palpites</a>
+    <div></div>
+    {% if show_grouped_guesses %}<div></div><a
+      href="{% url 'core:world_cup_ranking' pool.slug %}">Classificação<br>(Copa do Mundo)</a>
+    <div></div>{% endif %}
+    {% if show_grouped_guesses %}<div></div><a href="{% url 'core:world_cup_guesses_by_period' pool.slug %}">Todos
+      os palpites<br>(Copa do Mundo)</a>
+    <div></div>{% endif %}
+    {% if pool.user_is_owner %}<div></div><a href="{% url 'core:pool_management' pool.slug %}">Gerenciar bolão</a>
+    <div></div>{% endif %}
+  </div>
+  <button class="exit-btn" onclick="showPoolLeavingConfirmation()">Sair do bolão ❌</button>
+</div>
 
 <div class="exit-confirmation">
   <p>
@@ -20,7 +32,8 @@
   </p>
   <div>
     <button class="confirmation-btn stay-opt-btn" onclick="hidePoolLeavingConfirmation()">Ficar</button>
-    <a href={% url 'core:signout_pool' pool.slug pool.uuid %}><button class="confirmation-btn exit-opt-btn">Sair</button></a>
+    <a href={% url 'core:signout_pool' pool.slug pool.uuid %}><button
+        class="confirmation-btn exit-opt-btn">Sair</button></a>
   </div>
 </div>
 

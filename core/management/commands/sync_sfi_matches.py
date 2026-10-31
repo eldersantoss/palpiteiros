@@ -1,4 +1,4 @@
-"""Management command: sync_matches_sfi.
+"""Management command: sync_sfi_matches.
 
 Fetches matches from the Soccer Football Info (SFI) API for a configurable
 date range and upserts them into the database.
@@ -64,7 +64,9 @@ class Command(BaseCommand):
         # Load competitions first so we can exit early if none are registered,
         # avoiding unnecessary date computation and API calls.
         competitions_by_sfi_id = {
-            comp.sfi_id: comp for comp in Competition.objects.filter(sfi_id__isnull=False) if comp.sfi_id is not None
+            comp.sfi_id: comp
+            for comp in Competition.objects.filter(sfi_id__isnull=False, in_progress=True)
+            if comp.sfi_id is not None
         }
 
         if not competitions_by_sfi_id:
@@ -74,14 +76,23 @@ class Command(BaseCommand):
         today = django_timezone.now().date()
         dates = self._build_date_list(options, today)
 
-        self.stdout.write(f"sync_matches_sfi: processing {len(dates)} date(s): {dates[0]} → {dates[-1]}")
+        self.stdout.write(f"sync_sfi_matches: processing {len(dates)} date(s): {dates[0]} → {dates[-1]}")
 
         service = SFIService(api_key=settings.SFI_API_KEY, api_host=settings.SFI_API_HOST)
 
+        updated_comp_ids = set()
         for target_date in dates:
-            self._process_date(service, target_date, competitions_by_sfi_id, today)
+            updated_comp_ids.update(self._process_date(service, target_date, competitions_by_sfi_id, today))
 
-        self.stdout.write("sync_matches_sfi finished.")
+        if updated_comp_ids:
+            self.stdout.write(f"Recalculating standings for updated competitions: {updated_comp_ids}")
+            from core.models import CompetitionGroup
+
+            for group in CompetitionGroup.objects.filter(competition_id__in=updated_comp_ids):
+                self.stdout.write(f"  Recalculating standings for group {group}...")
+                group.recalculate_standings()
+
+        self.stdout.write("sync_sfi_matches finished.")
 
     def _build_date_list(self, options: dict, today: date) -> list[date]:
         """Return the ordered list of dates to process based on CLI options.
@@ -95,7 +106,7 @@ class Command(BaseCommand):
             return [single]
 
         start = options.get("start_date") or (today - timedelta(days=1))
-        end = options.get("end_date") or (today + timedelta(days=1))
+        end = options.get("end_date") or (today + timedelta(days=2))
 
         return [start + timedelta(days=i) for i in range((end - start).days + 1)]
 
@@ -105,16 +116,18 @@ class Command(BaseCommand):
         target_date: date,
         competitions_by_sfi_id: dict[str, Competition],
         today: date,
-    ) -> None:
+    ) -> set[int]:
         """Fetch and process all SFI matches for a single calendar day."""
         self.stdout.write(f"  Fetching matches for {target_date}...")
+
+        updated_competition_ids = set()
 
         try:
             matches = self._fetch_all_matches_for_date(service, target_date, today)
         except Exception:
             logger.exception("Failed to fetch SFI matches for %s.", target_date)
             self.stderr.write(f"  ERROR: could not fetch matches for {target_date}, skipping.")
-            return
+            return updated_competition_ids
 
         created, updated, skipped, teams_created = 0, 0, 0, 0
 
@@ -124,8 +137,14 @@ class Command(BaseCommand):
 
             if outcome == ProcessMatchResult.created:
                 created += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_competition_ids.add(comp.id)
             elif outcome == ProcessMatchResult.updated:
                 updated += 1
+                comp = competitions_by_sfi_id.get(match["championship"]["id"])
+                if comp:
+                    updated_competition_ids.add(comp.id)
             else:
                 skipped += 1
 
@@ -133,6 +152,7 @@ class Command(BaseCommand):
             f"  {target_date}: {created} created, {updated} updated, {skipped} skipped, "
             f"{teams_created} teams registered."
         )
+        return updated_competition_ids
 
     def _fetch_all_matches_for_date(self, service: SFIService, target_date: date, today: date) -> list[SFIMatch]:
         """Return every SFI match for *target_date*, handling pagination transparently.
@@ -255,16 +275,27 @@ class Command(BaseCommand):
         """Create or update a NOT_STARTED match without touching goal fields."""
         date_time = self._parse_match_datetime(match["date"])
 
-        _, created = Match.objects.update_or_create(
-            sfi_id=match["id"],
-            defaults={
-                "competition": competition,
-                "home_team": home_team,
-                "away_team": away_team,
-                "date_time": date_time,
-                "status": Match.NOT_STARTED,
-            },
-        )
+        try:
+            _, created = Match.objects.update_or_create(
+                sfi_id=match["id"],
+                defaults={
+                    "competition": competition,
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "date_time": date_time,
+                    "status": Match.NOT_STARTED,
+                },
+            )
+        except Exception as exc:
+            logger.exception(
+                "Error upserting NOT_STARTED match %s (%s vs %s at %s): %s",
+                match.get("id"),
+                match.get("teamA")["name"],
+                match.get("teamB")["name"],
+                match.get("date"),
+                exc,
+            )
+            return ProcessMatchResult.skipped
 
         return ProcessMatchResult.created if created else ProcessMatchResult.updated
 
@@ -284,10 +315,26 @@ class Command(BaseCommand):
 
         home_goals = match["teamA"]["score"]["2h"]
         away_goals = match["teamB"]["score"]["2h"]
+        date_time = self._parse_match_datetime(match["date"])
+
+        home_fouls = match["teamA"]["stats"]["fouls"]
+        away_fouls = match["teamB"]["stats"]["fouls"]
+        _hyc, _ayc = home_fouls["y_c"], away_fouls["y_c"]
+        _hrc, _arc = home_fouls["r_c"], away_fouls["r_c"]
+        home_yellow_cards = int(_hyc) if _hyc is not None else None
+        away_yellow_cards = int(_ayc) if _ayc is not None else None
+        home_red_cards = int(_hrc) if _hrc is not None else None
+        away_red_cards = int(_arc) if _arc is not None else None
+
         has_changes = (
             match_instance.status != Match.FINSHED
             or match_instance.home_goals != home_goals
             or match_instance.away_goals != away_goals
+            or match_instance.date_time != date_time
+            or match_instance.home_yellow_cards != home_yellow_cards
+            or match_instance.away_yellow_cards != away_yellow_cards
+            or match_instance.home_red_cards != home_red_cards
+            or match_instance.away_red_cards != away_red_cards
         )
         needs_consolidation = match_instance.guesses.filter(consolidated=False).exists()
 
@@ -295,7 +342,23 @@ class Command(BaseCommand):
             match_instance.status = Match.FINSHED  # "FT"
             match_instance.home_goals = home_goals
             match_instance.away_goals = away_goals
-            match_instance.save(update_fields=["status", "home_goals", "away_goals"])
+            match_instance.date_time = date_time
+            match_instance.home_yellow_cards = home_yellow_cards
+            match_instance.away_yellow_cards = away_yellow_cards
+            match_instance.home_red_cards = home_red_cards
+            match_instance.away_red_cards = away_red_cards
+            match_instance.save(
+                update_fields=[
+                    "status",
+                    "home_goals",
+                    "away_goals",
+                    "date_time",
+                    "home_yellow_cards",
+                    "away_yellow_cards",
+                    "home_red_cards",
+                    "away_red_cards",
+                ]
+            )
 
         return ProcessMatchResult.updated
 

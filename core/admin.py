@@ -13,11 +13,29 @@ class TeamAdmin(admin.ModelAdmin):
     search_fields = ("name", "code")
 
 
+class CompetitionGroupInline(admin.TabularInline):
+    model = models.CompetitionGroup
+    extra = 0
+    filter_horizontal = ["teams"]
+
+
+@admin.action(description="Desativar competições selecionadas")
+def deactivate_competitions(modeladmin, request, queryset):
+    queryset.update(in_progress=False)
+
+
+@admin.action(description="Ativar competições selecionadas")
+def activate_competitions(modeladmin, request, queryset):
+    queryset.update(in_progress=True)
+
+
 @admin.register(models.Competition)
 class CompetitionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "in_progress", "created", "modified")
     search_fields = ("name", "season")
     filter_horizontal = ["teams"]
+    inlines = [CompetitionGroupInline]
+    actions = [deactivate_competitions, activate_competitions]
 
 
 @admin.register(models.Guesser)
@@ -37,9 +55,12 @@ class MatchAdmin(admin.ModelAdmin):
         "competition",
         "date_time",
         "status",
-        "open_to_guesses",
         "home_goals",
         "away_goals",
+        "home_yellow_cards",
+        "away_yellow_cards",
+        "home_red_cards",
+        "away_red_cards",
     )
     list_filter = ["competition", "status"]
 

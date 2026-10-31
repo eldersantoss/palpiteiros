@@ -49,7 +49,7 @@ class Team(models.Model):
 
 
 class Competition(TimeStampedModel):
-    data_source_id = models.PositiveIntegerField(unique=True)
+    data_source_id = models.PositiveIntegerField(unique=True, blank=True, null=True)
     sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     name = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, related_name="competitions")
@@ -101,6 +101,180 @@ class Competition(TimeStampedModel):
         return None
 
 
+class CompetitionGroup(models.Model):
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.CASCADE,
+        related_name="groups",
+    )
+    name = models.CharField("Nome do grupo", max_length=50)
+    teams = models.ManyToManyField(
+        Team,
+        related_name="competition_groups",
+        verbose_name="Equipes",
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = "grupo"
+        verbose_name_plural = "grupos"
+        unique_together = [["competition", "name"]]
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"{self.competition} – {self.name}"
+
+    def get_standings(self):
+        standings = list(self.standings.select_related("team"))
+        if not standings and self.teams.exists():
+            self.recalculate_standings()
+            standings = list(self.standings.select_related("team"))
+
+        return [
+            {
+                "team": s.team,
+                "pts": s.pts,
+                "pj": s.pj,
+                "gf": s.gf,
+                "ga": s.ga,
+                "yc": s.yc,
+                "rc": s.rc,
+            }
+            for s in standings
+        ]
+
+    def recalculate_standings(self):
+        teams = list(self.teams.all())
+        if not teams:
+            self.standings.all().delete()
+            return
+
+        finished_matches = (
+            Match.objects.filter(
+                competition=self.competition,
+                status__in=Match.FINISHED_STATUS,
+            )
+            .filter(Q(home_team__in=teams) | Q(away_team__in=teams))
+            .select_related("home_team", "away_team")
+        )
+
+        standings_dict = {
+            team.id: {
+                "pts": 0,
+                "pj": 0,
+                "gf": 0,
+                "ga": 0,
+                "gd": 0,
+                "yc": 0,
+                "rc": 0,
+            }
+            for team in teams
+        }
+
+        for match in finished_matches:
+            hg = match.home_goals or 0
+            ag = match.away_goals or 0
+            home_team_id, away_team_id = match.home_team_id, match.away_team_id
+
+            if home_team_id in standings_dict:
+                standings_dict[home_team_id]["pj"] += 1
+                standings_dict[home_team_id]["gf"] += hg
+                standings_dict[home_team_id]["ga"] += ag
+                standings_dict[home_team_id]["yc"] += match.home_yellow_cards or 0
+                standings_dict[home_team_id]["rc"] += match.home_red_cards or 0
+                if hg > ag:
+                    standings_dict[home_team_id]["pts"] += 3
+                elif hg == ag:
+                    standings_dict[home_team_id]["pts"] += 1
+
+            if away_team_id in standings_dict:
+                standings_dict[away_team_id]["pj"] += 1
+                standings_dict[away_team_id]["gf"] += ag
+                standings_dict[away_team_id]["ga"] += hg
+                standings_dict[away_team_id]["yc"] += match.away_yellow_cards or 0
+                standings_dict[away_team_id]["rc"] += match.away_red_cards or 0
+                if ag > hg:
+                    standings_dict[away_team_id]["pts"] += 3
+                elif ag == hg:
+                    standings_dict[away_team_id]["pts"] += 1
+
+        with transaction.atomic():
+            # Delete entries for teams no longer in the group
+            team_ids = [t.id for t in teams]
+            self.standings.exclude(team_id__in=team_ids).delete()
+
+            for team in teams:
+                stats = standings_dict[team.id]
+                stats["gd"] = stats["gf"] - stats["ga"]
+
+                GroupStanding.objects.update_or_create(
+                    group=self,
+                    team=team,
+                    defaults=stats,
+                )
+
+    @classmethod
+    def get_standings_batch(cls, groups):
+        """Calcula/retorna standings para uma lista de grupos a partir de GroupStanding,
+        garantindo retrocompatibilidade."""
+        if not groups:
+            return {}
+
+        group_ids = [g.id for g in groups]
+
+        # Batch check: identify which groups already have standing records in DB
+        groups_with_standings = set(
+            GroupStanding.objects.filter(group_id__in=group_ids)
+            .values_list("group_id", flat=True)
+            .distinct()
+        )
+
+        # Fallback: Se algum grupo com times não possuir nenhum registro de standings no banco, recalculamos.
+        for group in groups:
+            # Check prefetched teams if available to avoid DB query via exists()
+            has_teams = bool(group.teams.all())
+            if has_teams and group.id not in groups_with_standings:
+                group.recalculate_standings()
+
+        standings_qs = GroupStanding.objects.filter(group_id__in=group_ids).select_related("team")
+
+        results = {g.id: [] for g in groups}
+        for s in standings_qs:
+            results[s.group_id].append(
+                {
+                    "team": s.team,
+                    "pts": s.pts,
+                    "pj": s.pj,
+                    "gf": s.gf,
+                    "ga": s.ga,
+                    "yc": s.yc,
+                    "rc": s.rc,
+                }
+            )
+        return results
+
+
+class GroupStanding(models.Model):
+    group = models.ForeignKey(CompetitionGroup, on_delete=models.CASCADE, related_name="standings")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="group_standings")
+    pts = models.PositiveIntegerField("PTS", default=0)
+    pj = models.PositiveIntegerField("PJ", default=0)
+    gf = models.PositiveIntegerField("GF", default=0)
+    ga = models.PositiveIntegerField("GA", default=0)
+    gd = models.IntegerField("GD", default=0)
+    yc = models.PositiveIntegerField("YC", default=0)
+    rc = models.PositiveIntegerField("RC", default=0)
+
+    class Meta:
+        verbose_name = "classificação de grupo"
+        verbose_name_plural = "classificações de grupo"
+        unique_together = [["group", "team"]]
+        ordering = ["-pts", "-gd", "-gf", "yc", "rc", "team_id"]
+
+    def __str__(self) -> str:
+        return f"{self.group} - {self.team.name}: {self.pts} PTS"
+
+
 class Match(models.Model):
     NOT_STARTED = "NS"
     FIRST_HALF = "1H"
@@ -126,10 +300,6 @@ class Match(models.Model):
         (FINSHED_AFTER_PENALTYS, "Encerrada após penalidades"),
     )
 
-    MINUTES_BEFORE_START_MATCH = 5
-
-    HOURS_BEFORE_OPEN_TO_GUESSES = 48
-
     data_source_id = models.PositiveIntegerField(blank=True, null=True)
     sfi_id = models.CharField("Soccer Football Info ID", max_length=50, blank=True, null=True, unique=True)
     competition = models.ForeignKey(
@@ -152,6 +322,10 @@ class Match(models.Model):
     date_time = models.DateTimeField("Data e hora")
     home_goals = models.PositiveIntegerField(blank=True, null=True)
     away_goals = models.PositiveIntegerField(blank=True, null=True)
+    home_yellow_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    away_yellow_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    home_red_cards = models.PositiveSmallIntegerField(blank=True, null=True)
+    away_red_cards = models.PositiveSmallIntegerField(blank=True, null=True)
     double_score = models.BooleanField(default=False)
 
     class Meta:
@@ -208,15 +382,6 @@ class Match(models.Model):
             f"{self.home_goals} x {self.away_goals}"
             if self.home_goals is not None and self.away_goals is not None
             else None
-        )
-
-    @admin.display(
-        boolean=True,
-        description="Aberta para palpites?",
-    )
-    def open_to_guesses(self):
-        return (self.date_time > timezone.now() + timezone.timedelta(minutes=self.MINUTES_BEFORE_START_MATCH)) and (
-            self.date_time <= timezone.now() + timezone.timedelta(hours=self.HOURS_BEFORE_OPEN_TO_GUESSES)
         )
 
     def get_pools(self):
@@ -319,11 +484,6 @@ class Guess(models.Model):
             f"{self.match.home_team.name} {self.home_goals}" + " x " + f"{self.away_goals} {self.match.away_team.name}"
         )
 
-    def get_score(self) -> int:
-        if not self.consolidated:
-            self.evaluate_and_consolidate()
-        return self.score
-
     def evaluate_and_consolidate(self):
         if self.match.result_str is not None:
             previous_score = self.score
@@ -362,6 +522,25 @@ class Guess(models.Model):
                 if not created:
                     entry.score = models.F("score") + score
                     entry.save(update_fields=["score"])
+
+        from core.constants import WORLD_CUP_PERIOD_DATE_RANGES
+
+        match_date_only = match_date.date()
+        for from_date, to_date in WORLD_CUP_PERIOD_DATE_RANGES.values():
+            if not from_date <= match_date_only <= to_date:
+                continue
+
+            for pool in self.pools.all():
+                wc_entry, created = WorldCupRankingEntry.objects.get_or_create(
+                    pool=pool,
+                    guesser=self.guesser,
+                    start_date=from_date,
+                    end_date=to_date,
+                    defaults={"score": score},
+                )
+                if not created:
+                    wc_entry.score = models.F("score") + score
+                    wc_entry.save(update_fields=["score"])
 
     @property
     def result_str(self) -> str:
@@ -467,6 +646,10 @@ class GuessPool(TimeStampedModel):
         "A partir de quantas horas antes do início de uma partida os palpites serão permitidos?",
         default=48,
     )
+    hours_to_keep_closed_matches_in_ranking = models.PositiveSmallIntegerField(
+        "Quantas horas manter partidas fechadas no ranking?",
+        default=36,
+    )
 
     class Meta:
         verbose_name = "bolão"
@@ -521,16 +704,32 @@ class GuessPool(TimeStampedModel):
         )
 
     def get_closed_recent_matches(self):
-        """Returns last closed matches for predictions"""
+        """Returns last closed for guesses matches that are still relevant for ranking"""
 
         return (
             self.get_matches()
             .filter(
-                date_time__gte=timezone.now() - timezone.timedelta(hours=36),
+                date_time__gte=timezone.now() - timezone.timedelta(hours=self.hours_to_keep_closed_matches_in_ranking),
                 date_time__lt=timezone.now() + timezone.timedelta(minutes=self.minutes_before_start_match),
             )
             .order_by("-date_time")
         )
+
+    def get_relevant_matches(self):
+        now = timezone.now()
+        cutoff = now + timezone.timedelta(minutes=self.minutes_before_start_match)
+        lower_bound = now - timezone.timedelta(hours=self.hours_to_keep_closed_matches_in_ranking)
+        upper_bound = now + timezone.timedelta(hours=self.hours_before_open_to_guesses)
+
+        all_matches = list(
+            self.get_matches().filter(date_time__gte=lower_bound, date_time__lte=upper_bound).order_by("date_time")
+        )
+
+        open_matches = [m for m in all_matches if m.date_time > cutoff]
+        closed_matches = [m for m in all_matches if m.date_time < cutoff]
+        closed_matches.reverse()
+
+        return open_matches, closed_matches
 
     @classmethod
     def toggle_flag_value(
@@ -697,6 +896,27 @@ class GuessPool(TimeStampedModel):
     def number_of_matches(self):
         return self.get_matches().count()
 
+    def get_ranking_for_world_cup_period(self, start_date: date, end_date: date):
+        """Retorna classificação para um período da Copa usando WorldCupRankingEntry."""
+        ranking_filter = Q(
+            world_cup_ranking_entries__pool=self,
+            world_cup_ranking_entries__start_date=start_date,
+            world_cup_ranking_entries__end_date=end_date,
+        )
+
+        return (
+            self.guessers.all()
+            .select_related("user")
+            .annotate(
+                score=Coalesce(
+                    Sum("world_cup_ranking_entries__score", filter=ranking_filter),
+                    0,
+                    output_field=models.IntegerField(),
+                )
+            )
+            .order_by("-score", "user__first_name")
+        )
+
     def get_ranking_for_period(self, year: int, month: int, week: int):
         """
         Retorna a classificação completa para um período, usando uma única query.
@@ -742,3 +962,20 @@ class RankingEntry(TimeStampedModel):
 
     def __str__(self):
         return f"Classificação {self.guesser} | bolão {self.pool} | ano {self.year}) | mês {self.month or '-'} | semana {self.week or '-'}"
+
+
+class WorldCupRankingEntry(TimeStampedModel):
+    pool = models.ForeignKey(GuessPool, on_delete=models.CASCADE, related_name="world_cup_ranking_entries")
+    guesser = models.ForeignKey(Guesser, on_delete=models.CASCADE, related_name="world_cup_ranking_entries")
+    start_date = models.DateField("Início do período")
+    end_date = models.DateField("Fim do período")
+    score = models.IntegerField("Pontuação", default=0)
+
+    class Meta:
+        verbose_name = "Registro de Classificação Copa"
+        verbose_name_plural = "Registros de Classificação Copa"
+        unique_together = [["pool", "guesser", "start_date", "end_date"]]
+        ordering = ["-score"]
+
+    def __str__(self):
+        return f"Copa {self.guesser} | bolão {self.pool} | {self.start_date}–{self.end_date}"

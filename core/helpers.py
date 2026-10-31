@@ -37,3 +37,17 @@ def redirect_with_msg(
 
 def get_current_year() -> int:
     return timezone.localdate().year
+
+
+def extract_and_parse_guesses_for_log(post_data):
+    guesses_submitted = {}
+    for key in post_data:
+        if key.startswith("home_goals_"):
+            m_id = key.split("_")[-1]
+            away_key = f"away_goals_{m_id}"
+            guesses_submitted[m_id] = {
+                "home_goals": post_data.get(key),
+                "away_goals": post_data.get(away_key),
+            }
+
+    return guesses_submitted

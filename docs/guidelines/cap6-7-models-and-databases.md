@@ -1718,8 +1718,6 @@ Q(description__icontains=name)
 
 )
 
-breakpoint()
-
 return qs
 
 7.4 Lean on Advanced Query Tools
